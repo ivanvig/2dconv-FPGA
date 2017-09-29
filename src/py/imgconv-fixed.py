@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 from imgconv import *
 from tool import _fixedInt
 
-# img_path = "../img/monarch_in_may.jpg"
-img_path = "../img/da_bossGS.jpg"
-# img_path = "../img/Lenna.png"
+# img_path = "../../img/monarch_in_may.jpg"
+img_path = "../../img/da_bossGS.jpg"
+# img_path = "../..2dconv-/img/Lenna.png"
 input_img = img.imread(img_path)
 
 kernel = np.array(
