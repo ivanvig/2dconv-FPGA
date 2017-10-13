@@ -27,18 +27,23 @@
 ** Modulo de control
 **** I/O
      *Input*
-     - _InputN_: 3 puertos de $BITS_IMAGEN bits que leen las filas de la imagen cargada en memoria, o las filas del kernel, dependiendo de los valores que tome el puerto *K/I*
-     - _K/I_: Puerto de un bit que determina si los valores leidos en *InputN* se deben cargar en el kernel o en el registro de la imagen. Cualquier modificacion dependera del estado leido en *valid*.
-       + Si se escribe un 1 en el puerto, el kernel sera modificado
-       + Si se escribe un 0 en el puerto, la imagen sera modificada
-       Durante un uso normal (fuera de la etapa de configuracion), deberia haber un 0 en el puerto
-     - _Valid_: Habilita la modificacion de los registros si hay un estado alto en el puerto
-       + Si se escribe un 1, los registros son modificados con cada flanco de clock.
-       + Si se escribe un 0, los registros permanecen intactos.
-     - _Reset_
+     - _GPIO_CTRL_In_: Puerto de 8 bits que recibe las instrucciones de control.
+     - _GPIO_Data_In_: Puerto de 24 bits que recibe los datos desde el exterior
+     - _Rst_
      - _Clk_
+     - _EoP_: Indica que se ha finalizado la etapa de procesamiento, se debe salir del estado de *RUN*
+     - _Data_In_: Puerto de 3*[8] bits que recibe los datos almacenados en memoria
      *OutPut*
-     - _Out_: Salida de $BITS_IMAGEN que representa el resultado de las operaciones
+     - _GPIO_Out_: Puerto de 32 bits utilizado para enviar informacion al exterior
+     - _Estado_: Puerto de 3 bits que indica en que estado se esta
+     - _SoP_: Indica que se ha pasado al estado de *RUN* y se debe comenzar el procesamiento de la informacion
+     - _EoP_: Indica que se ha pasado al estado de *OUT*
+     - _Valid_: Se pone en estado alto durante un ciclo cuando detecta un flanco de subida del *bit Valid* de la instruccion de control presente en *GPIO_CTRL_In*
+     - _C_Valid_: Se pone en estado alto durante un ciclo cuando detecta un flanco de subida del *bit Valid* de la instruccion de control presente en *GPIO_CTRL_In* /unicamente durante la etapa de configuracion del kernel en la estapa de LOAD/
+     - _Length_: Puerto de [10] bits que tiene a su salida la altura de la imagen con la que se esta trabajando
+     - _Data_Out_: Puerto de [24] bits que reflejan los datos recibidos desde *GPIO_Data_In* durante la etapa de carga de imagen en el estado de *LOAD*
+     - _Kernel_: Puerto de [24] bits que representan una fila del kernel (filtro) que se desea cargar, la configuracion del kernel debe ser habilitada mediante el puerto *K/I* y sincronizada utilizando el puerto *C_Valid*
+     - _K/I_: Indica si los datos entregados desde la memoria deben ser cargados a los registros del Kernel o el sector de la imagen.
    
 ** FSM
 **** I/O
@@ -75,11 +80,29 @@
    Es el modulo encargado de la administracion de los bloques de memoria, hace de interfaz entre las memorias y el resto de los bloques. Se encarga del routeo de la informacion
 **** I/O
      *Input*
-     - _i_DataConvN_: Puerto de [8] bits donde se escribe la salida del N-simo modulo *CONV*
-     - _Data_In_: Puerto de [8] bits donde se escriben los valores de la imagen en la etapa de *LOAD*
+     _ _CLK_
+     - _Rst_
+     - _i_DataConvN_: Puerto de [8] bits donde se escribe la salida del N-esimo modulo *CONV*
+     - _Data_In_: Puerto de 3*[8] bits donde se escriben los valores de la imagen en la etapa de *LOAD*
      - _Ch_Block_: Utilizado durante los estados de *LOAD* y *OUT*, indica que se ha terminado de leer un bloque y se debe pasar al siguiente
+       + Un estado alto indica el paso al siguiente bloque
      - _SoP_: Start of process, indica que se ha entrado al estado de *RUN*, se entregan los datos apuntados por *R_Addr* en los puertos *O_DataConvNM* y se escriben los datos presentes en los puertos *I_DataConvN* en las direcciones indicadas por *W_Addr*
-     - _O_DataConvNM_: 
+       + Un estado alto indica el paso al estado *RUN*
+     - _R_Addr_: [10]bits. Indica la direccion del dato a leer, si se esta en el estado de *RUN*, los datos leidos seran entregados por los puertos *O_DataConvNM*, caso contrario seran entregados al puerto *Data_Out*
+     - _W_Addr_: [10]bits. Indica la direccion de memoria donde escribir los datos, si se esta en el estado de *RUN*, los datos escritos seran los que se encuentran en el puerto *i_DataConvN*, caso contrario seran los del puerto *Data_In*
+     - _EoP_: Indica que se ha finalizado la etapa de procesamiento, es decir se sale del estado de *RUN* y se pasa al estado *OUT*, donde el *MCU* esta listo para entregar los datos de memoria a travez del puerto *Data_Out*
+       + Un 1 indica que se esta en el estado *OUT*
+       + Un 0 indica que se esta en cualquier otro estado
+       
+         *SoP* y *EoP* nunca deberian estar en 1 al mismo tiempo
+     - _MemData_InN_: Puerto de [8] bits que recibe los datos de la N-esima memoria que se encuentran en la direccion indicada por *R_Addr*
+     
+     *Output*
+     - _O_DataConvNM_: Puerto de [8] bits que tiene en su salida el dato que para el *InputM* del N-esimo modulo *CONV*
+     - _WEN_: Write Enable para la N-esima memoria
+     - _R_AddrN_: Puerto de [10] bits que indica la direccion de la N-esima memoria que se quiere leer
+     - _W_AddrN_: Puerto de [10] bits que indica la direccion de la N-esima memoria donde se quiere escribir el dato que se encuentra en *MemData_Out* si *WE* lo permite
+     - _Data_Out_: Puerto de 3*[8] bits donde se tiene el valor ubicado en la direccion indicada por *R_Addr* de 3 memorias
 ** Algoritmo
    El algoritmo para n convolucionadores necesita n + 2 memorias. Se tienen n estados, y cada estado es equivalente a hacer n desplazamientos ciruculares del anterior.
 
