@@ -25,10 +25,61 @@
      - _Out_: Salida de $BITS_IMAGEN que representa el resultado de las operaciones
     
 ** Modulo de control
+**** I/O
+     *Input*
+     - _InputN_: 3 puertos de $BITS_IMAGEN bits que leen las filas de la imagen cargada en memoria, o las filas del kernel, dependiendo de los valores que tome el puerto *K/I*
+     - _K/I_: Puerto de un bit que determina si los valores leidos en *InputN* se deben cargar en el kernel o en el registro de la imagen. Cualquier modificacion dependera del estado leido en *valid*.
+       + Si se escribe un 1 en el puerto, el kernel sera modificado
+       + Si se escribe un 0 en el puerto, la imagen sera modificada
+       Durante un uso normal (fuera de la etapa de configuracion), deberia haber un 0 en el puerto
+     - _Valid_: Habilita la modificacion de los registros si hay un estado alto en el puerto
+       + Si se escribe un 1, los registros son modificados con cada flanco de clock.
+       + Si se escribe un 0, los registros permanecen intactos.
+     - _Reset_
+     - _Clk_
+     *OutPut*
+     - _Out_: Salida de $BITS_IMAGEN que representa el resultado de las operaciones
    
 ** FSM
+**** I/O
+     *Input*
+     - _Clk_
+     - _Rst_
+     - _SoP_: Start of process, indica a la FSM que se ha terminado con la etapa de carga de datos y se debe comenzar con el procesamiento, al dar esa orden, la *FSM* pasa a tomar el control y lo retorna una vez terminado el procesamiento, a travez del puerto *EoP*
+       + Un 0 indica que no se esta en la etapa de procesamiento
+       + Un 1 indica que se debe dar inicio a la etapa de procesamiento
+     - _ImgLength_: Puerto de [10] bits, donde se indica la altura de la imagen (en pixels), la *FSM* procesara los datos en memoria hasta alcanzar dicho tamaño
+     - _Valid_: Indica cuando se deben incrementar las direcciones de memoria (*R_Addr* y *W_Addr*) con cada ciclo de clock
+       + Un 1 habilita el incremento
+       + Un 0 mantiene fija la direccion
+     *OutPut*
+     - _R_Addr_: [10] bits, es la direccion a ser leida en el proximo flanco de clock
+     - _W_Addr_: [10] bits, es la direccion donde sera escrita la salida del modulo *CONV*
+     - _EoP_: Indica que se ha finalizado la etapa de procesamiento poniendo la salida en alto
+     - _Ch_block_: Usado en los estados de *LOAD* y *OUT*, indican al *MCU* que se ha finalizado la lectura de un bloque y se debe pasar al siguiente.
+       + La salida esta en alto cuando se debe cambiar de bloque
 ** Memoria
+**** I/O
+     *Input*
+     - _W_Addr_: Direccion donde se debe escribir el dato presente en *Data_In*
+     - _R_Addr_: Direccion que indica el dato a ser leido a traves del puerto *Data_Out*
+     - _Clk_
+     - _WE_: Write Enable, habilita la escritura de los datos presentes en *Data_In* en la memoria
+       + Un 1 habilita la escritura
+       + Un 0 no permite la escritura
+     - _Data_In_: Puerto de [8] bits, los datos presentes en este puerto seran escritos en la direccion inidicada por *W_Addr* si *WE* esta habilitado
+     *Output*
+     - _Data_Out_: Puerto de [8] bits, la salida representa los datos de la direccion inidicada por *R_Addr* en el ciclo anterior
 
+** MCU
+   Es el modulo encargado de la administracion de los bloques de memoria, hace de interfaz entre las memorias y el resto de los bloques. Se encarga del routeo de la informacion
+**** I/O
+     *Input*
+     - _i_DataConvN_: Puerto de [8] bits donde se escribe la salida del N-simo modulo *CONV*
+     - _Data_In_: Puerto de [8] bits donde se escriben los valores de la imagen en la etapa de *LOAD*
+     - _Ch_Block_: Utilizado durante los estados de *LOAD* y *OUT*, indica que se ha terminado de leer un bloque y se debe pasar al siguiente
+     - _SoP_: Start of process, indica que se ha entrado al estado de *RUN*, se entregan los datos apuntados por *R_Addr* en los puertos *O_DataConvNM* y se escriben los datos presentes en los puertos *I_DataConvN* en las direcciones indicadas por *W_Addr*
+     - _O_DataConvNM_: 
 ** Algoritmo
    El algoritmo para n convolucionadores necesita n + 2 memorias. Se tienen n estados, y cada estado es equivalente a hacer n desplazamientos ciruculares del anterior.
 
