@@ -1,0 +1,35 @@
+* Estructura
+
+** Modulo de convolucion
+
+   El modulo de convolucion se encarga de hacer un producto interno de Frobenius entre una matriz precargada llamada Kernel (filtro), y un sector de una imagen. El sector tiene la misma dimension que el kernel.
+
+*** Estructura interna
+    El modulo tiene dos arreglos de registros, en uno esta cargado el kernel, el cual solo se ve modificado durante la configuracion. El otro arreglo tiene cargado la porcion de la imagen.
+    Una vez entregado un resultado, el arreglo que contiene la imagen desplaza sus filas hacia arriba, perdiendo la fila superior y cargando como fila inferior los valores que tiene en los puertos de entrada.
+    La salida de la operacion aumenta el rango de bits de trabajo, por lo que se debe reajustar el rango antes de ponerlo a la salida.
+
+**** I/O
+     *Input*
+     - _InputN_: 3 puertos de $BITS_IMAGEN bits que leen las filas de la imagen cargada en memoria, o las filas del kernel, dependiendo de los valores que tome el puerto *K/I*
+     - _K/I_: Puerto de un bit que determina si los valores leidos en *InputN* se deben cargar en el kernel o en el registro de la imagen. Cualquier modificacion dependera del estado leido en *valid*.
+       + Si se escribe un 1 en el puerto, el kernel sera modificado
+       + Si se escribe un 0 en el puerto, la imagen sera modificada
+       Durante un uso normal (fuera de la etapa de configuracion), deberia haber un 0 en el puerto
+     - _Valid_: Habilita la modificacion de los registros si hay un estado alto en el puerto
+       + Si se escribe un 1, los registros son modificados con cada flanco de clock.
+       + Si se escribe un 0, los registros permanecen intactos.
+     - _Reset_
+     - _Clk_
+     *OutPut*
+     - _Out_: Salida de $BITS_IMAGEN que representa el resultado de las operaciones
+    
+** Modulo de control
+   
+** FSM
+** Memoria
+
+** Algoritmo
+   El algoritmo para n convolucionadores necesita n + 2 memorias. Se tienen n estados, y cada estado es equivalente a hacer n desplazamientos ciruculares del anterior.
+
+   El primer estado 
