@@ -2,17 +2,17 @@
         parameter N = 2,
         parameter BITS_IMAGEN = 8
     )(
-        input  [N*BITS_IMAGEN-1:0]     	i_DataConv,
-        input  [(N+2)*BITS_IMAGEN-1:0] 	i_MemData,
-        input  [3*BITS_IMAGEN-1:0]     	i_Data,
+        input [N*BITS_IMAGEN-1:0]      i_DataConv,
+        input [(N+2)*BITS_IMAGEN-1:0]  i_MemData,
+        input [23:0]                   i_Data,
 
-        input                          	i_inputCtrl,
-		input							i_memCtrl,
-		input 							i_convCtrl,
+        input                          i_inputCtrl,
+		    input                          i_memCtrl,
+		    input                          i_convCtrl,
         //CONFIGURAR BIEN LAS SELECTORAS
-        output [3*N*BITS_IMAGEN-1:0]   	o_DataConv,
-        output [(N+2)*BITS_IMAGEN-1:0]	o_MemData,
-        output [3*BITS_IMAGEN-1:0]     	o_Data     //Revisar esto
+        output [3*N*BITS_IMAGEN-1:0]   o_DataConv,
+        output [(N+2)*BITS_IMAGEN-1:0] o_MemData,
+        output [3*BITS_IMAGEN-1:0]     o_Data     //Revisar esto
     );
 
     wire	[N*8-1:0]	tomemory;
@@ -22,9 +22,15 @@
 
     assign tomemory	= i_inputCtrl ? i_DataConv : i_Data[15:0];
 
-	assign o_MemData[15:0] 	= i_memCtrl ? 16'h0 : tomemory;
-	assign o_MemData[31:16] = i_memCtrl ? tomemory : 16'h0;
+	  assign o_MemData[15:0] 	= i_memCtrl ? 16'b0 : tomemory;
+	  assign o_MemData[31:16] = i_memCtrl ? tomemory : 16'b0;
+
+
+    assign o_Data[15:0] = i_memCtrl ? i_MemData[31:16] : i_MemData[15:0];
+    assign o_Data[23:16] = 8'b0;
 /*
+
+ASDASD
     always@(*) begin
 
     	//SALIDAS A LA MEMORIA
