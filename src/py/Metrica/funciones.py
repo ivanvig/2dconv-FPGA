@@ -48,19 +48,23 @@ def posProces(matrix):
     return matrix
 
 
-def fix_append(vector):
+def fix_append(vector, k):
     """
     retonra un vector con los valores fixed
     :param vector:
+    :param k
     :return:
     """
     fixed_vector = []
     for i in range(len(vector)):
-        fixed_vector.append(vector[i].fValue)
+        if k == 1:
+            fixed_vector.append(vector[i].value)
+        else:
+            fixed_vector.append(vector[i].fValue)
     return fixed_vector
 
 
-def fix_matriz(matriz, intWidth, fractWidth, signedMode, roundMode, saturateMode):
+def fix_matriz(matriz, intWidth, fractWidth, signedMode, roundMode, saturateMode , k=0):
     """
     Lleva la matriz a punto fijo de acuerdo a los parametros pasados
     :param matriz: matriz para con distintos valores
@@ -75,7 +79,7 @@ def fix_matriz(matriz, intWidth, fractWidth, signedMode, roundMode, saturateMode
     shape_m = np.shape(matriz)
     for i in range(0, shape_m[0]):
         fixmatriz.append(fix_append(arrayFixedInt(intWidth, fractWidth, matriz[i],
-                                                  signedMode, roundMode, saturateMode)))
+                                                  signedMode, roundMode, saturateMode),k))
     return fixmatriz
 
 
@@ -106,15 +110,5 @@ def potencia(matriz):
     power = 0.0
     for i in range(shape[0]):
         for j in range(shape[1]):
-            power += matriz[i][j]**2
-    return power
-
-
-kernel = np.array(
-    [
-        [0, -1, 0],
-        [-1, 1, 0],
-        [0, -1, 0]
-    ])
-
-
+            power += matriz[i][j] ** 2
+    return power / (shape[0] * shape[1])

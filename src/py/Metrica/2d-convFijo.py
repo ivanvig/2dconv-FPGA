@@ -10,7 +10,7 @@ import imgconv as ivn
 # @return numpy.array para escalas grices retorna MxN
 # para RGB retorna MxNx3, RGBA  retorna MxNx4
 
-img_path = "D:/Documents/Tarpuy/Python/Procesamiento/img/da_bossGS.jpg"
+img_path = "D:/Documents/Tarpuy/Procesamiento-R/2dconv-verilog/src/py/Metrica/img/da_bossGS.jpg"
 input_img = img.imread(img_path)
 
 # Filtro para la convolucion
@@ -20,6 +20,7 @@ kernel = np.array(
         [1, -4, 1],
         [0, 1, 0]
     ])
+
 # nomralizacion con 'l2'
 fix1 = fun.cross_corr(input_img, kernel)  # convolucon de la senal originla
 Signal = fun.potencia(fix1)  # potencia de la senal convlucionada
@@ -75,32 +76,3 @@ plt.xlabel('cantidad de bits parte flotante')
 plt.grid(True)
 plt.legend(loc="upper left")
 plt.show()
-
-"""
-imagel2 = fun.norm_m(input_img, 'l2')
-imagel2 = np.asarray(fun.fix_matriz(imagel2, 8, 8, 'U', 'round', 'saturate'))
-fix1 = fun.cross_corr(input_img, kernel)
-fix2 = fun.cross_corr(imagel2, ker_fix)  # fincion normalizada, kernel)
-img_fix = np.asarray(fun.fix_matriz(input_S, 8, 8, 'U', 'round', 'saturate'))
-fix3 = fun.cross_corr(img_fix, ker_fix)
-
-fig = plt.figure()
-ax = fig.add_subplot(2, 2, 1)
-ax.imshow(input_img, cmap="gray")
-ax.set_title("Imagen Original")
-
-ax2 = fig.add_subplot(2, 2, 2)
-ax2.imshow(fix1, cmap="gray")
-ax2.set_title("Despues de filtrar 1")
-
-ax3 = fig.add_subplot(2, 2, 3)
-ax3.imshow(fix2, cmap="gray")
-ax3.set_title("Imagen con fix2")
-
-
-ax4 = fig.add_subplot(2, 2, 4)
-
-ax4.imshow(fix3, cmap="gray")
-ax4.set_title("Filtrada con punto fijo 3")
-plt.show()
-"""
