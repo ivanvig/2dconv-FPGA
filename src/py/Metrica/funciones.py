@@ -112,3 +112,20 @@ def potencia(matriz):
         for j in range(shape[1]):
             power += matriz[i][j] ** 2
     return power / (shape[0] * shape[1])
+
+
+def pos(M, maxbits, nbits):
+    """
+    :param maxbits:
+    :param nbits:
+    :param matrix:
+    :return:
+    """
+    matrix = M.copy()
+    shape = np.shape(matrix)
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            matrix[i][j] = (((matrix[i][j] & 0x7ffff) + 0x40000) >> int(maxbits-nbits)) & int((2**nbits)-1)
+            # matrix[i][j] = (((matrix[i][j] & 0x7ffff) + 0x40000) >> 7) & 0xfff
+            # matrix[i][j] = (((matrix[i][j] & 0xfffff) + 0x80000) >> 11) & 0x1ff
+    return matrix
