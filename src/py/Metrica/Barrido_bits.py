@@ -47,22 +47,21 @@ img_fix = np.asarray(fun.fix_matriz(input_S, 8, 7, 'S', 'round', 'saturate'))
 # convolucion
 Conv_2 = fun.cross_corr(img_fix, ker_fix2)
 
-Conv_fix2 = np.asarray(fun.fix_matriz(np.asarray(Conv_2), 19, 14, 'S', 'round', 'saturate', 1))
+Conv_fix2 = np.asarray(fun.fix_matriz(np.asarray(Conv_2), 20, 14, 'S', 'round', 'saturate', 1))
 
 # comparacion
 SNR1 = []
+SNR2 = []
 Signal = fun.potencia(Conv_original)
 
 # defino vectores
-vec = np.arange(8, 14, 1)
+vec = np.arange(8, 15, 1)
 
-
-for i in vec:
-    print i
-    Conv_fix = fun.pos(Conv_fix2, 19, int(i))
-    Conv_fix3 = ivn.torange(Conv_fix, 1, 0)
-    Conv_fix3 = Conv_original - Conv_fix3
-    Noise = fun.potencia(Conv_fix3)
+for i in xrange(8, 15):
+    Conv_fix = fun.pos(Conv_fix2, 20, int(i))
+    Conv_fix = ivn.torange(Conv_fix, 1, 0)
+    Conv_fix = Conv_original - Conv_fix
+    Noise = fun.potencia(Conv_fix)
     SNR1.append(Signal / Noise)
 
 print 10*np.log10(SNR1)

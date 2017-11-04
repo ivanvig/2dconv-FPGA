@@ -16,7 +16,8 @@ def torange(matrix, max, min):
     matrix = np.true_divide((matrix-amin)*(max-min), (amax-amin)) + min
     return matrix
 
-def torange_c(matrix, max, min):
+
+def torange_c(matrix, max, min, amax, amin):
     """
     Implements a linear dynamic range expansion
     https://en.wikipedia.org/wiki/Normalization_(image_processing)
@@ -26,8 +27,8 @@ def torange_c(matrix, max, min):
     :param min:desired min value
     :return:normalized matrix
     """
-    amax = 0.0801 # np.amax(matrix)
-    amin = -0.1 # np.amin(matrix)
+    # amax = 0.0801  # np.amax(matrix)
+    # amin = -0.1  # np.amin(matrix)
     matrix = np.true_divide((matrix-amin)*(max-min), (amax-amin)) + min
     return matrix
 

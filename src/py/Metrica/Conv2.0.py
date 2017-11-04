@@ -9,8 +9,8 @@ def pos(matrix):
     shape = np.shape(matrix)
     for i in range(shape[0]):
         for j in range(shape[1]):
-            matrix[i][j] = (((matrix[i][j] & 0x7ffff) + 0x40000) >> 7) & 0xfff
-            # matrix[i][j] = (((matrix[i][j] & 0xfffff) + 0x80000) >> 11) & 0x1ff
+            # matrix[i][j] = (((matrix[i][j] & 0x7ffff) + 0x40000) >> 7) & 0xfff
+            matrix[i][j] = (((matrix[i][j] & 0xfffff) + 0x80000) >> 7) & 0x1fff
     return matrix
 
 
@@ -61,8 +61,8 @@ Conv_1 = fun.cross_corr(img_fix, ker_fix2)
 Conv_2 = fun.cross_corr(img_fix, ker_fix2)
 
 #
-Conv_fix = np.asarray(fun.fix_matriz(np.asarray(Conv_2), 19, 14, 'S', 'round', 'saturate'))
-Conv_fix2 = np.asarray(fun.fix_matriz(np.asarray(Conv_2), 19, 14, 'S', 'round', 'saturate',1))
+Conv_fix = np.asarray(fun.fix_matriz(np.asarray(Conv_2), 20, 14, 'S', 'round', 'saturate'))
+Conv_fix2 = np.asarray(fun.fix_matriz(np.asarray(Conv_2), 20, 14, 'S', 'round', 'saturate',1))
 
 Conv_fix2 = pos(Conv_fix2)
 

@@ -125,7 +125,8 @@ def pos(M, maxbits, nbits):
     shape = np.shape(matrix)
     for i in range(shape[0]):
         for j in range(shape[1]):
-            matrix[i][j] = (((matrix[i][j] & 0x7ffff) + 0x40000) >> int(maxbits-nbits)) & int((2**nbits)-1)
+            # matrix[i][j] = (((matrix[i][j] & 0x7ffff) + 0x40000) >> int(maxbits-nbits)) & int((2**nbits)-1)
             # matrix[i][j] = (((matrix[i][j] & 0x7ffff) + 0x40000) >> 7) & 0xfff
             # matrix[i][j] = (((matrix[i][j] & 0xfffff) + 0x80000) >> 11) & 0x1ff
+            matrix[i][j] = (((matrix[i][j] & 0xfffff) + 0x80000) >> int(maxbits-nbits)) & int((2**nbits)-1)
     return matrix
