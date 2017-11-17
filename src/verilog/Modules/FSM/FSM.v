@@ -14,7 +14,7 @@ module FSM(i_CLK, i_reset, i_SoP, i_imgLength, i_valid, o_readAdd, o_writeAdd, o
     localparam latency   = 5;
     localparam NBlatency = `NB_ADDRESS*latency;
      
-    //Definici髇 de puertos
+    //Definici贸n de puertos
     input                    i_CLK;
     input                    i_reset;
     input                    i_SoP;
@@ -79,8 +79,9 @@ module FSM(i_CLK, i_reset, i_SoP, i_imgLength, i_valid, o_readAdd, o_writeAdd, o
                  
       //Estado de procesamiento
       if(sopControl==1'b1) begin 
-      
+          
           counterAdd   <= counterAdd+1;
+          
           //Shifteo para el write address, teniendo en cuenta la latencia.
           counter_with_latency<= {counter_with_latency[(NBlatency-NB_ADDRESS)-1:0],counterAdd};
           if(counterAdd==imgHeight) begin
@@ -91,16 +92,24 @@ module FSM(i_CLK, i_reset, i_SoP, i_imgLength, i_valid, o_readAdd, o_writeAdd, o
           
       end
       
-      //Estado de lectura y carga. En ambos la l骻ica es la misma.
+      //Estado de lectura y carga. En ambos la l贸gica es la misma.
       else begin
-        
-        //Manejo de direcciones en funci髇 del valid
+ 
+          
+          //Testeo de change block
+         if(changeBlock<= 1'b1)
+             changeBlock<= 1'b0;
+         else
+             changeBlock<=changeBlock;
+          
+         
+        //Manejo de direcciones en funci贸n del valid
         if (i_valid)
             counterAdd<=counterAdd+1;
         else
             counterAdd<=counterAdd;
         
-        //Verificaci髇 si termino de leer/cargar un bloque
+        //Verificaci贸n si termino de leer/cargar un bloque
         if (counterAdd==imgHeight)begin
             changeBlock<= 1'b1;
             counterAdd <= 'd0;
