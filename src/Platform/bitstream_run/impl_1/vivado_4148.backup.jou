@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2017.3.1 (64-bit)
+# SW Build 2035080 on Fri Oct 20 14:20:01 MDT 2017
+# IP Build 2034413 on Fri Oct 20 15:56:25 MDT 2017
+# Start of session at: Fri Nov 17 11:22:53 2017
+# Process ID: 4148
+# Current directory: D:/ProyectosVivado/Platform/Platform.runs/impl_1
+# Command line: vivado.exe -log top_microblaze.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source top_microblaze.tcl -notrace
+# Log file: D:/ProyectosVivado/Platform/Platform.runs/impl_1/top_microblaze.vdi
+# Journal file: D:/ProyectosVivado/Platform/Platform.runs/impl_1\vivado.jou
+#-----------------------------------------------------------
+source top_microblaze.tcl -notrace

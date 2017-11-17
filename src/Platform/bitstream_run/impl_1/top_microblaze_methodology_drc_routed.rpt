@@ -1,0 +1,88 @@
+Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2017.3.1 (win64) Build 2035080 Fri Oct 20 14:20:01 MDT 2017
+| Date         : Fri Nov 17 11:24:07 2017
+| Host         : MSI running 64-bit major release  (build 9200)
+| Command      : report_methodology -file top_microblaze_methodology_drc_routed.rpt -pb top_microblaze_methodology_drc_routed.pb -rpx top_microblaze_methodology_drc_routed.rpx
+| Design       : top_microblaze
+| Device       : xc7a35ticsg324-1L
+| Speed File   : -1L
+| Design State : Routed
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Report Methodology
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: netlist
+          Floorplan: design_1
+      Design limits: <entire design considered>
+             Max violations: <unlimited>
+             Violations found: 10
++-----------+----------+------------------------------------------------+------------+
+| Rule      | Severity | Description                                    | Violations |
++-----------+----------+------------------------------------------------+------------+
+| SYNTH-6   | Warning  | Timing of a block RAM might be sub-optimal     | 1          |
+| TIMING-6  | Warning  | No common primary clock between related clocks | 2          |
+| TIMING-9  | Warning  | Unknown CDC Logic                              | 1          |
+| TIMING-18 | Warning  | Missing input or output delay                  | 6          |
++-----------+----------+------------------------------------------------+------------+
+
+2. REPORT DETAILS
+-----------------
+SYNTH-6#1 Warning
+Timing of a block RAM might be sub-optimal  
+The timing for the instance u_bram_1/BRAM_reg, implemented as a block RAM, might be sub-optimal as no output register was merged into the block
+Related violations: <none>
+
+TIMING-6#1 Warning
+No common primary clock between related clocks  
+The clocks clk_out1_design_1_clk_wiz_1_0 and clk_out1_design_1_clk_wiz_1_0_1 are related (timed together) but they have no common primary clock. The design could fail in hardware. To find a timing path between these clocks, run the following command: report_timing -from [get_clocks clk_out1_design_1_clk_wiz_1_0] -to [get_clocks clk_out1_design_1_clk_wiz_1_0_1]
+Related violations: <none>
+
+TIMING-6#2 Warning
+No common primary clock between related clocks  
+The clocks clk_out1_design_1_clk_wiz_1_0_1 and clk_out1_design_1_clk_wiz_1_0 are related (timed together) but they have no common primary clock. The design could fail in hardware. To find a timing path between these clocks, run the following command: report_timing -from [get_clocks clk_out1_design_1_clk_wiz_1_0_1] -to [get_clocks clk_out1_design_1_clk_wiz_1_0]
+Related violations: <none>
+
+TIMING-9#1 Warning
+Unknown CDC Logic  
+One or more asynchronous Clock Domain Crossing has been detected between 2 clock domains through a set_false_path or a set_clock_groups or set_max_delay -datapath_only constraint but no double-registers logic synchronizer has been found on the side of the capture clock. It is recommended to run report_cdc for a complete and detailed CDC coverage. Please consider using XPM_CDC to avoid Critical severities
+Related violations: <none>
+
+TIMING-18#1 Warning
+Missing input or output delay  
+An input delay is missing on sw[0] relative to clock(s) CLK, sys_clk_pin
+Related violations: <none>
+
+TIMING-18#2 Warning
+Missing input or output delay  
+An input delay is missing on sw[1] relative to clock(s) CLK, sys_clk_pin
+Related violations: <none>
+
+TIMING-18#3 Warning
+Missing input or output delay  
+An input delay is missing on sw[2] relative to clock(s) CLK, sys_clk_pin
+Related violations: <none>
+
+TIMING-18#4 Warning
+Missing input or output delay  
+An input delay is missing on sw[3] relative to clock(s) CLK, sys_clk_pin
+Related violations: <none>
+
+TIMING-18#5 Warning
+Missing input or output delay  
+An input delay is missing on uart_txd_in relative to clock(s) CLK, sys_clk_pin
+Related violations: <none>
+
+TIMING-18#6 Warning
+Missing input or output delay  
+An output delay is missing on uart_rxd_out relative to clock(s) CLK, sys_clk_pin
+Related violations: <none>
+
+
