@@ -28,11 +28,10 @@ module Conv #(
 
     // resultado
     reg [CONV_LEN-1:0]  conv_reg;
-    //reg [CONV_LEN-1:0]  result;
 
+    // reg de la convolucion
     reg signed [CONV_LEN-1:0] resultado;
-    // cable de la convolucion
-    wire [CONV_LEN-1:0] conv;
+    
     //  el resto de los cables    
     wire clk, selecK_I, rst, valid;
 
@@ -89,8 +88,8 @@ module Conv #(
             imagen[2]<=imagen[2];
             //kernel
             kernel[0]<=kernel[0];
-            kernel[1]<=kernel[2];
-            kernel[2]<=kernel[1];
+            kernel[1]<=kernel[1];
+            kernel[2]<=kernel[2];
             //matengo el lacheo
             conv_reg<=conv_reg;
         end

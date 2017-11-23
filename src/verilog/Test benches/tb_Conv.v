@@ -1,7 +1,5 @@
 `timescale  1ns/100ps //por cada evento de simulacion salta 1 ns
 //`timescale 1ns / 1ps
-
-
 //TB
 //ShiftLeds
 `define BIT_LEN 8
@@ -32,57 +30,94 @@ module test_Conv #(
     wire [CONV_LPOS-1:0] data;
     
 initial begin
-	dato0 = 8'b00000000; //0
-    dato1 = 8'b00100000; //0.25
-    dato2 = 8'b00000000; //0
-    KI = 1'b0; // modo carga kernel
-    rst = 1'b1; //  reseteo los registros 
-    valid = 1'b0; // carga y salida deshabilitada
-    CLK100MHZ	= 1'b0;
-    #10 rst	 = 1'b0;// bajo el reset
-    // carga primera fila del kernel 
-	#10 valid = 1'b1; // hibilito la carga y la salida
-	#5  valid = 1'b0; // de habilito la carga 
-    dato0 = 8'b00100000; //0.25
-    dato1 = 8'b10000000; //-1
-    dato2 = 8'b00100000; // 0.25
-    //cargo la segunda fila del kernel
-    #10 valid = 1'b1;
-    #5 valid = 1'b0;
+    CLK100MHZ	= 1'b1;
     dato0 = 8'b00000000; //0
     dato1 = 8'b00100000; //0.25
     dato2 = 8'b00000000; //0
+    rst = 1'b1; //  reseteo los registros 
+    valid = 1'b0; // carga y salida deshabilitada
+    KI = 1'b0; // modo carga kernel
+    #5 rst	 = 1'b0;// bajo el reset
+    
+    #5 valid = 1'b1; // hibilito la carga y la salida
+    // carga primera fila del kernel 
+
+    #5 dato0 = 8'b00100000; //0.25
+    dato1 = 8'b10000000; //-1
+    dato2 = 8'b00100000; // 0.25
+    //cargo la segunda fila del kernel
+    
+    #5dato0 = 8'b00000000; //0
+    dato1 = 8'b00100000; //0.25
+    dato2 = 8'b00000000; //0
     // cargo la tercera fila del
-    #10 valid = 1'b1;
+
     #5 valid = 1'b0;
     
     //Cargo dato
-    #1 KI = 1'b1; // paso al modo imagen 
+    #5 KI = 1'b1; // paso al modo imagen 
+    #5 valid = 1'b1;
     dato0 = 8'b01111111; //127 (0.992)
     dato1 = 8'b01111111; 
     dato2 = 8'b01111111;
     // cargo la primera fila de la imagen 
-    #10 valid = 1'b1;
-    #5 valid = 1'b0;
-    dato0 = 8'b01111111;
+    
+    #5dato0 = 8'b01111111;
     dato1 = 8'b01111111;
     dato2 = 8'b01111111;
     // cargo la segunda fila de la imagen
-    #10 valid = 1'b1;
-    #5 valid = 1'b0;
-    dato0 = 8'b01111110; //126 (0.984)
+    
+    #5dato0 = 8'b01111110; //126 (0.984)
     dato1 = 8'b01111110;
     dato2 = 8'b01111110;
     // cargo la tercera fila de la imagen
-    #10 valid = 1'b1;
-    #5 valid = 1'b0;
 
-    #10 valid = 1'b1;
     #5 valid = 1'b0;
+    //fin de etapa inicial----------------
+
+    #5 valid = 1'b1;
+
+    #25dato0 = 8'b01111111; //127 (0.992)
+    dato1 = 8'b01111111; 
+    dato2 = 8'b01111111; 
     
-    #100 KI = 1'b0;
+    #45dato0 = 8'b01111110; //126 (0.984)
+    dato1 = 8'b01111110;
+    dato2 = 8'b01111110;
 
-	#1000	$finish;
+    #30dato0 = 8'b01111111; //127 (0.992)
+    dato1 = 8'b01111111; 
+    dato2 = 8'b01111111; 
+
+    #20dato0 = 8'b01111110; //126 (0.984)
+    dato1 = 8'b01111110;
+    dato2 = 8'b01111110;
+
+    #15dato0 = 8'b01111101; //125 ()
+    dato1 = 8'b01111101;
+    dato2 = 8'b01111101;
+
+    #10dato0 = 8'b01111110; //126 (0.984)
+    dato1 = 8'b01111110;
+    dato2 = 8'b01111110;
+
+    #5dato0 = 8'b01111111; //127 (0.992)
+    dato1 = 8'b01111111; 
+    dato2 = 8'b01111111; 
+
+    #10 valid = 1'b0;
+    KI = 1'b0;
+
+/*  
+    //otro valid mas clock +2 
+    #10 valid = 1'b1;
+    #5 valid = 1'b0;
+    //otro valid mas clock +3 
+    #10 valid = 1'b1;
+    #5 valid = 1'b0;
+*/
+	#20	$finish;
+
 end
 always #2.5 CLK100MHZ = ~CLK100MHZ;
 
@@ -103,6 +138,7 @@ Conv
      0000111111100000 (4064)
 
              01111110 (126)  1 calculo de estos 
+
             *00100000 (0.25)
    ------------------
      0000111111000000 (4032)
@@ -113,6 +149,7 @@ Conv
      1100000010000000 (-1656)
 
         0000111111100000 (4064)
+   +    0000111111100000 (4064)
    +    0000111111100000 (4064)
    -    1100000010000000 (-1656)
    +    0000111111000000 (4032)
