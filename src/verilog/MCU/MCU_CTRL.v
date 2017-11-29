@@ -31,7 +31,7 @@ module MCU_CTRL
         if(rst) begin
             substate <= {clog2(SUB-1){1'b1}};
             next_state <= {clog2(STATES-1){1'b0}};
-            memSelect_load <= {clog2(N+2){1'b1}};
+            memSelect_load <= {clog2(N+1){1'b1}};
             memSelect_out <= {clog2(N+1){1'b1}};
             we_rw_status <= {1'b1, {(N+1){1'b0}}};
             we_proc_status <= {{N{1'b1}}, 2'b00};
@@ -105,7 +105,7 @@ module MCU_CTRL
 
     function integer clog2;
         input integer depth;
-        for (clog2=0; depth>1; clog2=clog2+1)
+        for (clog2=0; depth>0; clog2=clog2+1)
             depth = depth >> 1;
     endfunction
 
