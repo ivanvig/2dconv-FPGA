@@ -9,9 +9,9 @@ module MUX_ARRAY
         input [(N+2)*BITS_IMAGEN-1:0]      i_MemData,
         input [BITS_DATA-1:0]              i_Data,
 
-        input [$clog2(STATES)-1:0]         i_state,
-        input [$clog2(N/2 + 1) - 1:0]      i_substate, //PARA N PAR
-        input [$clog2(N+2)-1:0]            i_memSelect, //Elige memoria para escribir / leer
+        input [clog2(STATES-1)-1:0]         i_state,
+        input [clog2(N/2) - 1:0]      i_substate, //PARA N PAR
+        input [clog2(N+1)-1:0]            i_memSelect, //Elige memoria para escribir / leer
         output reg [3*N*BITS_IMAGEN-1:0]   o_DataConv,
         output reg [(N+2)*BITS_IMAGEN-1:0] o_MemData,
         output reg [BITS_DATA-1:0]         o_Data
@@ -22,8 +22,8 @@ module MUX_ARRAY
     always @ (*) begin
         case (i_state)
             2'b00: begin//LOAD
-                o_Data = 0;
-                o_DataConv = 0;
+                o_Data = {BITS_DATA{1'b0}};
+                o_DataConv = {(3*N*BITS_IMAGEN){1'b0}};
                 case (i_memSelect) 
                     2'b00: o_MemData = i_Data;
                     2'b01: o_MemData = {i_Data, {1*BITS_IMAGEN{1'b0}}};
@@ -33,7 +33,7 @@ module MUX_ARRAY
             end
 
             2'b01: begin //PROCESAMIENTO
-                o_Data = 0;
+                o_Data = {BITS_DATA{1'b0}};
                 case (i_substate) 
                     1'b0: begin
                         o_DataConv[3*BITS_IMAGEN-1:0] = i_MemData[3*BITS_IMAGEN-1:0];
@@ -49,9 +49,8 @@ module MUX_ARRAY
             end
 
             2'b10: begin//OUT
-                o_MemData = 0;
-                o_DataConv = 0;
-                
+                o_MemData = {(N+2)*BITS_IMAGEN{1'b0}};
+                o_DataConv = {(3*N*BITS_IMAGEN){1'b0}};
                 case (i_memSelect)
                     2'b00: o_Data = i_MemData[BITS_IMAGEN-1:0];
                     2'b01: o_Data = i_MemData[2*BITS_IMAGEN-1:BITS_IMAGEN];
@@ -62,10 +61,17 @@ module MUX_ARRAY
             end
 
             default: begin
-                o_MemData = 0;
-                o_DataConv = 0;
-                o_Data = 0;
+                o_MemData = {(N+2)*BITS_IMAGEN{1'b0}};
+                o_DataConv = {(3*N*BITS_IMAGEN){1'b0}};
+                o_Data = {BITS_DATA{1'b0}};
             end
         endcase
     end
+
+    function integer clog2;
+        input integer depth;
+        for (clog2=0; depth>0; clog2=clog2+1)
+            depth = depth >> 1;
+    endfunction
+
 endmodule
