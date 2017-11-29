@@ -9,9 +9,9 @@ module MUX_ARRAY
         input [(N+2)*BITS_IMAGEN-1:0]      i_MemData,
         input [BITS_DATA-1:0]              i_Data,
 
-        input [clog2(STATES-1)-1:0]         i_state,
-        input [clog2(N/2) - 1:0]      i_substate, //PARA N PAR
-        input [clog2(N+1)-1:0]            i_memSelect, //Elige memoria para escribir / leer
+        input [clog2(STATES-1)-1:0]        i_state,
+        input [clog2(N/2) - 1:0]           i_substate, //PARA N PAR
+        input [clog2(N+1)-1:0]             i_memSelect, //Elige memoria para escribir / leer
         output reg [3*N*BITS_IMAGEN-1:0]   o_DataConv,
         output reg [(N+2)*BITS_IMAGEN-1:0] o_MemData,
         output reg [BITS_DATA-1:0]         o_Data
