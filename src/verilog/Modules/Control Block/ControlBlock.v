@@ -24,9 +24,9 @@ module ControlBlock(i_GPIOvalid, i_GPIOctrl, i_GPIOdata, i_rst, i_CLK, i_EoP_FSM
     
      /*      Register file:
            
-           BITS M罶 SIGNIFICATIVOS (GPIO[31:29])
+           BITS M脕S SIGNIFICATIVOS (GPIO[31:29])
            
-                C骴igo instrucci髇              Acci髇
+                C贸digo instrucci贸n              Acci贸n
                 
                      000                      Cargar kernell
                      001                      Cargar Img_size
@@ -37,11 +37,11 @@ module ControlBlock(i_GPIOvalid, i_GPIOctrl, i_GPIOdata, i_rst, i_CLK, i_EoP_FSM
                      101-111                  No utilizados
                      ---------------------------------------
            
-           LSB ( GPIOctrl) -> VALID (bit 28 desde top_microblaze; est醤 los buses separados)
+           LSB ( GPIOctrl) -> VALID (bit 28 desde top_microblaze; est谩n los buses separados)
     
         */
       
-  //Parametrizaci髇
+  //Parametrizaci贸n
   localparam Kernel_load     = 0; 
   localparam ImgSize_load    = 1; 
   localparam Img_load        = 2;
@@ -168,7 +168,7 @@ module ControlBlock(i_GPIOvalid, i_GPIOctrl, i_GPIOdata, i_rst, i_CLK, i_EoP_FSM
                             //Es decir, se termino la etapa de procesamiento, y se pasa a la etapa OUT poniendo en alto EoP_MCU
                             
                             EoPMCU_reg<=1'b1;
-                            //Hay que bajarlo? Hasta cuando??
+                            SoP_reg<=1'b0;
               
                 end
  
