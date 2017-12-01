@@ -15,7 +15,10 @@ module micro_sim#(
     parameter M_LEN         = `M_LEN,
     parameter NB_ADDRESS    = `NB_ADDRESS,
     parameter RAM_WIDTH     = `RAM_WIDTH,
-    parameter GPIO_D        = `GPIO_D
+    parameter GPIO_D        = `GPIO_D,
+    localparam MEMO         = 1,
+    localparam MEM1         = 2,
+    localparam MEM2         = 3
     )(
     output[GPIO_D-1:0]	gpio_i_data_tri_i,
     output 		   		o_led,
@@ -32,13 +35,9 @@ module micro_sim#(
     reg [RAM_WIDTH-1:0] reg_aux;
     //----------
     reg ending;
-    reg writeEnable;
 
     wire [NB_ADDRESS-1:0] write_address_MEM;
     wire [NB_ADDRESS-1:0] read_address_MEM;
-
-    //clock de salida del micro
-    
     
     wire k_i; //selector de K/I
     wire valid;
@@ -69,7 +68,7 @@ module micro_sim#(
     assign dato2 = (k_i==1'b0)?dmicro2:mem2_o[BIT_LEN-1:0];
 
     //asignacion de la salida del convolucionador a la primera memoria 
-    //assign i_mem0 = reg_aux;
+    assign i_mem0 = reg_aux;
     // asignacon de la direccion de lectura de un registro local o del gpio
     assign read_address_MEM = (rstm==1'b0)?gpio_o_data_tri_o[NB_ADDRESS+7:8]:read_add;
     // asignacion de la direccion de escritura de un registro local
@@ -94,8 +93,8 @@ module micro_sim#(
     always @(posedge CLK100MHZ ) begin
         if (rst) begin
             // reset
-            read_add    <= {NB_ADDRESS{1'b1}};
-            write_add   <= 10'h3fb;
+            read_add    <= 10'h0;//{NB_ADDRESS{1'b1}};
+            write_add   <= 10'h0;//10'h3fa;
             ending      <= 1'b1;
             dmicro0     <= 8'h94;
             dmicro1     <= 8'h0;
@@ -110,8 +109,11 @@ module micro_sim#(
             dmicro2     <= dmicro2;
             reg_aux     <= data_oc;
             read_add    <= read_add +1;
-            write_add   <= write_add +1;
-            if(read_add == 10'h25) ending <=0;           
+            if (read_add >= 10'h6 && read_add <= 10'd440)
+                write_add   <= write_add +1;
+            else write_add   <= write_add;
+
+            if(read_add == 10'd440) ending <=0;           
             else ending <= ending;
         end
         else begin
@@ -139,15 +141,18 @@ module micro_sim#(
             .CLK100MHZ(CLK100MHZ));
 
     //intancia de la memoria
-    bram_memory
-        u_bram_0(.o_data(mem0_o),
+    bram_memory#(
+                .INIT(MEMO))
+        u_bram_0 
+            (.o_data(mem0_o),
             .i_wrEnable(wen),
-            .i_data(reg_aux),
+            .i_data(i_mem0),
             .i_writeAdd(write_address_MEM),
             .i_readAdd(read_address_MEM),
             .i_CLK(CLK100MHZ));
     
-    bram_memory
+    bram_memory#(
+                .INIT(MEM1))
         u_bram_1(.o_data(mem1_o),
             .i_wrEnable(wen),
             .i_data(i_data_mem1),
@@ -155,7 +160,8 @@ module micro_sim#(
             .i_readAdd(read_address_MEM),
             .i_CLK(CLK100MHZ));
     
-    bram_memory
+    bram_memory#(
+                .INIT(MEM2))
         u_bram_2(.o_data(mem2_o),
             .i_wrEnable(wen),
             .i_data(i_data_mem2),
