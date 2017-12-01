@@ -30,7 +30,8 @@ module tb_topmicro#(
     	gpio_o_data_tri_o = 32'h9;// reste
 
     	#20 gpio_o_data_tri_o = 32'h1E;
-    	#190 gpio_o_data_tri_o = 32'h0;
+    	
+    	#3210 gpio_o_data_tri_o = 32'h0;
     	#5   gpio_o_data_tri_o = gpio_o_data_tri_o + 32'h100;
     	#5   gpio_o_data_tri_o = gpio_o_data_tri_o + 32'h100;
     	#5   gpio_o_data_tri_o = gpio_o_data_tri_o + 32'h100;

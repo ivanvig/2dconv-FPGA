@@ -109,11 +109,11 @@ module micro_sim#(
             dmicro2     <= dmicro2;
             reg_aux     <= data_oc;
             read_add    <= read_add +1;
-            if (read_add >= 10'h6 && read_add <= 10'h25)
+            if (read_add >= 10'h6 && read_add <= 10'd440)
                 write_add   <= write_add +1;
             else write_add   <= write_add;
 
-            if(read_add == 10'h25) ending <=0;           
+            if(read_add == 10'd440) ending <=0;           
             else ending <= ending;
         end
         else begin
