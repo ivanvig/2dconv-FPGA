@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 `define NB_ADDRESS      10
-`define NB_IMAGE        10
+`define NB_IMAGE        11
 
 
 module FSM(i_CLK, i_reset, i_SoP, i_imgLength, i_valid, o_readAdd, o_writeAdd, o_EoP, o_changeBlock);
@@ -33,6 +33,7 @@ module FSM(i_CLK, i_reset, i_SoP, i_imgLength, i_valid, o_readAdd, o_writeAdd, o
     reg                                    endOfProcess;
     reg                                     changeBlock;
     reg                                      sopControl;
+    reg                             valid_previous_state;
     
     //Ni bien se crean los registros, toman esos valores.
     initial begin
@@ -47,6 +48,8 @@ module FSM(i_CLK, i_reset, i_SoP, i_imgLength, i_valid, o_readAdd, o_writeAdd, o
  
         
     always @(posedge i_CLK) begin
+    
+      valid_previous_state<=i_valid;
           
       if(i_reset==1'b1)begin
         counterAdd           <=`NB_ADDRESS'd0;
@@ -104,7 +107,7 @@ module FSM(i_CLK, i_reset, i_SoP, i_imgLength, i_valid, o_readAdd, o_writeAdd, o
           
          
         //Manejo de direcciones en función del valid
-        if (i_valid)
+        if (i_valid && !valid_previous_state)
             counterAdd<=counterAdd+1;
         else
             counterAdd<=counterAdd;

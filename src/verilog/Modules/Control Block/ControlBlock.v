@@ -110,6 +110,7 @@ module ControlBlock(i_GPIOvalid, i_GPIOctrl, i_GPIOdata, i_rst, i_CLK, i_EoP_FSM
                  go_to_led  <=  3'd0;
                   validFSM  <=  1'b0;
                  validCONV  <=  1'b0;
+ GPIO_valid_previous_state  <=  1'b0;
                     SoP_reg <=  1'b0;
                  EoPMCU_reg <=  1'b0;   
                         KI  <=  1'b1; //definido asi
