@@ -32,92 +32,98 @@ module micro_sim
 
     /////////// WIRES AGREGADOS //////////////
     wire [N*BITS_IMAGEN-1:0] conv_DataConv_mcu;
-    wire [BITS_DATA-1:0]     ctrl_Data_mcu;
     wire [(N+2)*BITS_IMAGEN-1:0] mem_MemData_mcu;
-    wire [NB_ADDRESS-1:0]         fsm_WAddr_mcu, fsm_RAddr_mcu;
-    wire                         fsm_chblk_mcu, fsm_sop_mcu, fsm_eop_mcu, rst, clk;
+    wire                         rst, clk;
     
-    wire [3*N*BITS_IMAGEN-1:0]  mcu_DataConv_conv;
-    wire [BITS_DATA-1:0]        mcu_Data_ctrl;
-    wire [N+1:0]                mcu_we_mem;
+    wire [3*N*BITS_IMAGEN-1:0]   mcu_DataConv_conv;
+    wire [BITS_DATA-1:0]         mcu_Data_ctrl;
+    wire [N+1:0]                 mcu_we_mem;
     wire [NB_ADDRESS-1:0]        mcu_WAddr_mem, mcu_RAddr_mem;
     wire [(N+2)*BITS_IMAGEN-1:0] mcu_MemData_mem;
 
     ////////////////////////////////////////////
     
-    wire k_i; //selector de K/I
-    wire valid;
-    wire dato0, dato1, dato2;
-    
+    // REGISTROS MODULOS FALTANTES
+
+    reg  fsm_eop_mcu, fsm_sop_mcu, fsm_chblk_mcu;
+    reg [NB_ADDRESS-1:0] fsm_RAddr_mcu, fsm_WAddr_mcu;
+
+    reg                  ctrl_valid_conv, ctrl_ki_conv;
+    reg [BITS_DATA-1:0]  ctrl_Data_mcu;
 
     // Microconotrolador
-    
-    assign rst      = gpio_o_data_tri_o[0]; //primeo en 1 despues en 0 res top y conv
-    assign k_i      = gpio_o_data_tri_o[1]; //K/I en 1 para la conv
-    assign valid    = gpio_o_data_tri_o[2]; //en 1 para la conv
-        
 
-    //asignacion de la salida del convolucionador a la primera memoria 
-    assign i_mem0 = reg_aux;
-    // asignacon de la direccion de lectura de un registro local o del gpio
-    assign read_address_MEM = (rstm==1'b0)?gpio_o_data_tri_o[NB_ADDRESS+7:8]:read_add;
-    // asignacion de la direccion de escritura de un registro local
-    assign write_address_MEM = write_add;
-    // asignacion de la salida de la memoria 0 al micro
-    assign gpio_i_data_tri_i[RAM_WIDTH-1:0] = mem0_o;
-    assign gpio_i_data_tri_i[GPIO_D-1:RAM_WIDTH] = 19'h0;
+    wire                 start;
+    wire                 next_data;
+    reg                  prev;
+    reg                  aux;
+    
+    
+    
+    
+    assign rst = gpio_o_data_tri_o[0]; //primeo en 1 despues en 0 res top y conv
+    assign start = gpio_o_data_tri_o[1];
+    assign next_data = gpio_o_data_tri_o[2];
+
+    assign gpio_i_data_tri_i[BITS_DATA-1:0] = mcu_Data_ctrl;
+    assign gpio_i_data_tri_i[GPIO_D-1:BITS_DATA] = 19'h0;
+
+    
+
     //asignacion de la finalizacion al led para un udicador visual.
-    assign o_led = ~ending;
+    assign o_led = fsm_eop_mcu;
 
     initial begin
-        dmicro0     = 13'h0;
-        dmicro1     = 13'h0;
-        dmicro2     = 13'h0;
-        read_add    = {NB_ADDRESS{1'b1}};
-        write_add   = {NB_ADDRESS{1'b1}};
-        ending      = 1'b1;
-        i_data_mem1 = 13'h0;
-        i_data_mem2 = 13'h0;
+        fsm_WAddr_mcu    = {NB_ADDRESS{1'b1}};
+        fsm_RAddr_mcu   = {NB_ADDRESS{1'b1}};
+        fsm_eop_mcu = 1'b1;
+        fsm_sop_mcu = 1'b0;
+        fsm_chblk_mcu = 1'b0;
+        ctrl_valid_conv = 1'b0;
+        ctrl_ki_conv = 1'b0;
+        ctrl_Data_mcu = {(BITS_DATA/2){2'b01}};
     end
-
+    
     always @(posedge CLK100MHZ ) begin
         if (rst) begin
             // reset
-            read_add    <= 10'h0;//{NB_ADDRESS{1'b1}};
-            write_add   <= 10'h0;//10'h3fa;
-            ending      <= 1'b1;
-            dmicro0     <= 8'h94;
-            dmicro1     <= 8'h0;
-            dmicro2     <= 8'h0;
-            i_data_mem1 <= 13'h0;
-            i_data_mem2 <= 13'h0;
-            reg_aux     <= {RAM_WIDTH{1'b0}};
-        end
-        else if (valid==1'b1 && ending==1'b1) begin
-            dmicro0     <= dmicro0;
-            dmicro1     <= dmicro1;
-            dmicro2     <= dmicro2;
-            reg_aux     <= data_oc;
-            read_add    <= read_add +1;
-            if (read_add >= 10'h6 && read_add <= 10'h25)
-                write_add   <= write_add +1;
-            else write_add   <= write_add;
+            fsm_RAddr_mcu    <= {NB_ADDRESS{1'b0}};
+            fsm_WAddr_mcu    <= {NB_ADDRESS{1'b0}};
+            fsm_eop_mcu <= 1'b1;
+            fsm_sop_mcu <= 1'b0;
+            fsm_chblk_mcu <= 1'b0;
+            ctrl_valid_conv <= 1'b0;
+            ctrl_ki_conv <= 1'b0;
+            ctrl_Data_mcu <= {(BITS_DATA/2){2'b01}};
+        end else begin
+            
+            prev <= next_data;
+            aux <= start;
 
-            if(read_add == 10'h25) ending <=0;           
-            else ending <= ending;
-        end
-        else begin
-            read_add    <= read_add;
-            write_add   <= write_add;
-            ending      <= ending;
-            i_data_mem1 <= i_data_mem1;
-            i_data_mem2 <= i_data_mem2;
-            dmicro0     <= dmicro0;
-            dmicro1     <= dmicro1;
-            dmicro2     <= dmicro2;
+            if ((start && !aux) || fsm_sop_mcu) begin
+                fsm_sop_mcu <= 1'b1;
+                fsm_eop_mcu <= 1'b0;
+                ctrl_valid_conv <= 1'b1;
+                
+                
+                fsm_RAddr_mcu <= fsm_RAddr_mcu + 1;
+                fsm_WAddr_mcu <= (fsm_RAddr_mcu < 3) ? {NB_ADDRESS{1'b0}} : fsm_WAddr_mcu + 1; // Cambiar numero segun latencia
+                
+                if (fsm_RAddr_mcu == {NB_ADDRESS{1'b1}}) begin
+                    ctrl_valid_conv <= 1'b0;
+                    fsm_sop_mcu <= 1'b0;
+                    fsm_eop_mcu <= 1'b1;
+                end
+            end else if((next_data && !prev) && fsm_eop_mcu) begin // if (start || fsm_sop_mcu)
+                fsm_RAddr_mcu <= fsm_WAddr_mcu + 1;
+            end else begin
+                fsm_WAddr_mcu <= {NB_ADDRESS{1'b0}};
+                fsm_RAddr_mcu <= {NB_ADDRESS{1'b0}};
+                ctrl_valid_conv <= 1'b0;
+            end
         end
     end
-
+    
     // instacia del Microcontrolador
    //inacia de Convolucionador
     generate
@@ -127,9 +133,9 @@ module micro_sim
                   .i_dato0(mcu_DataConv_conv[(i+1)*BITS_IMAGEN-1 -: BITS_DATAIN]),
                   .i_dato1(mcu_DataConv_conv[(i+2)*BITS_IMAGEN-1 -: BITS_DATAIN]),
                   .i_dato2(mcu_DataConv_conv[(i+3)*BITS_IMAGEN-1 -: BITS_DATAIN]),
-                  .i_selecK_I(k_i),
+                  .i_selecK_I(ctrl_ki_conv),
                   .i_reset(rst),
-                  .i_valid(valid),
+                  .i_valid(ctrl_valid_conv),
                   .CLK100MHZ(CLK100MHZ)
                   );
         end
