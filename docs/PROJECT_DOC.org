@@ -36,23 +36,42 @@
 ** Modulo de control
 **** I/O
      *Input*
-     - _GPIO_CTRL_In_: Puerto de 8 bits que recibe las instrucciones de control.
-     - _GPIO_Data_In_: Puerto de 24 bits que recibe los datos desde el exterior
-     - _Rst_
-     - _Clk_
-     - _EoP_: Indica que se ha finalizado la etapa de procesamiento, se debe salir del estado de *RUN*
-     - _Data_In_: Puerto de 3*[8] bits que recibe los datos almacenados en memoria
+     - i_GPIOvalid   : bit de valid asignado del bus del GPIO ( GPIO[28]).
+     - i_GPIOctrl    : Puerto de 3 bits que recibe las instrucciones de control   GPIO[31:29].
+     - i_GPIOdata    : Puerto de 24 bits que recibe los datos desde el exterior (GPIO[24:1])
+     - i_rst         : reset del módulo(GPIO[0])
+     - i_CLK         : entrada de clock
+     - i_EOP_from_FSM: Proveniente de la FSM, indica que se ha finalizado la etapa de procesamiento, se debe salir del estado de *RUN*
+     - i_MCUdata     : Puerto de 13 bits que recibe los datos almacenados en memoria (interactuando con el MCU)
+     
      *OutPut*
-     - _GPIO_Out_: Puerto de 32 bits utilizado para enviar informacion al exterior
-     - _Estado_: Puerto de 3 bits que indica en que estado se esta
-     - _SoP_: Indica que se ha pasado al estado de *RUN* y se debe comenzar el procesamiento de la informacion
-     - _EoP_: Indica que se ha pasado al estado de *OUT*
-     - _Valid_: Se pone en estado alto durante un ciclo cuando detecta un flanco de subida del *bit Valid* de la instruccion de control presente en *GPIO_CTRL_In*
-     - _C_Valid_: Se pone en estado alto durante un ciclo cuando detecta un flanco de subida del *bit Valid* de la instruccion de control presente en *GPIO_CTRL_In* /unicamente durante la etapa de configuracion del kernel en la estapa de LOAD/
-     - _Length_: Puerto de [10] bits que tiene a su salida la altura de la imagen con la que se esta trabajando
-     - _Data_Out_: Puerto de [24] bits que reflejan los datos recibidos desde *GPIO_Data_In* durante la etapa de carga de imagen en el estado de *LOAD*
-     - _Kernel_: Puerto de [24] bits que representan una fila del kernel (filtro) que se desea cargar, la configuracion del kernel debe ser habilitada mediante el puerto *K/I* y sincronizada utilizando el puerto *C_Valid*
-     - _K/I_: Indica si los datos entregados desde la memoria deben ser cargados a los registros del Kernel o el sector de la imagen.
+     - o_GPIOdata      : Puerto de 32 bits utilizado para enviar informacion al exterior
+     - o_MCUdata       : Puerto de [13] bits que reflejan los datos recibidos desde *GPIO_Data_In* durante la etapa de carga de imagen en el estado de *LOAD*
+     - o_led           : Puerto de 3 bits a modo indicativo para referenciar el estado
+     - o_SoP           : Indica que se ha pasado al estado de *RUN* y se debe comenzar el procesamiento de la informacion
+     - o_EOP_to_MCU    : Indica (al MCU) que se ha pasado al estado de *OUT*
+     - o_valid_to_FSM  : Se pone en estado alto durante un ciclo cuando detecta un flanco de subida del *bit Valid* de la instruccion de control presente en *GPIO_CTRL_In*
+     - o_valid_to_CONV : Se pone en estado alto durante un ciclo cuando detecta un flanco de subida del *bit Valid* de la instruccion de control presente en *GPIO_CTRL_In* /unicamente durante la etapa de configuracion del kernel en la estapa de LOAD/
+     - o_imgLength: Puerto de [10] bits que tiene a su salida la altura de la imagen con la que se esta trabajando
+     - o_KNLdata       : Puerto de [24] bits que representan una fila del kernel (filtro) que se desea cargar, la configuracion del kernel debe ser habilitada mediante el puerto *K/I* y sincronizada utilizando el puerto *C_Valid*
+     - o_KNorIMG       : Indica si los datos entregados desde la memoria deben ser cargados a los registros del Kernel o el sector de la imagen.
+     
+     
+ INSTRUCCIONES: (bits más significativos del bus (GPIO[31:29]); GPIO[28] es el bit asignado VALID)
+           
+                Código instrucción              Acción/estado
+                
+                     000                      Cargar kernell
+                     001                      Cargar Img_size
+                     010                      Cargar Imagen
+                     011                      Pedir dato
+                     100                      Cambio de estado (a precesamiento)
+                     -----------------------------------------
+                     101-111                  No utilizados
+                     ---------------------------------------
+           
+     
+     
    
 ** FSM
 **** I/O
