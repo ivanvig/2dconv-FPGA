@@ -56,22 +56,7 @@
      - o_KNLdata       : Puerto de [24] bits que representan una fila del kernel (filtro) que se desea cargar, la configuracion del kernel debe ser habilitada mediante el puerto *K/I* y sincronizada utilizando el puerto *C_Valid*
      - o_KNorIMG       : Indica si los datos entregados desde la memoria deben ser cargados a los registros del Kernel o el sector de la imagen.
      
-     
- INSTRUCCIONES: (bits más significativos del bus (GPIO[31:29]); GPIO[28] es el bit asignado VALID)
-           
-                Código instrucción              Acción/estado
-                
-                     000                      Cargar kernell
-                     001                      Cargar Img_size
-                     010                      Cargar Imagen
-                     011                      Pedir dato
-                     100                      Cambio de estado (a precesamiento)
-                     -----------------------------------------
-                     101-111                  No utilizados
-                     ---------------------------------------
-           
-     
-     
+   
    
 ** FSM
 **** I/O
