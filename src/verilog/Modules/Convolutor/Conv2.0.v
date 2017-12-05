@@ -54,7 +54,7 @@ module Conv #(
             imagen[2]<=24'h0;
             //reser valores de kernel
             kernel[0]<=24'h0;
-            kernel[1]<=24'h0;
+            kernel[1]<=24'h100;
             kernel[2]<=24'h0;
             //regitro de la convolucion
             conv_reg<=0;
