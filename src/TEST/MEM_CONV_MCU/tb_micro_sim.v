@@ -1,3 +1,5 @@
+`define GPIO_D 32
+
 module micro_sim_tb();
     
       parameter GPIO_D        = `GPIO_D;
@@ -31,17 +33,20 @@ module micro_sim_tb();
 
         #10 gpio_o_data_tri_o[2] = 1'b1;
         #10 gpio_o_data_tri_o[2] = 1'b0;
+        $finish;
+        
     end
 
     always #2 CLK100MHZ = ~CLK100MHZ;
 
     micro_sim
-        (
-         .gpio_o_data_tri_o(gpio_o_data_tri_o),
-         .gpio_i_data_tri_i(gpio_i_data_tri_i),
-         .o_led(o_led),
-         .CLK100MHZ(CLK100MHZ)
-         );
+        u_micro
+            (
+             .gpio_o_data_tri_o(gpio_o_data_tri_o),
+             .gpio_i_data_tri_i(gpio_i_data_tri_i),
+             .o_led(o_led),
+             .CLK100MHZ(CLK100MHZ)
+             );
     
 
 endmodule
