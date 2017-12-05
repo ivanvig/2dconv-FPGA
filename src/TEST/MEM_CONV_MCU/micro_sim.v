@@ -116,7 +116,7 @@ module micro_sim
                     fsm_eop_mcu <= 1'b1;
                 end
             end else if((next_data && !prev) && fsm_eop_mcu) begin // if (start || fsm_sop_mcu)
-                fsm_RAddr_mcu <= fsm_WAddr_mcu + 1;
+                fsm_RAddr_mcu <= fsm_RAddr_mcu + 1;
             end else begin
                 fsm_WAddr_mcu <= {NB_ADDRESS{1'b0}};
                 fsm_RAddr_mcu <= {NB_ADDRESS{1'b0}};
@@ -151,7 +151,7 @@ module micro_sim
              .i_Data(ctrl_Data_mcu),
              .i_MemData(mem_MemData_mcu),
              .i_WAddr(fsm_WAddr_mcu),
-             .i_RAddr(fsm_WAddr_mcu),
+             .i_RAddr(fsm_RAddr_mcu),
              .i_chblk(fsm_chblk_mcu),
              .i_sop(fsm_sop_mcu),
              .i_eop(fsm_eop_mcu),
