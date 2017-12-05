@@ -20,6 +20,7 @@ module micro_sim
       parameter N = 2,
       parameter BITS_IMAGEN = 11,
       parameter BITS_DATA = BITS_IMAGEN
+
       )(
         output [GPIO_D-1:0] gpio_i_data_tri_i,
         output              o_led,
@@ -80,7 +81,7 @@ module micro_sim
         fsm_sop_mcu = 1'b0;
         fsm_chblk_mcu = 1'b0;
         ctrl_valid_conv = 1'b0;
-        ctrl_ki_conv = 1'b0;
+        ctrl_ki_conv = 1'b1;
         ctrl_Data_mcu = {(BITS_DATA/2){2'b01}};
     end
     
@@ -93,7 +94,7 @@ module micro_sim
             fsm_sop_mcu <= 1'b0;
             fsm_chblk_mcu <= 1'b0;
             ctrl_valid_conv <= 1'b0;
-            ctrl_ki_conv <= 1'b0;
+            ctrl_ki_conv <= 1'b1;
             ctrl_Data_mcu <= {(BITS_DATA/2){2'b01}};
         end else begin
             
@@ -171,7 +172,7 @@ module micro_sim
     
     generate
         for (i = 0; i < (N+2); i = i+1) begin : gen_memory
-            memory u_mem
+            memory#(.INIT_FILE({"mem0" + i, ".txt"})) u_mem
                  (
                   .i_wrEnable(mcu_we_mem[i]),
                   .i_CLK(CLK100MHZ),
