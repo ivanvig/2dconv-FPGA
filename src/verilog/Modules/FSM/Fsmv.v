@@ -132,39 +132,43 @@ module Fsmv#(
                 beginigProcess <= beginigProcess;
                 if(counterAdd != imgHeight)  counterAdd   <= counterAdd+1;
                 else counterAdd   <= counterAdd;
-
+                
+                sopControl              <= sopControl;
+                states                  <= states; 
                 //Shifteo para el write address, teniendo en cuenta la latencia.
                 if(counterAdd>=10'h6 && counter_with_latency < imgHeight-2) begin
                     counter_with_latency    <= counter_with_latency +1;
                     fms2conVld              <= fms2conVld;
                     endOfProcess            <= endOfProcess;
-                    states                  <= states; 
+
                 end
                 else if(counter_with_latency == imgHeight-2)begin 
                     //si se llega la tamaño de la imagen reseteo los contadores 
                     counter_with_latency    <= counter_with_latency;
                     fms2conVld              <= 1'b0;
-                    
-                    if (~i_SoP) begin
-                        endOfProcess    <= 1'b1;
-                        states          <= 2'b00;
-                        sopControl      <= 1'b0;
-                    end
-                    else begin
-                        endOfProcess    <= endOfProcess;
-                        states          <= states;
-                        sopControl      <= sopControl;
-                    end
+                    endOfProcess            <= 1'b1;
+
                 end
                 else begin
                     counter_with_latency    <= counter_with_latency;
-                    sopControl              <= sopControl;
                     endOfProcess            <= endOfProcess;
                     fms2conVld              <= fms2conVld;
-                    states                  <= states; 
                     end
             end
-        	else begin
+        	else if(states == 2'b11)begin
+                if (~i_SoP) begin
+                    endOfProcess    <= endOfProcess;
+                    states          <= 2'b00;
+                    sopControl      <= 1'b0;
+                end
+                else begin
+                    endOfProcess    <= endOfProcess;
+                    states          <= states;
+                    sopControl      <= sopControl;
+                end
+
+            end
+            else begin
             		sopControl           <= sopControl;
             		counter_with_latency <= counter_with_latency;       
        	    		counterAdd           <= counterAdd;
