@@ -24,8 +24,8 @@ except OSError as err:
 print("[*] Escribiendo Archivo")
 for i in range(0, args.size):
     if i < imagen.shape[0]:
-        file.write("{:013b}\n".format(imagen[i,args.columna]))
+        file.write("{:04x}\n".format(imagen[i,args.columna]))
     else:
-        file.write("{:013b}\n".format(0))
+        file.write("{:04x}\n".format(0))
 
 print("[*] Archivo escrito con exito")
