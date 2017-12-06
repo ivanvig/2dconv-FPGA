@@ -5,7 +5,7 @@
 `define CONV_LPOS 13
 `define M_LEN 3
 `define GPIO_D 32
-`define NB_ADDRESS 4
+`define NB_ADDRESS 10
 
 module micro_sim
     #(
@@ -173,7 +173,7 @@ module micro_sim
     
     generate
         for (i = 0; i < (N+2); i = i+1) begin : gen_memory
-            memory#(.INIT_FILE({"mem0" + i, ".txt"}), .NB_ADDRESS(NB_ADDRESS)) u_mem
+            memory#(.INIT_FILE({"/home/iv/Xilinx/2dconv-FPGA/src/TEST/MEM_CONV_MCU/mem0" + i, ".txt"}), .NB_ADDRESS(NB_ADDRESS)) u_mem
                  (
                   .i_wrEnable(mcu_we_mem[i]),
                   .i_CLK(CLK100MHZ),
