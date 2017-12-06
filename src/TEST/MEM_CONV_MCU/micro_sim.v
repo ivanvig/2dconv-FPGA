@@ -103,13 +103,15 @@ module micro_sim
             if ((start && !aux) || fsm_sop_mcu) begin
                 fsm_sop_mcu <= 1'b1;
                 fsm_eop_mcu <= 1'b0;
+            end
+            if(fsm_sop_mcu && !fsm_eop_mcu)begin
                 ctrl_valid_conv <= 1'b1;
                 
                 
-                fsm_RAddr_mcu <= fsm_RAddr_mcu + 1;
-                fsm_WAddr_mcu <= (fsm_RAddr_mcu < 3) ? {NB_ADDRESS{1'b0}} : fsm_WAddr_mcu + 1; // Cambiar numero segun latencia
+                fsm_RAddr_mcu <= (fsm_RAddr_mcu == {NB_ADDRESS{1'b1}}) ? {NB_ADDRESS{1'b1}} : fsm_RAddr_mcu + 1;
+                fsm_WAddr_mcu <= (fsm_RAddr_mcu < 5) ? {NB_ADDRESS{1'b0}} : fsm_WAddr_mcu + 1; // Cambiar numero segun latencia
                 
-                if (fsm_RAddr_mcu == {NB_ADDRESS{1'b1}}) begin
+                if (fsm_WAddr_mcu == {NB_ADDRESS{1'b1}} - 2) begin
                     ctrl_valid_conv <= 1'b0;
                     fsm_sop_mcu <= 1'b0;
                     fsm_eop_mcu <= 1'b1;
