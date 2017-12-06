@@ -56,7 +56,7 @@ module MCU_CTRL
                 PROC: begin
                     if(next_state == state) begin
                         we_proc_status <= {we_proc_status[1:0], we_proc_status[N+1:2]};
-                        substate <= (substate == SUB) ? {clog2(SUB-1){1'b0}} : substate + 1;
+                        substate <= (substate == SUB-1) ? {clog2(SUB-1){1'b0}} : substate + 1;
                         next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
                     end
                 end
@@ -92,12 +92,12 @@ module MCU_CTRL
             end
 
             OUT: begin
-                o_we = {(N+1){1'b0}};
+                o_we = {(N+2){1'b0}};
                 o_memSelect = memSelect_out;
             end
 
             default: begin
-                o_we = {(N+1){1'b0}};
+                o_we = {(N+2){1'b0}};
                 o_memSelect = {(clog2(N+1) - 1){1'b0}};
             end
         endcase
