@@ -2,13 +2,13 @@ module MCU
     #(
       parameter N = 2,
       parameter STATES = 3,
-      parameter BITS_IMAGEN = 11,
-      parameter BITS_DATA = BITS_IMAGEN,
+      parameter BITS_IMAGEN = 8,
+      parameter BITS_DATA = 13,
       parameter BITS_ADDR = 10
       )(
-        input [N*BITS_IMAGEN-1:0]      i_DataConv,
-        input [BITS_DATA-1:0]          i_Data,
-        input [(N+2)*BITS_IMAGEN-1:0]  i_MemData,
+        input [N*BITS_DATA-1:0]        i_DataConv,
+        input [BITS_IMAGEN-1:0]        i_Data,
+        input [(N+2)*BITS_DATA-1:0]    i_MemData,
         input [BITS_ADDR-1:0]          i_WAddr, i_RAddr,
         input                          i_chblk, i_sop, i_eop, rst, clk,
 
@@ -16,7 +16,7 @@ module MCU
         output [BITS_DATA-1:0]         o_Data,
         output [N+1:0]                 o_we,
         output [BITS_ADDR-1:0]         o_WAddr, o_RAddr,
-        output [(N+2)*BITS_IMAGEN-1:0] o_MemData
+        output [(N+2)*BITS_DATA-1:0] o_MemData
         );
 
     wire [clog2(STATES-1)-1:0]         state;
