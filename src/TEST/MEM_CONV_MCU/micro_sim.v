@@ -5,7 +5,7 @@
 `define CONV_LPOS 13
 `define M_LEN 3
 `define GPIO_D 32
-`define NB_ADDRESS 10
+`define NB_ADDRESS 4
 
 module micro_sim
     #(
@@ -16,10 +16,9 @@ module micro_sim
       parameter NB_ADDRESS    = `NB_ADDRESS,
       parameter RAM_WIDTH     = 13,
       parameter GPIO_D        = `GPIO_D,
-      parameter BITS_DATAIN = 8,
       parameter N = 2,
-      parameter BITS_IMAGEN = 11,
-      parameter BITS_DATA = BITS_IMAGEN
+      parameter BITS_IMAGEN = 8,
+      parameter BITS_DATA = 13
 
       )(
         output [GPIO_D-1:0] gpio_i_data_tri_i,
@@ -32,15 +31,15 @@ module micro_sim
     
 
     /////////// WIRES AGREGADOS //////////////
-    wire [N*BITS_IMAGEN-1:0] conv_DataConv_mcu;
-    wire [(N+2)*BITS_IMAGEN-1:0] mem_MemData_mcu;
-    wire                         rst, clk;
+    wire [N*BITS_DATA-1:0] conv_DataConv_mcu;
+    wire [(N+2)*BITS_DATA-1:0] mem_MemData_mcu;
+    wire                         rst;
     
     wire [3*N*BITS_IMAGEN-1:0]   mcu_DataConv_conv;
     wire [BITS_DATA-1:0]         mcu_Data_ctrl;
     wire [N+1:0]                 mcu_we_mem;
     wire [NB_ADDRESS-1:0]        mcu_WAddr_mem, mcu_RAddr_mem;
-    wire [(N+2)*BITS_IMAGEN-1:0] mcu_MemData_mem;
+    wire [(N+2)*BITS_DATA-1:0] mcu_MemData_mem;
 
     ////////////////////////////////////////////
     
@@ -50,7 +49,7 @@ module micro_sim
     reg [NB_ADDRESS-1:0] fsm_RAddr_mcu, fsm_WAddr_mcu;
 
     reg                  ctrl_valid_conv, ctrl_ki_conv;
-    reg [BITS_DATA-1:0]  ctrl_Data_mcu;
+    reg [BITS_IMAGEN-1:0]  ctrl_Data_mcu;
 
     // Microconotrolador
 
@@ -82,7 +81,7 @@ module micro_sim
         fsm_chblk_mcu = 1'b0;
         ctrl_valid_conv = 1'b0;
         ctrl_ki_conv = 1'b1;
-        ctrl_Data_mcu = {(BITS_DATA/2){2'b01}};
+        ctrl_Data_mcu = {(BITS_IMAGEN/2){2'b01}};
     end
     
     always @(posedge CLK100MHZ ) begin
@@ -95,7 +94,7 @@ module micro_sim
             fsm_chblk_mcu <= 1'b0;
             ctrl_valid_conv <= 1'b0;
             ctrl_ki_conv <= 1'b1;
-            ctrl_Data_mcu <= {(BITS_DATA/2){2'b01}};
+            ctrl_Data_mcu <= {(BITS_IMAGEN/2){2'b01}};
         end else begin
             
             prev <= next_data;
@@ -131,9 +130,9 @@ module micro_sim
         for (i = 0; i < N; i = i+1) begin : gen_conv
             Conv u_conv
                  (.o_data(conv_DataConv_mcu[(i+1)*BITS_DATA-1 -: BITS_DATA]),
-                  .i_dato0(mcu_DataConv_conv[(i+1)*BITS_IMAGEN-1 -: BITS_DATAIN]),
-                  .i_dato1(mcu_DataConv_conv[(i+2)*BITS_IMAGEN-1 -: BITS_DATAIN]),
-                  .i_dato2(mcu_DataConv_conv[(i+3)*BITS_IMAGEN-1 -: BITS_DATAIN]),
+                  .i_dato0(mcu_DataConv_conv[(i*3+1)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
+                  .i_dato1(mcu_DataConv_conv[(i*3+2)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
+                  .i_dato2(mcu_DataConv_conv[(i*3+3)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
                   .i_selecK_I(ctrl_ki_conv),
                   .i_reset(rst),
                   .i_valid(ctrl_valid_conv),
@@ -144,7 +143,7 @@ module micro_sim
     
     
     //instancia MCU
-    MCU
+    MCU#(.BITS_ADDR(NB_ADDRESS))
         u_MemCU
             (
              .i_DataConv(conv_DataConv_mcu),
@@ -172,13 +171,13 @@ module micro_sim
     
     generate
         for (i = 0; i < (N+2); i = i+1) begin : gen_memory
-            memory#(.INIT_FILE({"mem0" + i, ".txt"})) u_mem
+            memory#(.INIT_FILE({"mem0" + i, ".txt"}), .NB_ADDRESS(NB_ADDRESS)) u_mem
                  (
                   .i_wrEnable(mcu_we_mem[i]),
                   .i_CLK(CLK100MHZ),
                   .i_writeAdd(mcu_WAddr_mem),
                   .i_readAdd(mcu_RAddr_mem),
-                  .i_data(mcu_MemData_mem),
+                  .i_data(mcu_MemData_mem[(i+1)*BITS_DATA-1 -: BITS_DATA]),
                   
                   .o_data(mem_MemData_mcu[(i+1)*BITS_DATA-1 -: BITS_DATA])
                   );
