@@ -2,13 +2,13 @@ module tb_MCU();
 
     parameter N = 2;
     parameter STATES = 3;
-    parameter BITS_IMAGEN = 11;
-    parameter BITS_DATA = BITS_IMAGEN;
+    parameter BITS_IMAGEN = 8;
+    parameter BITS_DATA = 13;
     parameter BITS_ADDR = 10;
     
-    reg [N*BITS_IMAGEN-1:0]      i_DataConv;
-    reg [BITS_DATA-1:0]          i_Data;
-    reg [(N+2)*BITS_IMAGEN-1:0]  i_MemData;
+    reg [N*BITS_DATA-1:0]      i_DataConv;
+    reg [BITS_IMAGEN-1:0]          i_Data;
+    reg [(N+2)*BITS_DATA-1:0]  i_MemData;
     reg [BITS_ADDR-1:0]          i_WAddr, i_RAddr;
     reg                          i_chblk, i_sop, i_eop, rst, clk;
 
@@ -16,14 +16,14 @@ module tb_MCU();
     wire [BITS_DATA-1:0]         o_Data;
     wire [N+1:0]                 o_we;
     wire [BITS_ADDR-1:0]         o_WAddr, o_RAddr;
-    wire [(N+2)*BITS_IMAGEN-1:0] o_MemData;
+    wire [(N+2)*BITS_DATA-1:0] o_MemData;
     
     
     initial begin
         
-        i_Data     = {BITS_DATA/2{1'b1,1'b0}};
-        i_MemData  = {N{{BITS_IMAGEN{1'b1}},{BITS_IMAGEN{1'b0}}}};
-        i_DataConv = {(3*N*BITS_IMAGEN){1'b1}};
+        i_Data     = {BITS_IMAGEN/2{1'b1,1'b0}};
+        i_MemData  = {13'h3,13'h2,13'h1,13'h0};
+        i_DataConv = {(N*BITS_DATA){1'b1}};
         i_WAddr = 1;
         i_RAddr = 1;
         
@@ -100,11 +100,11 @@ module tb_MCU();
 
     MCU
         #(
-          .N(2),
-          .STATES(3),
-          .BITS_IMAGEN(11),
-          .BITS_DATA(BITS_IMAGEN),
-          .BITS_ADDR(10)
+          .N(N),
+          .STATES(STATES),
+          .BITS_IMAGEN(BITS_IMAGEN),
+          .BITS_DATA(BITS_DATA),
+          .BITS_ADDR(BITS_ADDR)
           )
 
     u_MCU
