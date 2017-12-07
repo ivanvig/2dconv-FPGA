@@ -14,6 +14,7 @@ module Fsmv#(
     output [NB_ADDRESS-1:0]  o_writeAdd,
     output [NB_ADDRESS-1:0]  o_readAdd,
     output                   o_EoP,
+    output                   o_sopross,
     output                   o_changeBlock,
     output                   o_fms2conVld,
     input  [NB_IMAGE-1:0]    i_imgLength,
@@ -105,7 +106,7 @@ module Fsmv#(
                 else counterAdd   <= counterAdd;
                 
                 //Verificación si termino de leer/cargar un bloque
-                if (counterAdd==imgHeight)begin
+                if (counterAdd==i_imgLength)begin
                     if(~i_load)begin
                         changeBlock <= 1'b1;
                         states      <= 2'b00;
@@ -130,49 +131,40 @@ module Fsmv#(
             end
             else if(states == 2'b10) begin
                 beginigProcess <= beginigProcess;
-                if(counterAdd != imgHeight)  counterAdd   <= counterAdd+1;
+                
+                if(counterAdd <= i_imgLength)  counterAdd   <= counterAdd+1;
                 else counterAdd   <= counterAdd;
-
+        
                 //Shifteo para el write address, teniendo en cuenta la latencia.
-                if(counterAdd>=10'h6 && counter_with_latency < imgHeight-2) begin
+                if(counterAdd>=10'h6 && counter_with_latency < i_imgLength-2) begin
                     counter_with_latency    <= counter_with_latency +1;
-                    fms2conVld              <= fms2conVld;
                     endOfProcess            <= endOfProcess;
-                    states                  <= states; 
+                    fms2conVld              <= fms2conVld;
+                    sopControl              <= sopControl;
+                    states                  <= states;
                 end
-                else if(counter_with_latency == imgHeight-2)begin 
+                else if(counter_with_latency == i_imgLength-2)begin 
                     //si se llega la tamaño de la imagen reseteo los contadores 
                     counter_with_latency    <= counter_with_latency;
                     fms2conVld              <= 1'b0;
-                    
-                    if (~i_SoP) begin
-                        endOfProcess    <= 1'b1;
-                        states          <= 2'b00;
-                        sopControl      <= 1'b0;
-                    end
-                    else begin
-                        endOfProcess    <= endOfProcess;
-                        states          <= states;
-                        sopControl      <= sopControl;
-                    end
+                    endOfProcess            <= 1'b1;
+                    sopControl              <= 1'b0;
+                    states                  <= 2'b11;
                 end
                 else begin
                     counter_with_latency    <= counter_with_latency;
-                    sopControl              <= sopControl;
                     endOfProcess            <= endOfProcess;
                     fms2conVld              <= fms2conVld;
-                    states                  <= states; 
+                    sopControl              <= sopControl;
+                    states                  <= states;
                     end
             end
-        	else begin
-            		sopControl           <= sopControl;
-            		counter_with_latency <= counter_with_latency;       
-       	    		counterAdd           <= counterAdd;
-       	    		endOfProcess         <= endOfProcess;
-        			changeBlock          <= 1'b0;
-        			beginigProcess       <= beginigProcess;
-                    fms2conVld           <= fms2conVld; 	
-       		end
+        	else if(states == 2'b11)begin
+                if (~i_SoP)
+                    states   <= 2'b00;
+                else 
+                    states <= states;
+            end
         end 
     end 
     //end always   
@@ -183,5 +175,6 @@ module Fsmv#(
     assign          {o_EoP} =  endOfProcess;
     assign  {o_changeBlock} =  changeBlock;
     assign  o_fms2conVld    = fms2conVld;
+    assign  o_sopross       = sopControl;
 
 endmodule
