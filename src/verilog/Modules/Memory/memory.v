@@ -1,13 +1,12 @@
 `timescale 1ns / 1ps
 
-`define NB_ADDRESS 10
 `define RAM_WIDTH 13
 
 
 module memory( i_wrEnable, i_CLK, i_writeAdd, i_readAdd, i_data, o_data );
     
     parameter RAM_WIDTH = `RAM_WIDTH;    
-    parameter NB_ADDRESS= `NB_ADDRESS;
+    parameter NB_ADDRESS= 10;
     parameter INIT_FILE = "";
     localparam RAM_DEPTH=(2**NB_ADDRESS)-1;
     

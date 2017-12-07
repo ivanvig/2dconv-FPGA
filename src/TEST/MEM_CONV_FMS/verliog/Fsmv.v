@@ -1,13 +1,10 @@
 `timescale 1ns / 1ps
 
-`define NB_ADDRESS      10
-`define NB_IMAGE        10
-`define NB_STATES       2
-
 module Fsmv#(
-    parameter NB_ADDRESS= `NB_ADDRESS,
-    parameter NB_IMAGE  = `NB_IMAGE,
-    parameter NB_STATES = `NB_STATES
+    parameter NB_ADDRESS= 10,
+    parameter NB_IMAGE  = NB_ADDRESS,
+    parameter NB_STATES = 2,
+    parameter LATENCIA = 5
 
     )(
     //Definicion de puertos
@@ -40,36 +37,36 @@ module Fsmv#(
     reg [NB_STATES-1:0]  states;
 
     initial begin
-        counterAdd              = `NB_ADDRESS'd0;
-        counter_with_latency    = `NB_ADDRESS'd0;
-        imgHeight               = `NB_ADDRESS'd0;
+        counterAdd              = {NB_ADDRESS{1'b0}};
+        counter_with_latency    = {NB_ADDRESS{1'b0}};
+        imgHeight               = {NB_ADDRESS{1'b0}};
         endOfProcess            = 1'b0;
         changeBlock             = 1'b0;
         sopControl              = 1'b0;
         beginigProcess		    = 1'b0;
         valid_previous_state    = 1'b0;
         fms2conVld              = 1'b0;
-        states                  = `NB_STATES'd0;
+        states                  = {NB_STATES{1'b0}};
     end        
     
     always @(posedge i_CLK) begin  
       	valid_previous_state<=i_valid;
       	if(i_reset==1'b1)begin
-        	counterAdd           <= `NB_ADDRESS'd0;
-        	counter_with_latency <= `NB_ADDRESS'd0;
+        	counterAdd           <= {NB_ADDRESS{1'b0}};
+        	counter_with_latency <= {NB_ADDRESS{1'b0}};
         	endOfProcess         <= 1'b0;
         	changeBlock          <= 1'b0;
         	sopControl           <= 1'b0;
         	beginigProcess		 <= 1'b0;
         	imgHeight			 <= i_imgLength;
             fms2conVld           <= 1'b0;
-            states               <= `NB_STATES'd0;
+            states               <= {NB_STATES{1'b0}};
       	end
       	else begin
             imgHeight <= imgHeight;
             if(states == 2'b00) begin
-                counter_with_latency  <= `NB_ADDRESS'd0;
-                counterAdd            <= `NB_ADDRESS'd0;
+                counter_with_latency  <= {NB_ADDRESS{1'b0}};
+                counterAdd            <= {NB_ADDRESS{1'b0}};
                 changeBlock           <= 1'b0;
                 imgHeight             <= imgHeight;
                 if(i_load && ~i_SoP && ~endOfProcess) begin
@@ -84,7 +81,7 @@ module Fsmv#(
                     states <= 2'b10;
                     beginigProcess  <= 1'b0;
                     sopControl      <= 1'b1;
-                    fms2conVld      <= 1'b1;
+                    //fms2conVld      <= 1'b1;
                 end
                 else if(~i_load && ~i_SoP && endOfProcess)begin
                     //estado de lectura
@@ -101,11 +98,11 @@ module Fsmv#(
                 end
             end
             else if(states == 2'b01)begin
-                //Manejo de direcciones en función del valid
+                //Manejo de direcciones en funci??n del valid
                 if (i_valid && !valid_previous_state) counterAdd <= counterAdd+1;
                 else counterAdd   <= counterAdd;
                 
-                //Verificación si termino de leer/cargar un bloque
+                //Verificaci??n si termino de leer/cargar un bloque
                 if (counterAdd==i_imgLength)begin
                     if(~i_load)begin
                         changeBlock <= 1'b1;
@@ -130,23 +127,22 @@ module Fsmv#(
                 end 
             end
             else if(states == 2'b10) begin
+                fms2conVld <= 1'b1;
                 beginigProcess <= beginigProcess;
                 
                 if(counterAdd <= i_imgLength)  counterAdd   <= counterAdd+1;
                 else counterAdd   <= counterAdd;
         
                 //Shifteo para el write address, teniendo en cuenta la latencia.
-                if(counterAdd>=10'h6 && counter_with_latency < i_imgLength-2) begin
+                if(counterAdd>=LATENCIA && counter_with_latency < i_imgLength-2) begin
                     counter_with_latency    <= counter_with_latency +1;
                     endOfProcess            <= endOfProcess;
-                    fms2conVld              <= fms2conVld;
                     sopControl              <= sopControl;
                     states                  <= states;
                 end
                 else if(counter_with_latency == i_imgLength-2)begin 
-                    //si se llega la tamaño de la imagen reseteo los contadores 
+                    //si se llega la tama??o de la imagen reseteo los contadores 
                     counter_with_latency    <= counter_with_latency;
-                    fms2conVld              <= 1'b0;
                     endOfProcess            <= 1'b1;
                     sopControl              <= 1'b0;
                     states                  <= 2'b11;
@@ -154,7 +150,6 @@ module Fsmv#(
                 else begin
                     counter_with_latency    <= counter_with_latency;
                     endOfProcess            <= endOfProcess;
-                    fms2conVld              <= fms2conVld;
                     sopControl              <= sopControl;
                     states                  <= states;
                     end

@@ -5,7 +5,7 @@
 `define CONV_LPOS 13
 `define M_LEN 3
 `define GPIO_D 32
-`define NB_ADDRESS 10
+`define NB_ADDRESS 4
 
 module micro_sim
     #(
@@ -31,34 +31,34 @@ module micro_sim
     
 
     /////////// WIRES AGREGADOS //////////////
-    wire [N*BITS_DATA-1:0] conv_DataConv_mcu;
+    wire [N*BITS_DATA-1:0]  conv_DataConv_mcu;
     wire [(N+2)*BITS_DATA-1:0] mem_MemData_mcu;
-    wire                         rst;
+    wire                       rst;
     
-    wire [3*N*BITS_IMAGEN-1:0]   mcu_DataConv_conv;
-    wire [BITS_DATA-1:0]         mcu_Data_ctrl;
-    wire [N+1:0]                 mcu_we_mem;
-    wire [NB_ADDRESS-1:0]        mcu_WAddr_mem, mcu_RAddr_mem;
+    wire [3*N*BITS_IMAGEN-1:0] mcu_DataConv_conv;
+    wire [BITS_DATA-1:0]       mcu_Data_ctrl;
+    wire [N+1:0]               mcu_we_mem;
+    wire [NB_ADDRESS-1:0]      mcu_WAddr_mem, mcu_RAddr_mem;
     wire [(N+2)*BITS_DATA-1:0] mcu_MemData_mem;
+    wire                       fsm_eop_mcu, fsm_sop_mcu, fsm_chblk_mcu, fsm_valid_conv;
+    wire [NB_ADDRESS-1:0]      fsm_RAddr_mcu, fsm_WAddr_mcu;
+
 
     ////////////////////////////////////////////
     
     // REGISTROS MODULOS FALTANTES
 
-    reg  fsm_eop_mcu, fsm_sop_mcu, fsm_chblk_mcu;
-    reg [NB_ADDRESS-1:0] fsm_RAddr_mcu, fsm_WAddr_mcu;
-
-    reg                  ctrl_valid_conv, ctrl_ki_conv;
-    reg [BITS_IMAGEN-1:0]  ctrl_Data_mcu;
+    reg                        ctrl_valid_conv, ctrl_ki_conv;
+    reg [BITS_IMAGEN-1:0]      ctrl_Data_mcu;
+    reg                        ctrl_load_fsm, ctrl_sop_fsm, ctrl_valid_fsm;
+    reg [NB_ADDRESS-1:0]               ctrl_imglen_fsm;
 
     // Microconotrolador
 
-    wire                 start;
-    wire                 next_data;
-    reg                  prev;
-    reg                  aux;
-    
-    
+    wire                       start;
+    wire                       next_data;
+    reg                        prev;
+    reg                        aux;
     
     
     assign rst = gpio_o_data_tri_o[0]; //primeo en 1 despues en 0 res top y conv
@@ -72,61 +72,64 @@ module micro_sim
 
     //asignacion de la finalizacion al led para un udicador visual.
     assign o_led = fsm_eop_mcu;
+    always@(*) begin
+        ctrl_Data_mcu = 8'h7F;
+        ctrl_imglen_fsm = {NB_ADDRESS{1'b1}};
+        ctrl_load_fsm = 1'b0;
+        ctrl_ki_conv = 1'b1;
+        ctrl_valid_conv = 1'b0;
+    end
 
     initial begin
-        fsm_WAddr_mcu    = {NB_ADDRESS{1'b1}};
-        fsm_RAddr_mcu   = {NB_ADDRESS{1'b1}};
-        fsm_eop_mcu = 1'b1;
-        fsm_sop_mcu = 1'b0;
-        fsm_chblk_mcu = 1'b0;
         ctrl_valid_conv = 1'b0;
-        ctrl_ki_conv = 1'b1;
-        ctrl_Data_mcu = {(BITS_IMAGEN/2){2'b01}};
+        ctrl_sop_fsm = 1'b0;
+        ctrl_valid_fsm = 1'b0;
     end
     
-    always @(posedge CLK100MHZ ) begin
-        if (rst) begin
-            // reset
-            fsm_RAddr_mcu    <= {NB_ADDRESS{1'b0}};
-            fsm_WAddr_mcu    <= {NB_ADDRESS{1'b0}};
-            fsm_eop_mcu <= 1'b1;
-            fsm_sop_mcu <= 1'b0;
-            fsm_chblk_mcu <= 1'b0;
-            ctrl_valid_conv <= 1'b0;
-            ctrl_ki_conv <= 1'b1;
-            ctrl_Data_mcu <= {(BITS_IMAGEN/2){2'b01}};
+    always@(posedge CLK100MHZ) begin
+        if(rst) begin
+            ctrl_valid_conv = 1'b0;
+            ctrl_ki_conv = 1'b1;
+            ctrl_Data_mcu = {(BITS_IMAGEN/2){2'b01}};
+            ctrl_valid_conv = 1'b0;
+            ctrl_load_fsm = 1'b0;
+            ctrl_sop_fsm = 1'b0;
+            ctrl_valid_fsm = 1'b0;
+            ctrl_imglen_fsm = {NB_ADDRESS{1'b1}};
         end else begin
-            
-            prev <= next_data;
             aux <= start;
+            prev <= next_data;
 
-            if ((start && !aux) || fsm_sop_mcu) begin
-                fsm_sop_mcu <= 1'b1;
-                fsm_eop_mcu <= 1'b0;
-            end
-            if(fsm_sop_mcu && !fsm_eop_mcu)begin
-                ctrl_valid_conv <= 1'b1;
-                
-                
-                fsm_RAddr_mcu <= (fsm_RAddr_mcu == {NB_ADDRESS{1'b1}}) ? {NB_ADDRESS{1'b1}} : fsm_RAddr_mcu + 1;
-                fsm_WAddr_mcu <= (fsm_RAddr_mcu < 5) ? {NB_ADDRESS{1'b0}} : fsm_WAddr_mcu + 1; // Cambiar numero segun latencia
-                
-                if (fsm_WAddr_mcu == {NB_ADDRESS{1'b1}} - 2) begin
-                    ctrl_valid_conv <= 1'b0;
-                    fsm_sop_mcu <= 1'b0;
-                    fsm_eop_mcu <= 1'b1;
-                end
-            end else if((next_data && !prev) && fsm_eop_mcu) begin // if (start || fsm_sop_mcu)
-                fsm_RAddr_mcu <= fsm_RAddr_mcu + 1;
-            end else begin
-                fsm_WAddr_mcu <= {NB_ADDRESS{1'b0}};
-                fsm_RAddr_mcu <= {NB_ADDRESS{1'b0}};
-                ctrl_valid_conv <= 1'b0;
-            end
+            if(start & !aux)
+                ctrl_sop_fsm <= 1'b1;
+            else
+                ctrl_sop_fsm <= 1'b0;
+
+            if(fsm_eop_mcu & (next_data & !prev))
+                ctrl_valid_fsm <= 1'b1;
+            else
+                ctrl_valid_fsm <= 1'b0;
         end
     end
-    
     // instacia del Microcontrolador
+    //instancia FSM
+    Fsmv#(.NB_ADDRESS(NB_ADDRESS))
+        u_FSM
+            (
+             .o_writeAdd(fsm_WAddr_mcu),
+             .o_readAdd(fsm_RAddr_mcu),
+             .o_EoP(fsm_eop_mcu),
+             .o_sopross(fsm_sop_mcu),
+             .o_changeBlock(fsm_chblk_mcu),
+             .o_fms2conVld(fsm_valid_conv),
+             .i_imgLength(ctrl_imglen_fsm),
+             .i_CLK(CLK100MHZ),
+             .i_reset(rst),
+             .i_SoP(ctrl_sop_fsm),
+             .i_valid(ctrl_valid_fsm),
+             .i_load(ctrl_load_fsm)
+             );
+        
    //inacia de Convolucionador
     generate
         for (i = 0; i < N; i = i+1) begin : gen_conv
@@ -137,7 +140,7 @@ module micro_sim
                   .i_dato2(mcu_DataConv_conv[(i*3+3)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
                   .i_selecK_I(ctrl_ki_conv),
                   .i_reset(rst),
-                  .i_valid(ctrl_valid_conv),
+                  .i_valid(fsm_valid_conv),
                   .CLK100MHZ(CLK100MHZ)
                   );
         end

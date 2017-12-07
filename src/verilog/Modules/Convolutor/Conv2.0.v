@@ -1,15 +1,11 @@
 `timescale 1ns / 1ps
 
-`define BIT_LEN 8
-`define CONV_LEN 20
-`define CONV_LPOS 13
-`define M_LEN 3
 
 module Conv #(
-    parameter BIT_LEN =`BIT_LEN,
-    parameter CONV_LEN =`CONV_LEN,
-    parameter CONV_LPOS = `CONV_LPOS,
-    parameter M_LEN = `M_LEN
+    parameter BIT_LEN = 8,
+    parameter CONV_LEN = 20,
+    parameter CONV_LPOS =  13,
+    parameter M_LEN = 3
     )(
     output [CONV_LPOS-1:0] o_data,
     input [BIT_LEN-1:0] i_dato0,
