@@ -33,7 +33,7 @@ module ControlBlock(    //Definicion de puertos
                       output [23:0] o_KNLdata,
                       output [12:0] o_MCUdata,
                       output  [9:0] o_imgLength,
-                      output  [2:0] o_led, //o_estado
+                      //output  [2:0] o_led, //o_estado
                       output        o_EOP_to_MCU,
                       output        o_run,
                       output        o_valid_to_FSM,
@@ -74,8 +74,7 @@ module ControlBlock(    //Definicion de puertos
   reg    [23:0] dataKERNEL;
   reg    [23:0] dataGPIO;
   reg    [12:0] dataMCU;  
-  reg    [9:0] imgLength;
-  reg     [1:0] go_to_led;     
+  reg    [9:0] imgLength;   
   reg           validFSM;
   reg           validCONV;
   reg           GPIO_valid_previous_state;
@@ -84,7 +83,7 @@ module ControlBlock(    //Definicion de puertos
   reg           loadControl;
   reg           run_reg;
   reg           EoPMCU_reg;
-  reg           go_to_leds;
+  //reg           go_to_leds;
   reg           runControl;
   // En principio no haria falta el latcheo: reg [3:0] controlGPIO;
     
@@ -98,10 +97,11 @@ module ControlBlock(    //Definicion de puertos
   assign {o_run}           = run_reg;
   assign {o_EOP_to_MCU}    = EoPMCU_reg;
   assign {o_KNLdata}       = dataKERNEL;
-  assign {o_load}          = load_reg;
-  assign {o_led[0]}        = run_reg;
-  assign {o_led[1]}        = EoPMCU_reg;   
-     
+  assign {o_load}          = load_reg;   
+  
+   
+  //assign {o_led} = (i_GPIOctrl == Kernel_load )? 3'b001 : ( i_GPIOctrl == ImgSize_load)? 3'b010 : ( i_GPIOctrl == Img_load)? 3'b100: (i_GPIOctrl == Data_request )? 3'b011: (i_GPIOctrl == LoadFinish_goToRun)?3'b111: 3'b000 ;
+  
          
     always @(posedge i_CLK) begin
     
@@ -112,13 +112,13 @@ module ControlBlock(    //Definicion de puertos
     
        if(i_rst) begin
                       
-                 go_to_leds <= 3'b000;
+                 
                  dataGPIO   <=    'd0;
                  load_reg   <= 'd0;
                 dataKERNEL  <=  24'd0;
                    dataMCU  <=  13'd0;
                   imgLength <=  10'd0;
-                 go_to_led  <=   3'd0;
+                 //go_to_led  <=   3'd0;
                   validFSM  <=   1'b0;
                  validCONV  <=   1'b0;
  GPIO_valid_previous_state  <=   1'b0;
@@ -139,7 +139,6 @@ module ControlBlock(    //Definicion de puertos
                                          //Modo kernell activo por bajo
                                          load_reg<=1'b0;      
                                          KI<=1'b0;
-                                         go_to_leds<=3'b001;
                                          dataKERNEL<=i_GPIOdata;
                                          if (i_GPIOvalid && !GPIO_valid_previous_state)
                                                 validCONV<=1'b1;
@@ -151,8 +150,7 @@ module ControlBlock(    //Definicion de puertos
                         //Carga del tamano de la imagen Img_length
                         ImgSize_load: begin
                                         KI<=1'b0;
-                                        go_to_leds<=3'b001;
-                                        imgLength<=i_GPIOdata[9:0];
+                                        imgLength<=dataGPIO[9:0];
                                         load_reg<=1'b0;
                                         
                                         
@@ -160,7 +158,6 @@ module ControlBlock(    //Definicion de puertos
             
                        //Cargar imagen
                         Img_load:     begin
-                                         go_to_leds<=3'b001;
                                          KI<=1'b0;
                                          //Levanto senal de carga para la FSM
                                          if (loadControl==1'b1) begin
@@ -169,7 +166,7 @@ module ControlBlock(    //Definicion de puertos
                                          end
                                          else
                                             load_reg<=1'b0;
-                                            
+                                                                                     
                                             
                                          EoPMCU_reg<=1'b0;
                                          
@@ -182,15 +179,20 @@ module ControlBlock(    //Definicion de puertos
                         
                                                                 
                         LoadFinish_goToRun: begin
-                                        go_to_leds<=3'b010;
                                         KI<=1'b1;
                                         //Termino carga, paso a estado RUN. Se delega el control del sistema
                                         run_reg<=1'b1;
                                         runControl<=1'b1;
+                                        
                                         //Bajo senal de carga para la FSM
                                         load_reg <=1'b0;
+                        
                                      
                                      end
+                                     
+                                     
+                                     
+                             
                         default :   ;
                 endcase 
                 
@@ -200,7 +202,7 @@ module ControlBlock(    //Definicion de puertos
                             //Es decir, se termino la etapa de procesamiento, y se pasa a la etapa OUT poniendo en alto EoP_MCU
                            
                             if (i_GPIOctrl == Data_request) begin
-                                go_to_leds<=3'b100;     
+                                     
                                 if (i_GPIOvalid && GPIO_valid_previous_state==1'b0)
                                    validFSM<=1'b1;
                                 else 

@@ -9,7 +9,7 @@ module bram_memory#(
 	parameter RAM_WIDTH 	= `RAM_WIDTH,    
 	parameter NB_ADDRESS 	= `NB_ADDRESS,
 	parameter INIT 			= `INIT,
-	parameter INIT_FILE = "mem_0.txt",    
+	parameter INIT_FILE = "D:\\ProyectosVivado\\Control_Fsm_Conv_Mem\\Control_Fsm_Conv_Mem.srcs\\sim_1\\new\\mem_0.txt",    
 	localparam RAM_DEPTH=(2**NB_ADDRESS)-1
 	)(//Definición de puertos
 	output [RAM_WIDTH-1:0]   o_data,
@@ -33,8 +33,8 @@ module bram_memory#(
       initial begin
       	case (INIT)
         	1: $readmemh(INIT_FILE, BRAM, 0, RAM_DEPTH);
-        	2: $readmemh("mem_1.txt", BRAM, 0, RAM_DEPTH);
-        	3: $readmemh("mem_2.txt", BRAM, 0, RAM_DEPTH);
+        	2: $readmemh("D:\\ProyectosVivado\\Control_Fsm_Conv_Mem\\Control_Fsm_Conv_Mem.srcs\\sim_1\\new\\mem_1.txt", BRAM, 0, RAM_DEPTH);
+        	3: $readmemh("D:\\ProyectosVivado\\Control_Fsm_Conv_Mem\\Control_Fsm_Conv_Mem.srcs\\sim_1\\new\\mem_2.txt", BRAM, 0, RAM_DEPTH);
         	default: begin
         		for (ram_index = 0; ram_index <= RAM_DEPTH; ram_index = ram_index + 1)
 					BRAM[ram_index] = {RAM_WIDTH{1'b1}};

@@ -14,6 +14,7 @@ module FSMv2#(
     output [NB_ADDRESS-1:0]  o_writeAdd,
     output [NB_ADDRESS-1:0]  o_readAdd,
     output                   o_EoP,
+    output   [2:0]           o_led,
     output                   o_SOP_fromFSM,
     output                   o_changeBlock,
     output                   o_valid_fromFSM_toCONV,
@@ -38,7 +39,9 @@ module FSMv2#(
     reg                                      validFSM_toCONV_reg;
     //Ni bien se crean los registros, toman esos valores.
     reg [NB_STATES-1:0]  states;
-
+    
+    assign {o_led[0]} = i_SoP;
+    assign {o_led[1]} = o_EoP;
     initial begin
         counterAdd              = `NB_ADDRESS'd0;
         counter_with_latency    = `NB_ADDRESS'd0;
@@ -132,7 +135,7 @@ module FSMv2#(
             else if(states == 2'b10) begin
                 beginigProcess <= beginigProcess;
                 
-                if(counterAdd <= i_imgLength)  counterAdd   <= counterAdd+1;
+                if(counterAdd < i_imgLength)  counterAdd   <= counterAdd+1;
                 else  counterAdd<=counterAdd;
         
                 //Shifteo para el write address, teniendo en cuenta la latencia.

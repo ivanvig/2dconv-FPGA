@@ -86,7 +86,7 @@ module micro_all#(
      //Connect to both
      wire [9:0]imgLength_fromCTRL_toFSM;    
      //Connect to CONTROL
-     wire [2:0]ledControl;    
+     wire [2:0]ledFSM;    
      //Connect from CONTROL to MCU
      wire EoP_to_MCU;    
      //Connect from CONTROL to FSM
@@ -127,6 +127,7 @@ module micro_all#(
     assign GPIOdata     = gpio_o_data_tri_o[24:1];
     assign GPIOctrl     = gpio_o_data_tri_o[31:29];
     assign validGPIO    = gpio_o_data_tri_o[28];
+    assign {o_led}      = ledFSM;
         
 
     //asignacion de los datos de la memoria o del micro al convolucionador 
@@ -241,6 +242,7 @@ module micro_all#(
                .o_valid_fromFSM_toCONV(valid_fromFSM_toCONV),
                .o_SOP_fromFSM(SOP_fromFSM_wire),
                .i_imgLength(imgLength_fromCTRL_toFSM),
+               .o_led(ledFSM),
                .i_CLK(i_CLK),
                .i_reset(rst_all),
                .i_SoP(SOP_fromCTRL_toFSM),  //Senal de RUN
@@ -304,7 +306,7 @@ module micro_all#(
             .o_load(load_wire_fromCTRL_toFSM),
             .o_KNLdata(dmicro),
             .o_imgLength(imgLength_fromCTRL_toFSM),
-            .o_led(ledControl),
+            //.o_led(ledControl),
             .o_EOP_to_MCU(EoP_to_MCU),
             .o_run(SOP_fromCTRL_toFSM),//Senal de RUN
             .o_valid_to_FSM(valid_fromCTRL_toFSM),
