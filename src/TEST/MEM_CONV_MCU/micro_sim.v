@@ -5,7 +5,7 @@
 `define CONV_LPOS 13
 `define M_LEN 3
 `define GPIO_D 32
-`define NB_ADDRESS 4
+`define NB_ADDRESS 10
 
 module micro_sim
     #(
@@ -18,8 +18,12 @@ module micro_sim
       parameter GPIO_D        = `GPIO_D,
       parameter N = 2,
       parameter BITS_IMAGEN = 8,
-      parameter BITS_DATA = 13
-
+      parameter BITS_DATA = 13,
+      localparam Kernel_load            = 0, 
+      localparam ImgSize_load           = 1, 
+      localparam Img_load               = 2,
+      localparam Data_request           = 3,
+      localparam LoadFinish_goToRun = 4 
       )(
         output [GPIO_D-1:0] gpio_i_data_tri_i,
         output              o_led,
@@ -30,6 +34,9 @@ module micro_sim
     genvar                  i;
     
 
+    wire [23:0]             i_GPIOdata;
+    wire [2:0]              i_GPIOctrl;
+    wire                    i_GPIOvalid;
     /////////// WIRES AGREGADOS //////////////
     wire [N*BITS_DATA-1:0]  conv_DataConv_mcu;
     wire [(N+2)*BITS_DATA-1:0] mem_MemData_mcu;
@@ -40,30 +47,30 @@ module micro_sim
     wire [N+1:0]               mcu_we_mem;
     wire [NB_ADDRESS-1:0]      mcu_WAddr_mem, mcu_RAddr_mem;
     wire [(N+2)*BITS_DATA-1:0] mcu_MemData_mem;
-    wire                       fsm_eop_mcu, fsm_sop_mcu, fsm_chblk_mcu, fsm_valid_conv;
+    wire                       fsm_eop_ctrl, fsm_sop_mcu, fsm_chblk_mcu, fsm_valid_conv;
     wire [NB_ADDRESS-1:0]      fsm_RAddr_mcu, fsm_WAddr_mcu;
-
 
     ////////////////////////////////////////////
     
     // REGISTROS MODULOS FALTANTES
 
-    reg                        ctrl_valid_conv, ctrl_ki_conv;
-    reg [BITS_IMAGEN-1:0]      ctrl_Data_mcu;
-    reg                        ctrl_load_fsm, ctrl_sop_fsm, ctrl_valid_fsm;
-    reg [NB_ADDRESS-1:0]               ctrl_imglen_fsm;
+    wire                        ctrl_valid_conv, ctrl_ki_conv;
+    wire [BITS_IMAGEN-1:0]      ctrl_Data_mcu;
+    wire                        ctrl_load_fsm, ctrl_sop_fsm, ctrl_valid_fsm, ctrl_eop_mcu;
+    wire [NB_ADDRESS-1:0]       ctrl_imglen_fsm;
+    wire [23:0]                 ctrl_kernel_conv;
 
+
+    wire                        validCONV;
+    
     // Microconotrolador
 
-    wire                       start;
-    wire                       next_data;
-    reg                        prev;
-    reg                        aux;
+    assign validCONV = (i_GPIOctrl == LoadFinish_goToRun) ? fsm_valid_conv : ctrl_valid_conv;
     
-    
-    assign rst = gpio_o_data_tri_o[0]; //primeo en 1 despues en 0 res top y conv
-    assign start = gpio_o_data_tri_o[1];
-    assign next_data = gpio_o_data_tri_o[2];
+    assign rst = gpio_o_data_tri_o[0];
+    assign i_GPIOdata = gpio_o_data_tri_o[24:1];
+    assign i_GPIOctrl = gpio_o_data_tri_o[31:29];
+    assign i_GPIOvalid = gpio_o_data_tri_o[28];
 
     assign gpio_i_data_tri_i[BITS_DATA-1:0] = mcu_Data_ctrl;
     assign gpio_i_data_tri_i[GPIO_D-1:BITS_DATA] = 19'h0;
@@ -71,57 +78,41 @@ module micro_sim
     
 
     //asignacion de la finalizacion al led para un udicador visual.
-    assign o_led = fsm_eop_mcu;
-    always@(*) begin
-        ctrl_Data_mcu = 8'h7F;
-        ctrl_imglen_fsm = {NB_ADDRESS{1'b1}};
-        ctrl_load_fsm = 1'b0;
-        ctrl_ki_conv = 1'b1;
-        ctrl_valid_conv = 1'b0;
-    end
-
-    initial begin
-        ctrl_valid_conv = 1'b0;
-        ctrl_sop_fsm = 1'b0;
-        ctrl_valid_fsm = 1'b0;
-    end
-    
-    always@(posedge CLK100MHZ) begin
-        if(rst) begin
-            ctrl_valid_conv = 1'b0;
-            ctrl_ki_conv = 1'b1;
-            ctrl_Data_mcu = {(BITS_IMAGEN/2){2'b01}};
-            ctrl_valid_conv = 1'b0;
-            ctrl_load_fsm = 1'b0;
-            ctrl_sop_fsm = 1'b0;
-            ctrl_valid_fsm = 1'b0;
-            ctrl_imglen_fsm = {NB_ADDRESS{1'b1}};
-        end else begin
-            aux <= start;
-            prev <= next_data;
-
-            if(start & !aux)
-                ctrl_sop_fsm <= 1'b1;
-            else
-                ctrl_sop_fsm <= 1'b0;
-
-            if(fsm_eop_mcu & (next_data & !prev))
-                ctrl_valid_fsm <= 1'b1;
-            else
-                ctrl_valid_fsm <= 1'b0;
-        end
-    end
+    assign o_led = ctrl_eop_mcu;
     // instacia del Microcontrolador
+    //instancia CONTROL
+    ControlBlock
+        u_control
+            (
+             .i_GPIOdata(i_GPIOdata),
+             .i_MCUdata(mcu_Data_ctrl),
+             .i_GPIOctrl(i_GPIOctrl),
+             .i_GPIOvalid(i_GPIOvalid),
+             .i_rst(rst),
+             .i_CLK(CLK100MHZ),
+             .i_EOP_from_FSM(fsm_eop_ctrl),
+
+             .o_GPIOdata(gpio_i_data_tri_i),
+             .o_KNLdata(ctrl_kernel_conv),
+             .o_MCUdata(ctrl_Data_mcu),
+             .o_imgLength(ctrl_imglen_fsm),
+             .o_EOP_to_MCU(ctrl_eop_mcu),
+             .o_run(ctrl_sop_fsm),
+             .o_valid_to_FSM(ctrl_valid_fsm),
+             .o_valid_to_CONV(ctrl_valid_conv),
+             .o_KNorIMG(ctrl_ki_conv),
+             .o_load(ctrl_load_fsm)
+             );
     //instancia FSM
-    Fsmv#(.NB_ADDRESS(NB_ADDRESS))
+    FSMv2#(.NB_ADDRESS(NB_ADDRESS))
         u_FSM
             (
              .o_writeAdd(fsm_WAddr_mcu),
              .o_readAdd(fsm_RAddr_mcu),
-             .o_EoP(fsm_eop_mcu),
-             .o_sopross(fsm_sop_mcu),
+             .o_EoP(fsm_eop_ctrl),
+             .o_SOP_fromFSM(fsm_sop_mcu),
              .o_changeBlock(fsm_chblk_mcu),
-             .o_fms2conVld(fsm_valid_conv),
+             .o_valid_fromFSM_toCONV(fsm_valid_conv),
              .i_imgLength(ctrl_imglen_fsm),
              .i_CLK(CLK100MHZ),
              .i_reset(rst),
@@ -133,7 +124,7 @@ module micro_sim
    //inacia de Convolucionador
     generate
         for (i = 0; i < N; i = i+1) begin : gen_conv
-            Conv u_conv
+            Convolutor u_conv
                  (.o_data(conv_DataConv_mcu[(i+1)*BITS_DATA-1 -: BITS_DATA]),
                   .i_dato0(mcu_DataConv_conv[(i*3+1)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
                   .i_dato1(mcu_DataConv_conv[(i*3+2)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
@@ -141,7 +132,7 @@ module micro_sim
                   .i_selecK_I(ctrl_ki_conv),
                   .i_reset(rst),
                   .i_valid(fsm_valid_conv),
-                  .CLK100MHZ(CLK100MHZ)
+                  .i_CLK(CLK100MHZ)
                   );
         end
     endgenerate
@@ -157,8 +148,8 @@ module micro_sim
              .i_WAddr(fsm_WAddr_mcu),
              .i_RAddr(fsm_RAddr_mcu),
              .i_chblk(fsm_chblk_mcu),
-             .i_sop(fsm_sop_mcu),
-             .i_eop(fsm_eop_mcu),
+             .i_sop(ctrl_sop_fsm),
+             .i_eop(ctrl_eop_mcu),
              .rst(rst),
              .clk(CLK100MHZ),
 
