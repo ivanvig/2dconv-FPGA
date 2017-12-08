@@ -107,32 +107,28 @@ module Fsmv#(
             end
             else if(states == 2'b01)begin
                 //Manejo de direcciones en función del valid
-                if (i_valid && !valid_previous_state) counterAdd <= counterAdd+1;
-                else counterAdd   <= counterAdd;
-                
-                //Verificación si termino de leer/cargar un bloque
-                if (counterAdd==i_imgLength)begin
-                    if(~i_load)begin
-                        changeBlock <= 1'b1;
-                        states      <= 2'b00;
+                if (i_valid && !valid_previous_state) begin 
+                    //Verificación si termino de leer/cargar un bloque
+                    if (counterAdd==i_imgLength)begin
+                        counterAdd      <= counterAdd;
+                        changeBlock     <= 1'b1;
+                        states          <= 2'b00;
+                        if(endOfProcess > 0) endOfProcess <= endOfProcess-1;
+                        else if(beginigProcess>=2'b01) beginigProcess <= 1'b0;
+                        else begin
+                            endOfProcess      <= endOfProcess;
+                            beginigProcess    <= beginigProcess; 
+                        end 
                     end
                     else begin
-                        changeBlock <= changeBlock;
-                        states      <= states;
+                        counterAdd <= counterAdd+1;
+                        changeBlock     <= changeBlock;
+                        endOfProcess    <= endOfProcess;
+                        beginigProcess  <= beginigProcess;
+                        states          <= states; 
                     end
-                    if(endOfProcess > 0) endOfProcess <= endOfProcess-1;
-                    else if(beginigProcess>=2'b01) beginigProcess <= 1'b0;
-                    else begin
-                        endOfProcess      <= endOfProcess;
-                        beginigProcess    <= beginigProcess; 
-                    end 
-                end
-                else begin
-                    changeBlock     <= changeBlock;
-                    endOfProcess    <= endOfProcess;
-                    beginigProcess  <= beginigProcess;
-                    states          <= states; 
                 end 
+                else counterAdd   <= counterAdd;
             end
             else if(states == 2'b10) begin
                 beginigProcess <= beginigProcess;
@@ -175,6 +171,7 @@ module Fsmv#(
     //end always
 
     always @(*) begin
+        w_eop = 0;
         for(nconv=0; nconv<N_CONV; nconv = nconv +1)
             w_eop = w_eop | endOfProcess[nconv];
     end
