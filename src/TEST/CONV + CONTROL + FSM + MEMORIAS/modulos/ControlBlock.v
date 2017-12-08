@@ -31,7 +31,7 @@ module ControlBlock(    //Definicion de puertos
                      
                       output [31:0] o_GPIOdata,
                       output [23:0] o_KNLdata,
-                      output [12:0] o_MCUdata,
+                      output [7:0] o_MCUdata,
                       output  [9:0] o_imgLength,
                       //output  [2:0] o_led, //o_estado
                       output        o_EOP_to_MCU,
@@ -73,7 +73,7 @@ module ControlBlock(    //Definicion de puertos
 
   reg    [23:0] dataKERNEL;
   reg    [23:0] dataGPIO;
-  reg    [12:0] dataMCU;  
+  reg    [7:0] dataMCU;  
   reg    [9:0] imgLength;   
   reg           validFSM;
   reg           validCONV;
@@ -105,18 +105,13 @@ module ControlBlock(    //Definicion de puertos
          
     always @(posedge i_CLK) begin
     
-       GPIO_valid_previous_state<=i_GPIOvalid;
-       //No afecta que todo el tiempo latchee ambos puertos a los registros internos
-       dataMCU<=i_MCUdata;
-       dataGPIO<=i_GPIOdata;
-    
        if(i_rst) begin
                       
                  
                  dataGPIO   <=    'd0;
                  load_reg   <= 'd0;
                 dataKERNEL  <=  24'd0;
-                   dataMCU  <=  13'd0;
+                   dataMCU  <=  8'd0;
                   imgLength <=  10'd0;
                  //go_to_led  <=   3'd0;
                   validFSM  <=   1'b0;
@@ -129,6 +124,10 @@ module ControlBlock(    //Definicion de puertos
                         KI  <=   1'b0; //definido asi en la documentación.
        end
        else begin    
+           GPIO_valid_previous_state<=i_GPIOvalid;
+           dataMCU<=i_GPIOdata;
+           dataGPIO<=i_MCUdata;
+
               //!run_reg => no estoy en estado RUN (si estoy en el mismo, este modulo no cede el control)
               if(run_reg==1'b0 && runControl==1'b0) begin  
                

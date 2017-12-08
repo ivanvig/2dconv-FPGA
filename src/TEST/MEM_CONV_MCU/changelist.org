@@ -1,0 +1,31 @@
+* Control Block
+  /Habria que parametrizar algunos puertos/
+
+  + i_GPIOdata y o_GPIOdata tienen alguna mala conexion entre ellos: cuando i_GPIOdata se modifica, o_GPIOdata tambien lo hace, pero con X en algunos bits (SOLUCIONADO CON EL CAMBIO DE REGISTROS)
+
+  + Cambiado o_MCUdata de 13 a 8 bits
+
+  + Cambiado dataMCU de 13 a 8 bits
+
+  + dataMCU registraba los valores de i_MCUdata y o_MCUdata los ponia a la salida, lo que hace un bucle de informacion, se cambio a: 
+    - o_MCUdata = dataMCU <= i_GPIOdata
+
+    - o_GPIOdata = dataGPIO <= i_MCUdata
+
+  + Movidos los registros que registran en cada clock hacia adentro el else del reset para evitar doble asignacion de forma paralela
+
+ 
+* MCU/FSM/CONTROL
+  + Memoria se esta escribiendo durante etapa de carga de kernel, de todas formas no deberia afectar
+  + 
+
+
+* ESTADOS
+
+ | Estado              | Resultado |
+ |---------------------+-----------|
+ | Carga de kernel     | OK        |
+ | Carga de img length | OK        |
+ | Carga de memoria    |           |
+ |                     |           |
+  
