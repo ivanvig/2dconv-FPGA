@@ -80,7 +80,6 @@ module ControlBlock(    //Definicion de puertos
   reg           GPIO_valid_previous_state;
   reg           KI;
   reg           load_reg;
-  reg           loadControl;
   reg           run_reg;
   reg           EoPMCU_reg;
   //reg           go_to_leds;
@@ -119,7 +118,6 @@ module ControlBlock(    //Definicion de puertos
  GPIO_valid_previous_state  <=   1'b0;
                     run_reg <=   1'b0;
                  EoPMCU_reg <=   1'b0;  
-                 loadControl<=   1'b1; 
                  runControl <=   1'b0;
                         KI  <=   1'b0; //definido asi en la documentación.
        end
@@ -149,7 +147,7 @@ module ControlBlock(    //Definicion de puertos
                         //Carga del tamano de la imagen Img_length
                         ImgSize_load: begin
                                         KI<=1'b0;
-                                        imgLength<=dataGPIO[9:0];
+                                        imgLength<=i_GPIOdata[9:0];
                                         load_reg<=1'b0;
                                         
                                         
@@ -159,12 +157,7 @@ module ControlBlock(    //Definicion de puertos
                         Img_load:     begin
                                          KI<=1'b0;
                                          //Levanto senal de carga para la FSM
-                                         if (loadControl==1'b1) begin
-                                             load_reg<=1'b1;
-                                             loadControl<=1'b0;
-                                         end
-                                         else
-                                            load_reg<=1'b0;
+                                         load_reg<=1'b1;
                                                                                      
                                             
                                          EoPMCU_reg<=1'b0;

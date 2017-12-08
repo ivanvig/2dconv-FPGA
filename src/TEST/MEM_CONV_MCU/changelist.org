@@ -14,10 +14,20 @@
 
   + Movidos los registros que registran en cada clock hacia adentro el else del reset para evitar doble asignacion de forma paralela
 
+  + imglength ahora registra los valores de i_GPIOdata[9:0]
+
+  + load esta en alto durante toda la carga de la imagen
+
+  + eliminado loadControl ya no se usa mas (a parte que por la forma que estaba codeado solo iba a funcionar para un ciclo)
+
+
+* FSM (branch)
+  + Eliminado registro de imgHeight, se usa i_imglength
+
  
 * MCU/FSM/CONTROL
   + Memoria se esta escribiendo durante etapa de carga de kernel, de todas formas no deberia afectar
-  + 
+  + Datos de la ultima posicion de las memorias son erroneos
 
 
 * ESTADOS
@@ -26,6 +36,7 @@
  |---------------------+-----------|
  | Carga de kernel     | OK        |
  | Carga de img length | OK        |
- | Carga de memoria    |           |
- |                     |           |
+ | Carga de memoria    | FAIL      |
+ | Procesamiento       | ?         |
+ | Salida              | ?         |
   

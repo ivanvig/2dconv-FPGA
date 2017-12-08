@@ -40,7 +40,7 @@ module micro_sim_tb();
         #100 i_GPIOvalid = 1'b1;
         #100 i_GPIOvalid = 1'b0;
         
-        #100 i_GPIOdata = 24'h010;
+        #100 i_GPIOdata = 24'h0100;
         #100 i_GPIOvalid = 1'b1;
         #100 i_GPIOvalid = 1'b0;
 
@@ -50,7 +50,7 @@ module micro_sim_tb();
 
         //CARGO IMAGE LENGTH
         #500 i_GPIOctrl = 3'b001;
-        i_GPIOdata = 24'h00A;
+        i_GPIOdata = 24'h009;
         
         //CARGO IMAGEN EN MEMORIA
         #500 i_GPIOctrl = 3'b010;

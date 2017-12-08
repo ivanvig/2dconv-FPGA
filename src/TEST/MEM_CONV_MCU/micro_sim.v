@@ -114,15 +114,15 @@ module micro_sim
              .o_load(ctrl_load_fsm)
              );
     //instancia FSM
-    FSMv2#(.NB_ADDRESS(NB_ADDRESS))
+    Fsmv#(.NB_ADDRESS(NB_ADDRESS))
         u_FSM
             (
              .o_writeAdd(fsm_WAddr_mcu),
              .o_readAdd(fsm_RAddr_mcu),
              .o_EoP(fsm_eop_ctrl),
-             .o_SOP_fromFSM(fsm_sop_mcu),
+             .o_sopross(fsm_sop_mcu),
              .o_changeBlock(fsm_chblk_mcu),
-             .o_valid_fromFSM_toCONV(fsm_valid_conv),
+             .o_fms2conVld(fsm_valid_conv),
              .i_imgLength(ctrl_imglen_fsm),
              .i_CLK(CLK100MHZ),
              .i_reset(rst),
