@@ -4,12 +4,13 @@
 `define NB_IMAGE        10
 `define NB_STATES       2
 `define N_CONV          1
+`define LATENCIA        5
 module Fsmv#(
     parameter NB_ADDRESS= `NB_ADDRESS,
     parameter NB_IMAGE  = `NB_IMAGE,
     parameter NB_STATES = `NB_STATES,
-    parameter  N_CONV   = `N_CONV
-
+    parameter  N_CONV   = `N_CONV,
+    parameter  LATENCIA = `LATENCIA
     )(
     //Definicion de puertos
     output [NB_ADDRESS-1:0]  o_writeAdd,
@@ -52,7 +53,6 @@ module Fsmv#(
         valid_previous_state    = 1'b0;
         fms2conVld              = 1'b0;
         states                  = `NB_STATES'd0;
-        w_eop                   = 1'b0;
     end        
     
     always @(posedge i_CLK) begin  
@@ -116,27 +116,28 @@ module Fsmv#(
                         end 
                     end
                     else begin
-                        counterAdd <= counterAdd+1;
+                        counterAdd      <= counterAdd+1;
                         changeBlock     <= changeBlock;
                         endOfProcess    <= endOfProcess;
                         beginigProcess  <= beginigProcess;
                         states          <= states; 
                     end
                 end 
-                else counterAdd   <= counterAdd;
+                else 
+                    counterAdd   <= counterAdd;
             end
             else if(states == 2'b10) begin
                 beginigProcess <= beginigProcess;
                 
-                if(counterAdd <= i_imgLength)  counterAdd   <= counterAdd+1;
-                else counterAdd   <= counterAdd;
-        
+                if(counterAdd <= i_imgLength)  
+                    counterAdd   <= counterAdd+1;
+                else 
+                    counterAdd   <= counterAdd;
                 //Shifteo para el write address, teniendo en cuenta la latencia.
-                if(counterAdd>=10'h6 && counter_with_latency < i_imgLength-2) begin
+                if(counterAdd>=LATENCIA && counter_with_latency < i_imgLength-2) begin
                     counter_with_latency    <= counter_with_latency +1;
                     endOfProcess            <= endOfProcess;
                     fms2conVld              <= fms2conVld;
-                    sopControl              <= sopControl;
                     states                  <= states;
                 end
                 else if(counter_with_latency == i_imgLength-2)begin 
@@ -144,22 +145,20 @@ module Fsmv#(
                     counter_with_latency    <= counter_with_latency;
                     fms2conVld              <= 1'b0;
                     endOfProcess            <= N_CONV;
-                    sopControl              <= 1'b0;
                     states                  <= 2'b11;
                 end
                 else begin
                     counter_with_latency    <= counter_with_latency;
                     endOfProcess            <= endOfProcess;
                     fms2conVld              <= fms2conVld;
-                    sopControl              <= sopControl;
                     states                  <= states;
                     end
             end
         	else if(states == 2'b11)begin
-                if (~i_SoP)
+                if (~i_SoP) 
                     states   <= 2'b00;
                 else 
-                    states <= states;
+                    states <= states;  
             end
         end 
     end 
