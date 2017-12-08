@@ -62,8 +62,18 @@ module micro_sim
 
 
     wire                        validCONV;
+    wire [3*N*BITS_IMAGEN-1:0]  dataCONV;
+
+    
     
     // Microconotrolador
+    
+    generate
+        for (i = 0; i < N; i = i+1) begin
+            assign dataCONV[(i+1)*3*BITS_IMAGEN-1 -: 3*BITS_IMAGEN] = (ctrl_ki_conv) ? mcu_DataConv_conv[(i+1)*3*BITS_IMAGEN-1 -: 3*BITS_IMAGEN] : ctrl_kernel_conv;
+        end
+        
+    endgenerate
 
     assign validCONV = (i_GPIOctrl == LoadFinish_goToRun) ? fsm_valid_conv : ctrl_valid_conv;
     
@@ -126,12 +136,12 @@ module micro_sim
         for (i = 0; i < N; i = i+1) begin : gen_conv
             Convolutor u_conv
                  (.o_data(conv_DataConv_mcu[(i+1)*BITS_DATA-1 -: BITS_DATA]),
-                  .i_dato0(mcu_DataConv_conv[(i*3+1)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
-                  .i_dato1(mcu_DataConv_conv[(i*3+2)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
-                  .i_dato2(mcu_DataConv_conv[(i*3+3)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
+                  .i_dato0(dataCONV[(i*3+1)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
+                  .i_dato1(dataCONV[(i*3+2)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
+                  .i_dato2(dataCONV[(i*3+3)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
                   .i_selecK_I(ctrl_ki_conv),
                   .i_reset(rst),
-                  .i_valid(fsm_valid_conv),
+                  .i_valid(validCONV),
                   .i_CLK(CLK100MHZ)
                   );
         end
@@ -167,7 +177,7 @@ module micro_sim
     
     generate
         for (i = 0; i < (N+2); i = i+1) begin : gen_memory
-            memory#(.INIT_FILE({"/home/iv/Xilinx/2dconv-FPGA/src/TEST/MEM_CONV_MCU/mem0" + i, ".txt"}), .NB_ADDRESS(NB_ADDRESS)) u_mem
+            memory#(.INIT_FILE({"mem0" + i, ".txt"}), .NB_ADDRESS(NB_ADDRESS)) u_mem
                  (
                   .i_wrEnable(mcu_we_mem[i]),
                   .i_CLK(CLK100MHZ),
