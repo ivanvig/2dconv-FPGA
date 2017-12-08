@@ -52,7 +52,6 @@ module Micro_fms#(
     wire signed [BIT_LEN-1:0] dato0, dato1, dato2;
     //datos salida del conv 
     wire signed [RAM_WIDTH-1:0] data_oc;
-    //entrada de la mem_0
 
     //fms----------------------------------------------
     reg  [NB_IMAGE-1:0]     imgLength;
@@ -149,11 +148,14 @@ module Micro_fms#(
     // instacia del Microcontrolador
    //inacia de Convolucionador
 
-   Fsmv
+    Fsmv#(  .NB_ADDRESS(NB_ADDRESS),
+            .NB_IMAGE(NB_IMAGE),
+            .LATENCIA(6))
         u_fsmv(.o_writeAdd(write_add_fsm2conv),
             .o_readAdd(read_add_fsm2conv),
             .o_EoP(o_led[2]),
-            .o_changeBlock(o_led[1]),
+            .o_sopross(o_led[1]),
+            //.o_changeBlock(o_led[1]),
             .o_fms2conVld(valid_conv),
             .i_imgLength(imgLength),
             .i_CLK(CLK100MHZ),
