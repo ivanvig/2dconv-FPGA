@@ -30,8 +30,7 @@ module MCU_CTRL
     always @ (posedge clk) begin
         if(rst) begin
             substate <= {clog2(SUB-1){1'b1}};
-            //next_state <= {clog2(STATES-1){1'b0}};
-            next_state <= 2'b01; //                   <===== [!] SOLO TESTING, ELIMINAR Y DESCOMENTAR ARRIBA PARA FUNCIONAMIENTO NORMAL
+            next_state <= {clog2(STATES-1){1'b0}};
             memSelect_load <= {clog2(N+1){1'b1}};
             memSelect_out <= {clog2(N+1){1'b1}};
             we_rw_status <= {1'b1, {(N+1){1'b0}}};
