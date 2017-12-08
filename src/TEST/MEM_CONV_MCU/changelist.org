@@ -20,6 +20,8 @@
 
   + eliminado loadControl ya no se usa mas (a parte que por la forma que estaba codeado solo iba a funcionar para un ciclo)
 
+  + El bloque de control ahora siempre envia valid cuando lo recibe desde el GPIO, sin importar el estado en el que se este
+
 
 * FSM (branch)
   + Eliminado registro de imgHeight, se usa i_imglength

@@ -125,6 +125,10 @@ module ControlBlock(    //Definicion de puertos
            GPIO_valid_previous_state<=i_GPIOvalid;
            dataMCU<=i_GPIOdata;
            dataGPIO<=i_MCUdata;
+           if (i_GPIOvalid && GPIO_valid_previous_state==1'b0)
+               validFSM<=1'b1;
+           else 
+               validFSM<=1'b0;
 
               //!run_reg => no estoy en estado RUN (si estoy en el mismo, este modulo no cede el control)
               if(run_reg==1'b0 && runControl==1'b0) begin  
@@ -162,10 +166,6 @@ module ControlBlock(    //Definicion de puertos
                                             
                                          EoPMCU_reg<=1'b0;
                                          
-                                         if (i_GPIOvalid && GPIO_valid_previous_state==1'b0)
-                                             validFSM<=1'b1;
-                                         else 
-                                             validFSM<=1'b0;
                                         
                                       end 
                         
@@ -193,14 +193,6 @@ module ControlBlock(    //Definicion de puertos
                             //Estando en RUN, al recibir la senal End Of Process del FSM, debo SALIR del estado mencionado
                             //Es decir, se termino la etapa de procesamiento, y se pasa a la etapa OUT poniendo en alto EoP_MCU
                            
-                            if (i_GPIOctrl == Data_request) begin
-                                     
-                                if (i_GPIOvalid && GPIO_valid_previous_state==1'b0)
-                                   validFSM<=1'b1;
-                                else 
-                                   validFSM<=1'b0;
-                                
-                            end
                            
                     load_reg   <=1'b0;
                     EoPMCU_reg <=1'b1;

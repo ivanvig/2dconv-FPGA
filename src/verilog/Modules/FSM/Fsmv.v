@@ -84,7 +84,6 @@ module Fsmv#(
                     states <= 2'b10;
                     beginigProcess  <= 1'b0;
                     sopControl      <= 1'b1;
-                    fms2conVld      <= 1'b1;
                 end
                 else if(~i_load && ~i_SoP && endOfProcess>0)begin
                     //estado de lectura
@@ -128,6 +127,7 @@ module Fsmv#(
             end
             else if(states == 2'b10) begin
                 beginigProcess <= beginigProcess;
+                fms2conVld      <= 1'b1;
                 
                 if(counterAdd <= i_imgLength)  
                     counterAdd   <= counterAdd+1;
@@ -137,24 +137,22 @@ module Fsmv#(
                 if(counterAdd>=LATENCIA && counter_with_latency < i_imgLength-2) begin
                     counter_with_latency    <= counter_with_latency +1;
                     endOfProcess            <= endOfProcess;
-                    fms2conVld              <= fms2conVld;
                     states                  <= states;
                 end
                 else if(counter_with_latency == i_imgLength-2)begin 
                     //si se llega la tamaño de la imagen reseteo los contadores 
                     counter_with_latency    <= counter_with_latency;
-                    fms2conVld              <= 1'b0;
                     endOfProcess            <= N_CONV;
                     states                  <= 2'b11;
                 end
                 else begin
                     counter_with_latency    <= counter_with_latency;
                     endOfProcess            <= endOfProcess;
-                    fms2conVld              <= fms2conVld;
                     states                  <= states;
                     end
             end
         	else if(states == 2'b11)begin
+                fms2conVld <= 1'b0;
                 if (~i_SoP) 
                     states   <= 2'b00;
                 else 

@@ -158,8 +158,8 @@ module micro_sim
              .i_WAddr(fsm_WAddr_mcu),
              .i_RAddr(fsm_RAddr_mcu),
              .i_chblk(fsm_chblk_mcu),
-             .i_sop(ctrl_sop_fsm),
-             .i_eop(ctrl_eop_mcu),
+             .i_sop(fsm_sop_mcu),
+             .i_eop(fsm_eop_ctrl),
              .rst(rst),
              .clk(CLK100MHZ),
 
