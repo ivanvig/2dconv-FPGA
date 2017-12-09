@@ -31,7 +31,6 @@ module Fsmv#(
     reg [NB_ADDRESS-1:0]           counter_with_latency;
     reg [N_CONV-1:0]                       endOfProcess;
     //registro utulizado para el estado de carga a las memoriras
-    reg                                   beginigProcess; 
     reg                                     changeBlock;
     reg                                      sopControl;
     reg                            valid_previous_state;
@@ -49,25 +48,23 @@ module Fsmv#(
         endOfProcess            = `N_CONV'd0;
         changeBlock             = 1'b0;
         sopControl              = 1'b0;
-        beginigProcess		    = 1'b0;
         valid_previous_state    = 1'b0;
         fms2conVld              = 1'b0;
         states                  = `NB_STATES'd0;
     end        
     
     always @(posedge i_CLK) begin  
-      	valid_previous_state<=i_valid;
-      	if(i_reset)begin
-        	counterAdd           <= `NB_ADDRESS'd0;
-        	counter_with_latency <= `NB_ADDRESS'd0;
-        	endOfProcess         <= `N_CONV'd0;
-        	changeBlock          <= 1'b0;
-        	sopControl           <= 1'b0;
-        	beginigProcess		 <= 1'b0;
+        valid_previous_state<=i_valid;
+        if(i_reset)begin
+            counterAdd           <= `NB_ADDRESS'd0;
+            counter_with_latency <= `NB_ADDRESS'd0;
+            endOfProcess         <= `N_CONV'd0;
+            changeBlock          <= 1'b0;
+            sopControl           <= 1'b0;
             fms2conVld           <= 1'b0;
             states               <= `NB_STATES'd0;
-      	end
-      	else begin
+        end
+        else begin
             if(states == 2'b00) begin
                 counter_with_latency  <= `NB_ADDRESS'd0;
                 counterAdd            <= `NB_ADDRESS'd0;
@@ -75,26 +72,22 @@ module Fsmv#(
                 if(i_load && ~i_SoP && endOfProcess==0) begin
                     //estado de carga
                     states          <= 2'b01;
-                    beginigProcess  <= 1'b1;
                     sopControl      <= 1'b0;
                     fms2conVld      <= 1'b0;
                 end
                 else if(~i_load  && i_SoP && endOfProcess==0) begin
                     //estado de procesamiento
                     states <= 2'b10;
-                    beginigProcess  <= 1'b0;
                     sopControl      <= 1'b1;
                 end
                 else if(~i_load && ~i_SoP && endOfProcess>0)begin
                     //estado de lectura
                     states          <= 2'b01;
-                    beginigProcess  <= 1'b0;
                     sopControl      <= 1'b0;
                     fms2conVld      <= 1'b0;
                 end
                 else begin
                     states          <= states;
-                    beginigProcess  <= 1'b0;
                     sopControl      <= 1'b0;
                     fms2conVld      <= 1'b0;
                 end
@@ -108,17 +101,13 @@ module Fsmv#(
                         changeBlock     <= 1'b1;
                         states          <= 2'b00;
                         if(endOfProcess > 0) endOfProcess <= endOfProcess-1;
-                        else if(beginigProcess>=2'b01) beginigProcess <= 1'b0;
-                        else begin
+                        else 
                             endOfProcess      <= endOfProcess;
-                            beginigProcess    <= beginigProcess; 
-                        end 
                     end
                     else begin
                         counterAdd      <= counterAdd+1;
                         changeBlock     <= changeBlock;
                         endOfProcess    <= endOfProcess;
-                        beginigProcess  <= beginigProcess;
                         states          <= states; 
                     end
                 end 
@@ -126,10 +115,9 @@ module Fsmv#(
                     counterAdd   <= counterAdd;
             end
             else if(states == 2'b10) begin
-                beginigProcess <= beginigProcess;
                 fms2conVld      <= 1'b1;
                 
-                if(counterAdd <= i_imgLength)  
+                if(counterAdd < i_imgLength)  
                     counterAdd   <= counterAdd+1;
                 else 
                     counterAdd   <= counterAdd;
@@ -151,7 +139,7 @@ module Fsmv#(
                     states                  <= states;
                     end
             end
-        	else if(states == 2'b11)begin
+            else if(states == 2'b11)begin
                 fms2conVld <= 1'b0;
                 if (~i_SoP) 
                     states   <= 2'b00;
