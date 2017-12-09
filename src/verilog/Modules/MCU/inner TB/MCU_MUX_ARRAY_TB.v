@@ -1,6 +1,6 @@
 module tb_MUX_ARRAY();
     
-    parameter N = 2;
+    parameter N = 4;
     parameter BITS_IMAGEN = 8;
     parameter STATES = 3;
     parameter BITS_DATA = 13;
@@ -10,9 +10,10 @@ module tb_MUX_ARRAY();
     reg [(N+2)*BITS_DATA-1:0]      i_MemData;
     reg [BITS_IMAGEN-1:0]              i_Data;
 
-    reg [$clog2(STATES)-1:0]         i_state;
-    reg [$clog2(N/2 + 1):0]          i_substate; //PARA N PAR
-    reg [$clog2(N+2)-1:0]            i_memSelect;
+    reg [clog2(STATES-1)-1:0]         i_state;
+    reg [clog2(N/2) - 1:0]     i_substate; //PARA N PAR
+    
+    reg [clog2(N+1)-1:0]            i_memSelect;
 
     wire [3*N*BITS_IMAGEN-1:0]       o_DataConv;
     wire [(N+2)*BITS_DATA-1:0]     o_MemData;
@@ -20,10 +21,11 @@ module tb_MUX_ARRAY();
     
 
     initial begin
-
+    
+        $display("%d", 2**clog2(N/2));
         i_Data     = {BITS_IMAGEN{1'b1,1'b0}};
         i_MemData  = {13'b0, 13'b1, 13'b0, 13'b1};
-        i_DataConv = {26{1'b1}};
+        i_DataConv = {13'h3,13'h2,13'h1,13'h0};
         
         i_state     = 0;
         i_substate  = 0;
@@ -65,4 +67,12 @@ module tb_MUX_ARRAY();
          .o_MemData(o_MemData),
          .o_Data(o_Data)
          );
+             
+             
+        function integer clog2;
+             input integer depth;
+             for (clog2=0; depth>0; clog2=clog2+1)
+                 depth = depth >> 1;
+         endfunction
+         
 endmodule

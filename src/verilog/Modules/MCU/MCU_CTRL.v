@@ -41,14 +41,14 @@ module MCU_CTRL
             chblk <= i_chblk;
             case(state)
                 LOAD: begin // LOAD
-                    /*if(next_state == state) begin
+                    if(next_state == state) begin
                         //vengo desde out
                         //memSelect_out <= (memSelect_out == N + 1) ? 0 : memSelect_out + 1;
                         next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
                         //we_rw_status <= {we_rw_status[N:0], we_rw_status[N+1]};
                         //memSelect_load <= (memSelect_load == N + 1) ? {clog2(N+1){1'b0}} : memSelect_load + 1;
                         //next_state <= (next_state == STATES  - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
-                    end*/
+                    end
                     else begin
                         if(i_chblk && (i_chblk != chblk)) begin
                             we_rw_status <= {we_rw_status[N:0], we_rw_status[N+1]};
@@ -57,7 +57,7 @@ module MCU_CTRL
                     end
                 end
                 PROC: begin
-                    /*if(next_state == state) begin
+                    if(next_state == state) begin
                         //vengo desde load
                         //we_rw_status <= {we_rw_status[N:0], we_rw_status[N+1]};
                         //memSelect_load <= (memSelect_load == N + 1) ? {clog2(N+1){1'b0}} : memSelect_load + 1;
@@ -65,7 +65,7 @@ module MCU_CTRL
                         //we_proc_status <= {we_proc_status[1:0], we_proc_status[N+1:2]};
                         //substate <= (substate == SUB-1) ? {clog2(SUB-1){1'b0}} : substate + 1;
                         //next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
-                   end*/
+                   end
                 end
 
                 OUT: begin
