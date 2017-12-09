@@ -82,9 +82,6 @@ module micro_sim
     assign i_GPIOctrl = gpio_o_data_tri_o[31:29];
     assign i_GPIOvalid = gpio_o_data_tri_o[28];
 
-    assign gpio_i_data_tri_i[BITS_DATA-1:0] = mcu_Data_ctrl;
-    assign gpio_i_data_tri_i[GPIO_D-1:BITS_DATA] = 19'h0;
-
     
 
     //asignacion de la finalizacion al led para un udicador visual.
