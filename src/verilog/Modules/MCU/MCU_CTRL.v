@@ -32,7 +32,7 @@ module MCU_CTRL
             substate <= {clog2(SUB-1){1'b0}};
             next_state <= {clog2(STATES-1){1'b0}};
             memSelect_load <= {clog2(N+1){1'b0}};
-            memSelect_out <= {clog2(N+1){1'b1}};
+            memSelect_out <= {clog2(N+1){1'b0}};
             we_rw_status <= {{(N+1){1'b0}}, 1'b1};
             we_proc_status <= {2'b00, {N{1'b1}}};
             chblk <= 1'b0;
