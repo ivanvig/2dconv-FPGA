@@ -66,7 +66,7 @@ module top_microblaze
              .usb_uart_txd(uart_rxd_out)
              );
     micro_sim
-        u_bloques
+        u_ALL
             (
              .gpio_i_data_tri_i(gpio_i_data_tri_i),
              .o_led(eop),

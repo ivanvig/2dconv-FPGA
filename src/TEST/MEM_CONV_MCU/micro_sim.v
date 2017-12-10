@@ -111,7 +111,7 @@ module micro_sim
              .o_load(ctrl_load_fsm)
              );
     //instancia FSM
-    Fsmv#(.NB_ADDRESS(NB_ADDRESS))
+    Fsmv#(.NB_ADDRESS(NB_ADDRESS), .N_CONV(N))
         u_FSM
             (
              .o_writeAdd(fsm_WAddr_mcu),
@@ -131,7 +131,7 @@ module micro_sim
    //inacia de Convolucionador
     generate
         for (i = 0; i < N; i = i+1) begin : gen_conv
-            Convolutor u_conv
+            Conv u_conv
                  (.o_data(conv_DataConv_mcu[(i+1)*BITS_DATA-1 -: BITS_DATA]),
                   .i_dato0(dataCONV[(i*3+1)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
                   .i_dato1(dataCONV[(i*3+2)*BITS_IMAGEN-1 -: BITS_IMAGEN]),
@@ -139,7 +139,7 @@ module micro_sim
                   .i_selecK_I(ctrl_ki_conv),
                   .i_reset(rst),
                   .i_valid(validCONV),
-                  .i_CLK(CLK100MHZ)
+                  .CLK100MHZ(CLK100MHZ)
                   );
         end
     endgenerate
@@ -174,7 +174,8 @@ module micro_sim
     
     generate
         for (i = 0; i < (N+2); i = i+1) begin : gen_memory
-            memory#(.INIT_FILE({"mem0" + i, ".txt"}), .NB_ADDRESS(NB_ADDRESS)) u_mem
+            //memory#(.INIT_FILE({"mem0" + i, ".txt"}), .NB_ADDRESS(NB_ADDRESS)) u_mem
+            memory#(.NB_ADDRESS(NB_ADDRESS)) u_mem
                  (
                   .i_wrEnable(mcu_we_mem[i]),
                   .i_CLK(CLK100MHZ),
