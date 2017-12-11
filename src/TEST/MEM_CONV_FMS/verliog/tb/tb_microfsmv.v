@@ -36,7 +36,7 @@ module tb_microfsmv# (
     	gpio_o_data_tri_o = 32'h5;
     	
         //latcheo el tamaño de la imgen
-        #20 gpio_o_data_tri_o = 32'ha05;
+        #20 gpio_o_data_tri_o = 32'h1b705;
         //
         #20 gpio_o_data_tri_o = 32'h0;
 
@@ -44,124 +44,125 @@ module tb_microfsmv# (
         //memoria 1-------------------------------
     	#50 gpio_o_data_tri_o = 32'ha0;
         
-        #50 gpio_o_data_tri_o = 32'h07f20;
+        #50 gpio_o_data_tri_o = 32'h07fa0;
 
-    	#10 gpio_o_data_tri_o = 32'h07f30;
-        #10  gpio_o_data_tri_o = 32'h07f20;
+    	#10 gpio_o_data_tri_o = 32'h07fb0; //30
+        #10  gpio_o_data_tri_o = 32'h07fa0; //20
 
-        #10 gpio_o_data_tri_o = 32'h07f30;
-        #10  gpio_o_data_tri_o = 32'h07f20;
+        #10 gpio_o_data_tri_o = 32'h07fb0;
+        #10  gpio_o_data_tri_o = 32'h07fa0;
     	//7e
-        #10 gpio_o_data_tri_o = 32'h07e30;
-        #10  gpio_o_data_tri_o = 32'h07e20;
+        #10 gpio_o_data_tri_o = 32'h07eb0;
+        #10  gpio_o_data_tri_o = 32'h07ea0;
 
-        #10 gpio_o_data_tri_o = 32'h07e30;
-    	#10  gpio_o_data_tri_o = 32'h07e20;
+        #10 gpio_o_data_tri_o = 32'h07eb0;
+    	#10  gpio_o_data_tri_o = 32'h07ea0;
 
-        #10 gpio_o_data_tri_o = 32'h07e30;
-    	#10  gpio_o_data_tri_o = 32'h07e20;
+        #10 gpio_o_data_tri_o = 32'h07eb0;
+    	#10  gpio_o_data_tri_o = 32'h07ea0;
 
-        #10 gpio_o_data_tri_o = 32'h07e30;
-    	#10  gpio_o_data_tri_o = 32'h07e20;
+        #10 gpio_o_data_tri_o = 32'h07eb0;
+    	#10  gpio_o_data_tri_o = 32'h07ea0;
 
-        #10 gpio_o_data_tri_o = 32'h07e30;
-    	#10  gpio_o_data_tri_o = 32'h07e20;
+        #10 gpio_o_data_tri_o = 32'h07eb0;
+    	#10  gpio_o_data_tri_o = 32'h07ea0;
 
-        #10 gpio_o_data_tri_o = 32'h07e30;
-    	#10  gpio_o_data_tri_o = 32'h07e20;
+        #10 gpio_o_data_tri_o = 32'h07eb0;
+    	#10  gpio_o_data_tri_o = 32'h07ea0;
     	//7f
-        #10 gpio_o_data_tri_o = 32'h07f30;
-    	#10  gpio_o_data_tri_o = 32'h07f20;
+        #10 gpio_o_data_tri_o = 32'h07fb0;
+    	#10  gpio_o_data_tri_o = 32'h07fa0;
 
-        #10 gpio_o_data_tri_o = 32'h07f30;
-    	#10  gpio_o_data_tri_o = 32'h07f20;
+        #10 gpio_o_data_tri_o = 32'h07fb0;
+    	#10  gpio_o_data_tri_o = 32'h07fa0;
 
-        #10 gpio_o_data_tri_o = 32'h07f30;
-    	#10  gpio_o_data_tri_o = 32'h07f20;
+        #10 gpio_o_data_tri_o = 32'h07fb0;
+    	#10  gpio_o_data_tri_o = 32'h07fa0;
 
         //memoria 2 ----------------------------------
         //7f
         #100 gpio_o_data_tri_o = 32'hC0;
 
-        #100 gpio_o_data_tri_o = 32'h07f40;
+        #100 gpio_o_data_tri_o = 32'h07fc0;
 
-        #10 gpio_o_data_tri_o = 32'h07f50;
-        #10  gpio_o_data_tri_o = 32'h07f40;
+        #10 gpio_o_data_tri_o = 32'h07fd0;
+        #10  gpio_o_data_tri_o = 32'h07fc0;
 
-        #10 gpio_o_data_tri_o = 32'h07f50;
-        #10  gpio_o_data_tri_o = 32'h07f40;
+        #10 gpio_o_data_tri_o = 32'h07fd0;
+        #10  gpio_o_data_tri_o = 32'h07fc0;
         //7e
-        #10 gpio_o_data_tri_o = 32'h07e50;
-        #10  gpio_o_data_tri_o = 32'h07e40;
+        #10 gpio_o_data_tri_o = 32'h07ed0;
+        #10  gpio_o_data_tri_o = 32'h07ec0;
 
-        #10 gpio_o_data_tri_o = 32'h07e50;
-        #10  gpio_o_data_tri_o = 32'h07e40;
+        #10 gpio_o_data_tri_o = 32'h07ed0;
+        #10  gpio_o_data_tri_o = 32'h07ec0;
 
-        #10 gpio_o_data_tri_o = 32'h07e50;
-        #10  gpio_o_data_tri_o = 32'h07e40;
+        #10 gpio_o_data_tri_o = 32'h07ed0;//50
+        #10  gpio_o_data_tri_o = 32'h07ec0;//40
 
-        #10 gpio_o_data_tri_o = 32'h07e50;
-        #10  gpio_o_data_tri_o = 32'h07e40;
+        #10 gpio_o_data_tri_o = 32'h07ed0;
+        #10  gpio_o_data_tri_o = 32'h07ec0;
 
-        #10 gpio_o_data_tri_o = 32'h07e50;
-        #10  gpio_o_data_tri_o = 32'h07e40;
+        #10 gpio_o_data_tri_o = 32'h07ed0;
+        #10  gpio_o_data_tri_o = 32'h07ec0;
 
-        #10 gpio_o_data_tri_o = 32'h07e50;
-        #10  gpio_o_data_tri_o = 32'h07e40;
+        #10 gpio_o_data_tri_o = 32'h07ed0;
+        #10  gpio_o_data_tri_o = 32'h07ec0;
         //7f
-        #10 gpio_o_data_tri_o = 32'h07f50;
-        #10  gpio_o_data_tri_o = 32'h07f40;
+        #10 gpio_o_data_tri_o = 32'h07fd0;
+        #10  gpio_o_data_tri_o = 32'h07fc0;
 
-        #10 gpio_o_data_tri_o = 32'h07f50;
-        #10  gpio_o_data_tri_o = 32'h07f40;
+        #10 gpio_o_data_tri_o = 32'h07fd0;
+        #10  gpio_o_data_tri_o = 32'h07fc0;
 
-        #10 gpio_o_data_tri_o = 32'h07f50;
-        #10  gpio_o_data_tri_o = 32'h07f40;
+        #10 gpio_o_data_tri_o = 32'h07fd0;
+        #10  gpio_o_data_tri_o = 32'h07fc0;
 
         //memoria 3----------------------------------
         #100 gpio_o_data_tri_o = 32'hE0;
-        #100  gpio_o_data_tri_o = 32'h07f60;
+        #100  gpio_o_data_tri_o = 32'h07fe0;
         
-        #10 gpio_o_data_tri_o = 32'h07f70;
-        #10  gpio_o_data_tri_o = 32'h07f60;
+        #10 gpio_o_data_tri_o = 32'h07ff0;
+        #10  gpio_o_data_tri_o = 32'h07fe0;
 
-        #10 gpio_o_data_tri_o = 32'h07f70;
-        #10  gpio_o_data_tri_o = 32'h07f60;
+        #10 gpio_o_data_tri_o = 32'h07ff0;
+        #10  gpio_o_data_tri_o = 32'h07fe0;
         //7e
-        #10 gpio_o_data_tri_o = 32'h07e70;
-        #10  gpio_o_data_tri_o = 32'h07e60;
+        #10 gpio_o_data_tri_o = 32'h07ef0;
+        #10  gpio_o_data_tri_o = 32'h07ee0;
 
-        #10 gpio_o_data_tri_o = 32'h07e70;
-        #10  gpio_o_data_tri_o = 32'h07e60;
+        #10 gpio_o_data_tri_o = 32'h07ef0;
+        #10  gpio_o_data_tri_o = 32'h07ee0;
 
-        #10 gpio_o_data_tri_o = 32'h07e70;
-        #10  gpio_o_data_tri_o = 32'h07e60;
+        #10 gpio_o_data_tri_o = 32'h07ef0;
+        #10  gpio_o_data_tri_o = 32'h07ee0;
 
-        #10 gpio_o_data_tri_o = 32'h07e70;
-        #10  gpio_o_data_tri_o = 32'h07e60;
+        #10 gpio_o_data_tri_o = 32'h07ef0;
+        #10  gpio_o_data_tri_o = 32'h07ee0;
 
-        #10 gpio_o_data_tri_o = 32'h07e70;
-        #10  gpio_o_data_tri_o = 32'h07e60;
+        #10 gpio_o_data_tri_o = 32'h07ef0;
+        #10  gpio_o_data_tri_o = 32'h07ee0;
 
-        #10 gpio_o_data_tri_o = 32'h07e70;
-        #10  gpio_o_data_tri_o = 32'h07e60;
+        #10 gpio_o_data_tri_o = 32'h07ef0;
+        #10  gpio_o_data_tri_o = 32'h07ee0;
         //7f
-        #10 gpio_o_data_tri_o = 32'h07f70;
-        #10  gpio_o_data_tri_o = 32'h07f60;
+        #10 gpio_o_data_tri_o = 32'h07ff0;
+        #10  gpio_o_data_tri_o = 32'h07fe0;
 
-        #10 gpio_o_data_tri_o = 32'h07f70;
-        #10  gpio_o_data_tri_o = 32'h07f60;
+        #10 gpio_o_data_tri_o = 32'h07ff0;//70
+        #10  gpio_o_data_tri_o = 32'h07fe0;//60
 
-        #10 gpio_o_data_tri_o = 32'h07f70;
-        #10  gpio_o_data_tri_o = 32'h07f60;
-
+        #10 gpio_o_data_tri_o = 32'h07f6a;
+        #10 gpio_o_data_tri_o = 32'h07f7a;
+        #10 gpio_o_data_tri_o = 32'h07f6a; ////la instruccion magica
+     
         */
         //sop-------------------------------------------
-    	#500  gpio_o_data_tri_o = 32'h0A;
+    	#500 gpio_o_data_tri_o = 32'h0A;
     	#500 gpio_o_data_tri_o = 32'h02;
 
     	// salida de datos
-    	#200 gpio_o_data_tri_o = 32'h10;
+    	#1500 gpio_o_data_tri_o = 32'h10;
     	#10 gpio_o_data_tri_o = 32'h0;
     	#10 gpio_o_data_tri_o = 32'h10;
     	#10 gpio_o_data_tri_o = 32'h0;
