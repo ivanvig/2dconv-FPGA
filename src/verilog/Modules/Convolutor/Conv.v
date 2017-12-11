@@ -16,7 +16,7 @@ module Conv #(
     input [BIT_LEN-1:0] i_dato0,
     input [BIT_LEN-1:0] i_dato1,
     input [BIT_LEN-1:0] i_dato2,
-    input i_selecK_I,
+    input i_selecK_I, //KI=0 modo kernle k=1 modo imagen
     input i_reset,
     input i_valid,
     input CLK100MHZ
@@ -26,58 +26,49 @@ module Conv #(
     reg signed [BIT_ARRAY-1:0] kernel [0:M_LEN-1];    
     // registros de la imagen
     reg signed [BIT_ARRAY-1:0] imagen [0:M_LEN-1];
-
     // resultado
     reg signed [CONV_LPOS-1:0]  conv_reg;
-
     // reg de la convolucion
     reg signed [CONV_LEN-1:0] resultado;
     
-    //  el resto de los cables    
-    wire clk, selecK_I, rst, valid;
-
     integer ptr_row;
     integer ptr_column;
 
-    assign clk          = CLK100MHZ;
-    assign selecK_I     = i_selecK_I; //KI=0 modo kernle k=1 modo imagen
-    assign rst          = i_reset;
-    assign valid        = i_valid;
-
     //Asigancion de Convolucion a la salida
-    assign {o_data[CONV_LPOS-1],o_data[CONV_LPOS-2:0]}= {~conv_reg[CONV_LPOS-1], conv_reg[CONV_LPOS-2 : 0]};
-
-    always @( posedge clk) begin
-        if(rst) begin
+    assign {o_data[CONV_LPOS-1],o_data[CONV_LPOS-2:0]}= {~conv_reg[CONV_LPOS-1], conv_reg[CONV_LPOS-2:0]};
+    integer shift;
+    always @( posedge CLK100MHZ) begin
+        if(i_reset) begin
             //reset valores de imagen
-            imagen[0]<=24'h0;
-            imagen[1]<=24'h0;
-            imagen[2]<=24'h0;
+            for(shift=0; shift < M_LEN; shift = shift +1) begin
+                imagen[shift]<={BIT_ARRAY{1'b0}};
+                kernel[shift]<={BIT_ARRAY{1'b0}};
+            end 
             //reser valores de kernel . modif
-            
+            /*
             kernel[0]<=24'h002000;
             kernel[1]<=24'h208020;
             kernel[2]<=24'h002000;
-            
+            */
             //regitro de la convolucion
-            conv_reg<=0;
+            conv_reg<={CONV_LPOS{1'b0}};
         end
-        else if(valid)begin
-            case (selecK_I)
+        else if(i_valid)begin
+            case (i_selecK_I)
                 1'b1: begin
                     // imagen
-                    imagen[0]<=imagen[1];
-                    imagen[1]<=imagen[2];
-                    imagen[2]<={i_dato2,i_dato1,i_dato0};
+                    for( shift = 0; shift < M_LEN-1; shift = shift +1)
+                        imagen[shift]<=imagen[shift+1];
+                    imagen[M_LEN-1]<={i_dato2,i_dato1,i_dato0};
                     //latcheo de la salida 
                     conv_reg<= resultado[CONV_LEN-1:CONV_LEN-CONV_LPOS];
                     //conv_reg<= resultado;
                 end
                 1'b0: begin
                     //kernel
-                    kernel[0]<=kernel[1];
-                    kernel[1]<=kernel[2];
-                    kernel[2]<={i_dato2,i_dato1,i_dato0};
+                    for( shift = 0; shift < M_LEN-1; shift = shift +1)
+                        kernel[shift]<=kernel[shift+1];
+                    kernel[M_LEN-1]<={i_dato2,i_dato1,i_dato0};
                     //salida
                     conv_reg<=conv_reg;
 
@@ -86,13 +77,10 @@ module Conv #(
         end
         else begin 
             //imagen 
-            imagen[0]<=imagen[0];
-            imagen[1]<=imagen[1];
-            imagen[2]<=imagen[2];
-            //kernel
-            kernel[0]<=kernel[0];
-            kernel[1]<=kernel[1];
-            kernel[2]<=kernel[2];
+            for (shift =0 ; shift<M_LEN;shift=shift+1) begin: elseequ
+                imagen[shift]<=imagen[shift];
+                kernel[shift]<=kernel[shift];
+            end
             //matengo el lacheo
             conv_reg<=conv_reg;
         end
