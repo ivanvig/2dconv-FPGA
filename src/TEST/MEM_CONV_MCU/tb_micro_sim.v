@@ -81,8 +81,8 @@ module micro_sim_tb();
             file[j] = $fopen({"/home/ivan/XilinxProjects/2dconv-FPGA/src/TEST/MEM_CONV_MCU/out_mem0"+j,".txt"}, "w");
         end
         j = 0;
-        for (i = 0; i < N*IMG_SIZE; i = i+1) begin
-            if ((i % (IMG_SIZE+1)) == 0 && i > 0) begin
+        for (i = 0; i < N*(IMG_SIZE-2); i = i+1) begin
+            if ((i % (IMG_SIZE-1)) == 0 && i > 0) begin
                 j = j+1;
                 $display("Paso a memoria %d", j);
             end
