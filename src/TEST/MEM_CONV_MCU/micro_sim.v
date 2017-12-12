@@ -85,7 +85,7 @@ module micro_sim
     
 
     //asignacion de la finalizacion al led para un udicador visual.
-    assign o_led = ctrl_eop_mcu;
+    assign o_led = fsm_eop_ctrl;
     // instacia del Microcontrolador
     //instancia CONTROL
     ControlBlock

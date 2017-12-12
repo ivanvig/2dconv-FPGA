@@ -5,7 +5,7 @@ module micro_sim_tb();
     parameter GPIO_D        = `GPIO_D;
     parameter N = 2;
     parameter IMG_SIZE = 15;
-    localparam PATH = "/home/ivan/XilinxProjects/2dconv-FPGA/src/TEST/MEM_CONV_MCU/";
+    localparam PATH = "/home/iv/Xilinx/2dconv-FPGA/src/TEST/MEM_CONV_MCU/";
     localparam FILENAME = "mem0";
     localparam OUTFNAME = "out_mem0";
 
@@ -21,7 +21,7 @@ module micro_sim_tb();
     reg              i_GPIOvalid;
     reg              rst;
 
-    integer           i, j, k, aux;
+    integer           i, j, k, aux, aux_name;
     integer           file[0:N+1];
 
     assign gpio_o_data_tri_o = {i_GPIOctrl,i_GPIOvalid, 3'b0, i_GPIOdata, rst};
@@ -66,7 +66,11 @@ module micro_sim_tb();
             //CARGO IMAGEN EN MEMORIA
             #500 i_GPIOctrl = 3'b010;
             for (j = 0; j < aux; j = j+1) begin
-                file[j] = $fopen({PATH, FILENAME+j+aux*k,".txt"}, "r");
+                if(k == 1)
+                    aux_name = N+2;
+                else
+                    aux_name = N;
+                file[j] = $fopen({PATH, FILENAME+j+aux_name*k,".txt"}, "r");
                 if(!file[j]) begin
                     $display("Error abriendo archivo");
                     $stop;
@@ -90,7 +94,7 @@ module micro_sim_tb();
                 file[j] = $fopen({PATH, OUTFNAME+j+k*N,".txt"}, "w");
             end
             j = 0;
-            for (i = 0; i <= N*(IMG_SIZE-2); i = i+1) begin
+            for (i = 0; i <= N*(IMG_SIZE-2)+1; i = i+1) begin
                 if (i % (IMG_SIZE-1) == 0 && i > IMG_SIZE-2) begin
                     j = j+1;
                     $display("Paso a memoria %d", j);

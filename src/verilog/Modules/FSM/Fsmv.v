@@ -88,6 +88,7 @@ module Fsmv#(
                 end
                 else if(~i_load && ~i_SoP && endOfProcess>0)begin
                     //estado de lectura
+                    endOfProcess    <= endOfProcess-1;
                     states          <= 2'b01;
                     sopControl      <= 1'b0;
                     fms2conVld      <= 1'b0;
@@ -99,36 +100,27 @@ module Fsmv#(
                 end
             end
             else if(states == 2'b01)begin
-                if(endOfProcess > 0 && i_load) begin
-                    states <= 2'b00;
-                    endOfProcess <= {N_CONV{1'b0}};
-                    changeBlock <= 1'b1;
-                end else begin
-                    //Manejo de direcciones en función del valid
-                    if (i_valid && !valid_previous_state) begin 
-                        //Verificación si termino de leer/cargar un bloque
-                        if (endOfProcess > 0 && counterAdd==i_imgLength-2)begin
-                            counterAdd      <= counterAdd;
-                            changeBlock     <= 1'b1;
-                            states          <= 2'b00;
-                            endOfProcess    <= endOfProcess-1;
-                        end
-                        else if (counterAdd == i_imgLength) begin
-                            counterAdd      <= counterAdd;
-                            changeBlock     <= 1'b1;
-                            states          <= 2'b00;
-                            endOfProcess    <= endOfProcess;   
-                        end
-                        else begin
-                            counterAdd      <= counterAdd+1;
-                            changeBlock     <= changeBlock;
-                            endOfProcess    <= endOfProcess;
-                            states          <= states; 
-                        end
-                    end 
-                    else 
-                        counterAdd   <= counterAdd;
-                end
+                //Manejo de direcciones en función del valid
+                if (i_valid && !valid_previous_state) begin 
+                    //Verificación si termino de leer/cargar un bloque
+                    if (endOfProcess > 0 && counterAdd==i_imgLength-2)begin
+                        counterAdd      <= counterAdd;
+                        changeBlock     <= 1'b1;
+                        states          <= 2'b00;
+                    end
+                    else if (counterAdd == i_imgLength) begin
+                        counterAdd      <= counterAdd;
+                        changeBlock     <= 1'b1;
+                        states          <= 2'b00;
+                    end
+                    else begin
+                        counterAdd      <= counterAdd+1;
+                        changeBlock     <= changeBlock;
+                        states          <= states; 
+                    end
+                end 
+                else 
+                    counterAdd   <= counterAdd;
             end
             else if(states == 2'b10) begin
              
@@ -139,25 +131,24 @@ module Fsmv#(
                 //Shifteo para el write address, teniendo en cuenta la latencia.
                 if(counterAdd>=LATENCIA && counter_with_latency < i_imgLength-2) begin
                     counter_with_latency    <= counter_with_latency +1;
-                    endOfProcess            <= endOfProcess;
                     fms2conVld              <= fms2conVld;
                     states                  <= states;
                 end
                 else if(counter_with_latency == i_imgLength-2)begin 
                     //si se llega la tamaño de la imagen reseteo los contadores 
+                    changeBlock     <= 1'b1;
                     counter_with_latency    <= counter_with_latency;
                     fms2conVld              <= 1'b0;
-                    endOfProcess            <= N_CONV;
                     states                  <= 2'b11;
                 end
                 else begin
                     counter_with_latency    <= counter_with_latency;
-                    endOfProcess            <= endOfProcess;
                     fms2conVld              <= fms2conVld;
                     states                  <= states;
                     end
             end
         	else if(states == 2'b11)begin
+              endOfProcess            <= N_CONV+1;
                 if (~i_SoP) 
                     states   <= 2'b00;
                 else 

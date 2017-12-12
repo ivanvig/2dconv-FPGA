@@ -129,12 +129,13 @@ module ControlBlock(    //Definicion de puertos
                validFSM<=1'b0;
 
               //!run_reg => no estoy en estado RUN (si estoy en el mismo, este modulo no cede el control)
-              if(run_reg==1'b0) begin  
+              if(!run_reg) begin  
                
                 case (i_GPIOctrl)
                
                         //Carga kernell
                         Kernel_load:  begin
+                            run_reg<=1'b0;
                                          //Modo kernell activo por bajo
                                          load_reg<=1'b0;      
                                          KI<=1'b0;
@@ -148,6 +149,7 @@ module ControlBlock(    //Definicion de puertos
                                 
                         //Carga del tamano de la imagen Img_length
                         ImgSize_load: begin
+                            run_reg<=1'b0;
                                         KI<=1'b1;
                                         imgLength<=i_GPIOdata[9:0];
                                         load_reg<=1'b0;
@@ -157,48 +159,31 @@ module ControlBlock(    //Definicion de puertos
             
                        //Cargar imagen
                         Img_load:     begin
+                            run_reg<=1'b0;
                                          KI<=1'b1;
                                          //Levanto senal de carga para la FSM
                                          load_reg<=1'b1;
-                                                                                     
-                                            
-                                         EoPMCU_reg<=1'b0;
-                                         
-                                        
-                                      end 
+                                      end
                         
                                                                 
                         LoadFinish_goToRun: begin
-                                        KI<=1'b1;
-                                        //Termino carga, paso a estado RUN. Se delega el control del sistema
-                                        run_reg<=1'b1;
-                                        
-                                        //Bajo senal de carga para la FSM
-                                        load_reg <=1'b0;
-                        
-                                     
-                                     end
-                                     
-                                     
-                                     
-                             
+                            if(!i_EOP_from_FSM) begin
+                                KI<=1'b1;
+                                //Termino carga, paso a estado RUN. Se delega el control del sistema
+                                
+                                run_reg<=1'b1;
+                                
+                                //Bajo senal de carga para la FSM
+                                load_reg <=1'b0;
+                            end
+                            
+                            
+                        end
                         default :   ;
                 endcase 
                 
-                end
-                else if (i_EOP_from_FSM && run_reg==1'b1) begin
-                            //Estando en RUN, al recibir la senal End Of Process del FSM, debo SALIR del estado mencionado
-                            //Es decir, se termino la etapa de procesamiento, y se pasa a la etapa OUT poniendo en alto EoP_MCU
-                           
-                           
-                    load_reg   <=1'b0;
-                    EoPMCU_reg <=1'b1;
-                    run_reg    <=1'b0;
-                    KI         <=1'b1;
-                    //Hay que bajarlo? Hasta cuando??
-
-                end
- 
+           end else if(i_EOP_from_FSM && run_reg)
+               run_reg = 0;
         end//End if/else rst
         
     end //End always

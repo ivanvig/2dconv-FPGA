@@ -42,12 +42,7 @@ module MCU_CTRL
             case(state)
                 LOAD: begin // LOAD
                     if(next_state == state) begin
-                        //vengo desde out
-                        //memSelect_out <= (memSelect_out == N + 1) ? 0 : memSelect_out + 1;
                         next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
-                        //we_rw_status <= {we_rw_status[N:0], we_rw_status[N+1]};
-                        //memSelect_load <= (memSelect_load == N + 1) ? {clog2(N+1){1'b0}} : memSelect_load + 1;
-                        //next_state <= (next_state == STATES  - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
                     end
                     else begin
                         if(i_chblk && (i_chblk != chblk)) begin
@@ -58,24 +53,17 @@ module MCU_CTRL
                 end
                 PROC: begin
                     if(next_state == state) begin
-                        //vengo desde load
-                        //we_rw_status <= {we_rw_status[N:0], we_rw_status[N+1]};
-                        //memSelect_load <= (memSelect_load == N + 1) ? {clog2(N+1){1'b0}} : memSelect_load + 1;
                         next_state <= (next_state == STATES  - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
-                        //we_proc_status <= {we_proc_status[1:0], we_proc_status[N+1:2]};
-                        //substate <= (substate == SUB-1) ? {clog2(SUB-1){1'b0}} : substate + 1;
-                        //next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
+                   end else begin
+                       if(i_chblk && (i_chblk != chblk))
+                           we_proc_status <= {we_proc_status[1:0], we_proc_status[N+1:2]};
                    end
                 end
 
                 OUT: begin
                     if(next_state == state) begin
-                        //vengo desde PROC
-                        //we_proc_status <= {we_proc_status[1:0], we_proc_status[N+1:2]};
                         substate <= (substate == SUB-1) ? {clog2(SUB-1){1'b0}} : substate + 1;
                         next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
-                        //memSelect_out <= (memSelect_out == N + 1) ? 0 : memSelect_out + 1;
-                        //next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
                     end
                     else begin
                         if(i_chblk && (i_chblk != chblk)) 
