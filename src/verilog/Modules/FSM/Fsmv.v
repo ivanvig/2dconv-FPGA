@@ -99,6 +99,11 @@ module Fsmv#(
                 end
             end
             else if(states == 2'b01)begin
+                if(endOfProcess > 0 && i_load) begin
+                    states <= 2'b00;
+                    endOfProcess <= {N_CONV{1'b0}};
+                    //TODO: TERMINAR CON ESTO
+                end
                 //Manejo de direcciones en función del valid
                 if (i_valid && !valid_previous_state) begin 
                     //Verificación si termino de leer/cargar un bloque

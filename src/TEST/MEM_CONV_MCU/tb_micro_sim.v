@@ -18,7 +18,7 @@ module micro_sim_tb();
     reg              i_GPIOvalid;
     reg              rst;
 
-    integer           i, j;
+    integer           i, j, k, aux;
     integer           file[0:N+1];
 
     assign gpio_o_data_tri_o = {i_GPIOctrl,i_GPIOvalid, 3'b0, i_GPIOdata, rst};
@@ -54,45 +54,52 @@ module micro_sim_tb();
         #500 i_GPIOctrl = 3'b001;
         i_GPIOdata = IMG_SIZE;
         
-        //CARGO IMAGEN EN MEMORIA
-        #500 i_GPIOctrl = 3'b010;
-        for (j = 0; j < N+2; j = j+1) begin
-            file[j] = $fopen({"mem0"+j,".txt"}, "r");
-            if(!file[j]) begin
-                $display("Error abriendo archivo");
-                $stop;
-            end else begin
-                for (i = 0; i <= IMG_SIZE; i = i+1) begin
-                    if(i == IMG_SIZE && j == N+1)
-                        #100 i_GPIOctrl = 100; //ultimo dato a cargar
-                    #100 $fscanf(file[j], "%h", i_GPIOdata);
-                    #100 i_GPIOvalid = 1'b1;
-                    #100 i_GPIOvalid = 1'b0;
+        for(k = 0; k < 2*N+2; k = k+4) begin
+            if(k == 0)
+                aux = N+2;
+            else
+                aux = N;           
+            
+            //CARGO IMAGEN EN MEMORIA
+            #500 i_GPIOctrl = 3'b010;
+            for (j = 0; j < aux; j = j+1) begin
+                file[j] = $fopen({"/home/iv/Xilinx/2dconv-FPGA/src/TEST/MEM_CONV_MCU/mem0"+j+k,".txt"}, "r");
+                if(!file[j]) begin
+                    $display("Error abriendo archivo");
+                    $stop;
+                end else begin
+                    for (i = 0; i <= IMG_SIZE; i = i+1) begin
+                        if(i == IMG_SIZE && j == aux-1)
+                            #100 i_GPIOctrl = 100; //ultimo dato a cargar
+                        #100 $fscanf(file[j], "%h", i_GPIOdata);
+                        #100 i_GPIOvalid = 1'b1;
+                        #100 i_GPIOvalid = 1'b0;
+                    end
                 end
             end
-        end
-        for (j = 0; j < N+2; j = j+1) begin
-            $fclose(file[j]);
-        end
-        
-        wait(o_led);
-        #100 i_GPIOctrl = 011;
-        for (j = 0; j < N; j = j+1) begin
-            file[j] = $fopen({"/home/ivan/XilinxProjects/2dconv-FPGA/src/TEST/MEM_CONV_MCU/out_mem0"+j,".txt"}, "w");
-        end
-        j = 0;
-        for (i = 0; i < N*(IMG_SIZE-2); i = i+1) begin
-            if ((i % (IMG_SIZE-1)) == 0 && i > 0) begin
-                j = j+1;
-                $display("Paso a memoria %d", j);
+            for (j = 0; j < N+2; j = j+1) begin
+                $fclose(file[j]);
             end
-            $fwrite(file[j], "%h\n", gpio_i_data_tri_i[12:0]);
-            #100 i_GPIOvalid = 1'b1;
-            #100 i_GPIOvalid = 1'b0;
+            
+            wait(o_led);
+            #100 i_GPIOctrl = 011;
+            for (j = 0; j < N; j = j+1) begin
+                file[j] = $fopen({"/home/iv/Xilinx/2dconv-FPGA/src/TEST/MEM_CONV_MCU/out_mem0"+j+k,".txt"}, "w");
+            end
+            j = 0;
+            for (i = 0; i <= N*(IMG_SIZE-2); i = i+1) begin
+                if (((i % (IMG_SIZE-2))-1) == 0 && i > IMG_SIZE-2) begin
+                    j = j+1;
+                    $display("Paso a memoria %d", j);
+                end
+                $fwrite(file[j], "%h\n", gpio_i_data_tri_i[12:0]);
+                #100 i_GPIOvalid = 1'b1;
+                #100 i_GPIOvalid = 1'b0;
 
-        end
-        for (j = 0; j < N; j = j+1) begin
-            $fclose(file[j]);
+            end
+            for (j = 0; j < N; j = j+1) begin
+                $fclose(file[j]);
+            end
         end
         $finish;
     end

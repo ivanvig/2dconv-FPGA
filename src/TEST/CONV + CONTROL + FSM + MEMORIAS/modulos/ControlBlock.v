@@ -83,7 +83,6 @@ module ControlBlock(    //Definicion de puertos
   reg           run_reg;
   reg           EoPMCU_reg;
   //reg           go_to_leds;
-  reg           runControl;
   // En principio no haria falta el latcheo: reg [3:0] controlGPIO;
     
  //Registers:
@@ -118,7 +117,6 @@ module ControlBlock(    //Definicion de puertos
  GPIO_valid_previous_state  <=   1'b0;
                     run_reg <=   1'b0;
                  EoPMCU_reg <=   1'b0;  
-                 runControl <=   1'b0;
                         KI  <=   1'b0; //definido asi en la documentación.
        end
        else begin    
@@ -131,7 +129,7 @@ module ControlBlock(    //Definicion de puertos
                validFSM<=1'b0;
 
               //!run_reg => no estoy en estado RUN (si estoy en el mismo, este modulo no cede el control)
-              if(run_reg==1'b0 && runControl==1'b0) begin  
+              if(run_reg==1'b0) begin  
                
                 case (i_GPIOctrl)
                
@@ -150,7 +148,7 @@ module ControlBlock(    //Definicion de puertos
                                 
                         //Carga del tamano de la imagen Img_length
                         ImgSize_load: begin
-                                        KI<=1'b0;
+                                        KI<=1'b1;
                                         imgLength<=i_GPIOdata[9:0];
                                         load_reg<=1'b0;
                                         
@@ -159,7 +157,7 @@ module ControlBlock(    //Definicion de puertos
             
                        //Cargar imagen
                         Img_load:     begin
-                                         KI<=1'b0;
+                                         KI<=1'b1;
                                          //Levanto senal de carga para la FSM
                                          load_reg<=1'b1;
                                                                                      
@@ -174,7 +172,6 @@ module ControlBlock(    //Definicion de puertos
                                         KI<=1'b1;
                                         //Termino carga, paso a estado RUN. Se delega el control del sistema
                                         run_reg<=1'b1;
-                                        runControl<=1'b1;
                                         
                                         //Bajo senal de carga para la FSM
                                         load_reg <=1'b0;
@@ -189,7 +186,7 @@ module ControlBlock(    //Definicion de puertos
                 endcase 
                 
                 end
-                else if (i_EOP_from_FSM && runControl==1'b1) begin
+                else if (i_EOP_from_FSM && run_reg==1'b1) begin
                             //Estando en RUN, al recibir la senal End Of Process del FSM, debo SALIR del estado mencionado
                             //Es decir, se termino la etapa de procesamiento, y se pasa a la etapa OUT poniendo en alto EoP_MCU
                            
@@ -197,7 +194,7 @@ module ControlBlock(    //Definicion de puertos
                     load_reg   <=1'b0;
                     EoPMCU_reg <=1'b1;
                     run_reg    <=1'b0;
-                    KI         <=1'b0;
+                    KI         <=1'b1;
                     //Hay que bajarlo? Hasta cuando??
 
                 end
