@@ -102,32 +102,33 @@ module Fsmv#(
                 if(endOfProcess > 0 && i_load) begin
                     states <= 2'b00;
                     endOfProcess <= {N_CONV{1'b0}};
-                    //TODO: TERMINAR CON ESTO
+                    changeBlock <= 1'b1;
+                end else begin
+                    //Manejo de direcciones en función del valid
+                    if (i_valid && !valid_previous_state) begin 
+                        //Verificación si termino de leer/cargar un bloque
+                        if (endOfProcess > 0 && counterAdd==i_imgLength-2)begin
+                            counterAdd      <= counterAdd;
+                            changeBlock     <= 1'b1;
+                            states          <= 2'b00;
+                            endOfProcess    <= endOfProcess-1;
+                        end
+                        else if (counterAdd == i_imgLength) begin
+                            counterAdd      <= counterAdd;
+                            changeBlock     <= 1'b1;
+                            states          <= 2'b00;
+                            endOfProcess    <= endOfProcess;   
+                        end
+                        else begin
+                            counterAdd      <= counterAdd+1;
+                            changeBlock     <= changeBlock;
+                            endOfProcess    <= endOfProcess;
+                            states          <= states; 
+                        end
+                    end 
+                    else 
+                        counterAdd   <= counterAdd;
                 end
-                //Manejo de direcciones en función del valid
-                if (i_valid && !valid_previous_state) begin 
-                    //Verificación si termino de leer/cargar un bloque
-                    if (endOfProcess > 0 && counterAdd==i_imgLength-2)begin
-                        counterAdd      <= counterAdd;
-                        changeBlock     <= 1'b1;
-                        states          <= 2'b00;
-                        endOfProcess    <= endOfProcess-1;
-                    end
-                    else if (counterAdd == i_imgLength) begin
-                       counterAdd      <= counterAdd;
-                        changeBlock     <= 1'b1;
-                        states          <= 2'b00;
-                        endOfProcess    <= endOfProcess;   
-                    end
-                    else begin
-                        counterAdd      <= counterAdd+1;
-                        changeBlock     <= changeBlock;
-                        endOfProcess    <= endOfProcess;
-                        states          <= states; 
-                    end
-                end 
-                else 
-                    counterAdd   <= counterAdd;
             end
             else if(states == 2'b10) begin
              
