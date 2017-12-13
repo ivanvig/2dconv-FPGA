@@ -34,7 +34,6 @@ module ControlBlock(    //Definicion de puertos
                       output [7:0] o_MCUdata,
                       output  [9:0] o_imgLength,
                       //output  [2:0] o_led, //o_estado
-                      output        o_EOP_to_MCU,
                       output        o_run,
                       output        o_valid_to_FSM,
                       output        o_valid_to_CONV,
@@ -81,7 +80,6 @@ module ControlBlock(    //Definicion de puertos
   reg           KI;
   reg           load_reg;
   reg           run_reg;
-  reg           EoPMCU_reg;
   //reg           go_to_leds;
   // En principio no haria falta el latcheo: reg [3:0] controlGPIO;
     
@@ -93,7 +91,6 @@ module ControlBlock(    //Definicion de puertos
   assign {o_GPIOdata}      = dataGPIO;
   assign {o_MCUdata}       = dataMCU;
   assign {o_run}           = run_reg;
-  assign {o_EOP_to_MCU}    = EoPMCU_reg;
   assign {o_KNLdata}       = dataKERNEL;
   assign {o_load}          = load_reg;   
   
@@ -116,7 +113,6 @@ module ControlBlock(    //Definicion de puertos
                  validCONV  <=   1'b0;
  GPIO_valid_previous_state  <=   1'b0;
                     run_reg <=   1'b0;
-                 EoPMCU_reg <=   1'b0;  
                         KI  <=   1'b0; //definido asi en la documentación.
        end
        else begin    

@@ -29,7 +29,6 @@ module Fsmv#(
     //Latcheo de salidas 
     reg [NB_ADDRESS-1:0]                     counterAdd;
     reg [NB_ADDRESS-1:0]           counter_with_latency;
-    reg [NB_ADDRESS-1:0]					  imgHeight;
     reg [N_CONV-1:0]                       endOfProcess;
     //registro utulizado para el estado de carga a las memoriras
     reg                                     changeBlock;
@@ -46,7 +45,6 @@ module Fsmv#(
     initial begin
         counterAdd              = `NB_ADDRESS'd0;
         counter_with_latency    = `NB_ADDRESS'd0;
-        imgHeight               = `NB_ADDRESS'd0;
         endOfProcess            = `N_CONV'd0;
         changeBlock             = 1'b0;
         sopControl              = 1'b0;
@@ -63,17 +61,14 @@ module Fsmv#(
         	endOfProcess         <= `N_CONV'd0;
         	changeBlock          <= 1'b0;
         	sopControl           <= 1'b0;
-        	imgHeight			 <= i_imgLength;
             fms2conVld           <= 1'b0;
             states               <= `NB_STATES'd0;
       	end
       	else begin
-            imgHeight <= imgHeight;
             if(states == 2'b00) begin
                 counter_with_latency  <= `NB_ADDRESS'd0;
                 counterAdd            <= `NB_ADDRESS'd0;
                 changeBlock           <= 1'b0;
-                imgHeight             <= imgHeight;
                 if(i_load && ~i_SoP && endOfProcess==0) begin
                     //estado de carga
                     states          <= 2'b01;
