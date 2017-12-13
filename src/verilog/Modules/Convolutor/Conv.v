@@ -92,7 +92,6 @@ module Conv #(
         
     endgenerate
 
-
     always @(*) begin
         parcial0=0;
         for(ptr0 = 0 ; ptr0 < 4; ptr0 = ptr0 +1)begin
@@ -106,20 +105,7 @@ module Conv #(
             parcial1 = parcial1 + array_prod[4+ptr1]; 
         end
     end
-
+    //assignacion de las sumas parciales, a la convolucion
     assign  resultado = parcial0 + parcial1 + array_prod[8];
-    
-    /*
-    always @(*) begin
-        resultado = 20'h0;
-        for(ptr_row = 0 ; ptr_row < M_LEN ; ptr_row=ptr_row+1) 
-        begin: SumaYMult
-            for (ptr_column = 0 ; ptr_column < M_LEN ; ptr_column=ptr_column+1) 
-            begin: SumaTop
-                resultado = resultado + $signed(kernel[ptr_row][(ptr_column+1)*BIT_LEN-1 -: BIT_LEN])*
-                                        $signed(imagen[ptr_row][(ptr_column+1)*BIT_LEN-1 -: BIT_LEN]);
-            end
-        end
-    end
-    */
+   
 endmodule
