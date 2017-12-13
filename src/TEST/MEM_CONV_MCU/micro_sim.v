@@ -26,7 +26,7 @@ module micro_sim
       localparam LoadFinish_goToRun = 4 
       )(
         output [GPIO_D-1:0] gpio_i_data_tri_i,
-        output              o_led,
+        output [2:0]        o_led,
         input               CLK100MHZ,
         input [GPIO_D-1:0]  gpio_o_data_tri_o
         );
@@ -85,7 +85,7 @@ module micro_sim
     
 
     //asignacion de la finalizacion al led para un udicador visual.
-    assign o_led = fsm_eop_ctrl;
+    assign o_led = {ctrl_load_fsm, fsm_sop_mcu, fsm_eop_ctrl};
     // instacia del Microcontrolador
     //instancia CONTROL
     ControlBlock

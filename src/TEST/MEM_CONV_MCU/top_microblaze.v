@@ -24,8 +24,7 @@ module top_microblaze
       )(
         output [3:0] o_led,
         output       uart_rxd_out,
-        input [3:0]  i_sw,
-        input [3:0]  btn,
+        input        ck_rst,
         input        CLK100MHZ,
         input        uart_txd_in 
     );
@@ -40,14 +39,14 @@ module top_microblaze
     wire sys_clock;
     //clock de salida del micro
     wire clk_o;
-    wire eop;
+    wire [2:0] leds;
     
     
     // Microconotrolador
-    assign reset        = i_sw[0];
+    assign reset        = ck_rst;
     assign sys_clock    = CLK100MHZ;
     
-    assign o_led[0] = eop;
+    assign o_led[2:0] = leds;
 
 
 
@@ -69,7 +68,7 @@ module top_microblaze
         u_ALL
             (
              .gpio_i_data_tri_i(gpio_i_data_tri_i),
-             .o_led(eop),
+             .o_led(leds),
 
              .CLK100MHZ(clk_o),
              .gpio_o_data_tri_o(gpio_o_data_tri_o)

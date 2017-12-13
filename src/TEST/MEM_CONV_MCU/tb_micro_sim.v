@@ -57,7 +57,7 @@ module micro_sim_tb();
         #500 i_GPIOctrl = 3'b001;
         i_GPIOdata = IMG_SIZE;
         
-        for(k = 0; k < 2; k = k+1) begin
+        for(k = 0; k < 3; k = k+1) begin
             if(k == 0)
                 aux = N+2;
             else

@@ -11,15 +11,19 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="13928292000fs"></ZoomStartTime>
-      <ZoomEndTime time="13981592001fs"></ZoomEndTime>
-      <Cursor1Time time="14000000000fs"></Cursor1Time>
+      <ZoomStartTime time="43046750000fs"></ZoomStartTime>
+      <ZoomEndTime time="43056150001fs"></ZoomEndTime>
+      <Cursor1Time time="43072000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="239"></NameColumnWidth>
-      <ValueColumnWidth column_width="110"></ValueColumnWidth>
+      <ValueColumnWidth column_width="102"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="93" />
+   <WVObjectSize size="123" />
+   <wave_markers>
+      <marker label="" time="27102000000" />
+      <marker label="" time="21402000000" />
+   </wave_markers>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_control/i_GPIOdata">
       <obj_property name="ElementShortName">i_GPIOdata[23:0]</obj_property>
       <obj_property name="ObjectShortName">i_GPIOdata[23:0]</obj_property>
@@ -132,9 +136,25 @@
       <obj_property name="ElementShortName">EoPMCU_reg</obj_property>
       <obj_property name="ObjectShortName">EoPMCU_reg</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_control/runControl">
-      <obj_property name="ElementShortName">runControl</obj_property>
-      <obj_property name="ObjectShortName">runControl</obj_property>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_control/Kernel_load">
+      <obj_property name="ElementShortName">Kernel_load[31:0]</obj_property>
+      <obj_property name="ObjectShortName">Kernel_load[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_control/ImgSize_load">
+      <obj_property name="ElementShortName">ImgSize_load[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ImgSize_load[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_control/Img_load">
+      <obj_property name="ElementShortName">Img_load[31:0]</obj_property>
+      <obj_property name="ObjectShortName">Img_load[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_control/Data_request">
+      <obj_property name="ElementShortName">Data_request[31:0]</obj_property>
+      <obj_property name="ObjectShortName">Data_request[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_control/LoadFinish_goToRun">
+      <obj_property name="ElementShortName">LoadFinish_goToRun[31:0]</obj_property>
+      <obj_property name="ObjectShortName">LoadFinish_goToRun[31:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_FSM/o_writeAdd">
       <obj_property name="ElementShortName">o_writeAdd[9:0]</obj_property>
@@ -148,9 +168,17 @@
       <obj_property name="ElementShortName">o_EoP</obj_property>
       <obj_property name="ObjectShortName">o_EoP</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_FSM/o_sopross">
+      <obj_property name="ElementShortName">o_sopross</obj_property>
+      <obj_property name="ObjectShortName">o_sopross</obj_property>
+   </wvobject>
    <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_FSM/o_changeBlock">
       <obj_property name="ElementShortName">o_changeBlock</obj_property>
       <obj_property name="ObjectShortName">o_changeBlock</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_FSM/o_fms2conVld">
+      <obj_property name="ElementShortName">o_fms2conVld</obj_property>
+      <obj_property name="ObjectShortName">o_fms2conVld</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_FSM/i_imgLength">
       <obj_property name="ElementShortName">i_imgLength[9:0]</obj_property>
@@ -184,13 +212,13 @@
       <obj_property name="ElementShortName">counter_with_latency[9:0]</obj_property>
       <obj_property name="ObjectShortName">counter_with_latency[9:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_FSM/endOfProcess">
-      <obj_property name="ElementShortName">endOfProcess[0:0]</obj_property>
-      <obj_property name="ObjectShortName">endOfProcess[0:0]</obj_property>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_FSM/imgHeight">
+      <obj_property name="ElementShortName">imgHeight[9:0]</obj_property>
+      <obj_property name="ObjectShortName">imgHeight[9:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_FSM/beginigProcess">
-      <obj_property name="ElementShortName">beginigProcess</obj_property>
-      <obj_property name="ObjectShortName">beginigProcess</obj_property>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_FSM/endOfProcess">
+      <obj_property name="ElementShortName">endOfProcess[1:0]</obj_property>
+      <obj_property name="ObjectShortName">endOfProcess[1:0]</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_FSM/changeBlock">
       <obj_property name="ElementShortName">changeBlock</obj_property>
@@ -204,9 +232,21 @@
       <obj_property name="ElementShortName">valid_previous_state</obj_property>
       <obj_property name="ObjectShortName">valid_previous_state</obj_property>
    </wvobject>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_FSM/fms2conVld">
+      <obj_property name="ElementShortName">fms2conVld</obj_property>
+      <obj_property name="ObjectShortName">fms2conVld</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_FSM/states">
       <obj_property name="ElementShortName">states[1:0]</obj_property>
       <obj_property name="ObjectShortName">states[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_FSM/w_eop">
+      <obj_property name="ElementShortName">w_eop</obj_property>
+      <obj_property name="ObjectShortName">w_eop</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_FSM/nconv">
+      <obj_property name="ElementShortName">nconv[31:0]</obj_property>
+      <obj_property name="ObjectShortName">nconv[31:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /o_data">
       <obj_property name="ElementShortName">o_data[12:0]</obj_property>
@@ -236,9 +276,9 @@
       <obj_property name="ElementShortName">i_valid</obj_property>
       <obj_property name="ObjectShortName">i_valid</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /i_CLK">
-      <obj_property name="ElementShortName">i_CLK</obj_property>
-      <obj_property name="ObjectShortName">i_CLK</obj_property>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /CLK100MHZ">
+      <obj_property name="ElementShortName">CLK100MHZ</obj_property>
+      <obj_property name="ObjectShortName">CLK100MHZ</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /kernel">
       <obj_property name="ElementShortName">kernel[0:2][23:0]</obj_property>
@@ -249,28 +289,12 @@
       <obj_property name="ObjectShortName">imagen[0:2][23:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /conv_reg">
-      <obj_property name="ElementShortName">conv_reg[19:0]</obj_property>
-      <obj_property name="ObjectShortName">conv_reg[19:0]</obj_property>
+      <obj_property name="ElementShortName">conv_reg[12:0]</obj_property>
+      <obj_property name="ObjectShortName">conv_reg[12:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /resultado">
       <obj_property name="ElementShortName">resultado[19:0]</obj_property>
       <obj_property name="ObjectShortName">resultado[19:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /selecK_I">
-      <obj_property name="ElementShortName">selecK_I</obj_property>
-      <obj_property name="ObjectShortName">selecK_I</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /rst">
-      <obj_property name="ElementShortName">rst</obj_property>
-      <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /valid">
-      <obj_property name="ElementShortName">valid</obj_property>
-      <obj_property name="ObjectShortName">valid</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /ptr_row">
       <obj_property name="ElementShortName">ptr_row[31:0]</obj_property>
@@ -279,6 +303,30 @@
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /ptr_column">
       <obj_property name="ElementShortName">ptr_column[31:0]</obj_property>
       <obj_property name="ObjectShortName">ptr_column[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /shift">
+      <obj_property name="ElementShortName">shift[31:0]</obj_property>
+      <obj_property name="ObjectShortName">shift[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /BIT_LEN">
+      <obj_property name="ElementShortName">BIT_LEN[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BIT_LEN[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /CONV_LEN">
+      <obj_property name="ElementShortName">CONV_LEN[31:0]</obj_property>
+      <obj_property name="ObjectShortName">CONV_LEN[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /CONV_LPOS">
+      <obj_property name="ElementShortName">CONV_LPOS[31:0]</obj_property>
+      <obj_property name="ObjectShortName">CONV_LPOS[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /M_LEN">
+      <obj_property name="ElementShortName">M_LEN[31:0]</obj_property>
+      <obj_property name="ObjectShortName">M_LEN[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_conv[0].u_conv /BIT_ARRAY">
+      <obj_property name="ElementShortName">BIT_ARRAY[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BIT_ARRAY[31:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/i_DataConv">
       <obj_property name="ElementShortName">i_DataConv[25:0]</obj_property>
@@ -356,40 +404,116 @@
       <obj_property name="ElementShortName">memSelect[1:0]</obj_property>
       <obj_property name="ObjectShortName">memSelect[1:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/\gen_memory[0].u_mem /i_wrEnable">
-      <obj_property name="ElementShortName">i_wrEnable</obj_property>
-      <obj_property name="ObjectShortName">i_wrEnable</obj_property>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/N">
+      <obj_property name="ElementShortName">N[31:0]</obj_property>
+      <obj_property name="ObjectShortName">N[31:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/\gen_memory[0].u_mem /i_CLK">
-      <obj_property name="ElementShortName">i_CLK</obj_property>
-      <obj_property name="ObjectShortName">i_CLK</obj_property>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/STATES">
+      <obj_property name="ElementShortName">STATES[31:0]</obj_property>
+      <obj_property name="ObjectShortName">STATES[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_memory[0].u_mem /i_writeAdd">
-      <obj_property name="ElementShortName">i_writeAdd[9:0]</obj_property>
-      <obj_property name="ObjectShortName">i_writeAdd[9:0]</obj_property>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/BITS_IMAGEN">
+      <obj_property name="ElementShortName">BITS_IMAGEN[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BITS_IMAGEN[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_memory[0].u_mem /i_readAdd">
-      <obj_property name="ElementShortName">i_readAdd[9:0]</obj_property>
-      <obj_property name="ObjectShortName">i_readAdd[9:0]</obj_property>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/BITS_DATA">
+      <obj_property name="ElementShortName">BITS_DATA[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BITS_DATA[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_memory[0].u_mem /i_data">
-      <obj_property name="ElementShortName">i_data[12:0]</obj_property>
-      <obj_property name="ObjectShortName">i_data[12:0]</obj_property>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/BITS_ADDR">
+      <obj_property name="ElementShortName">BITS_ADDR[31:0]</obj_property>
+      <obj_property name="ObjectShortName">BITS_ADDR[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_memory[0].u_mem /o_data">
-      <obj_property name="ElementShortName">o_data[12:0]</obj_property>
-      <obj_property name="ObjectShortName">o_data[12:0]</obj_property>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/i_sop">
+      <obj_property name="ElementShortName">i_sop</obj_property>
+      <obj_property name="ObjectShortName">i_sop</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_memory[0].u_mem /BRAM">
-      <obj_property name="ElementShortName">BRAM[1023:0][12:0]</obj_property>
-      <obj_property name="ObjectShortName">BRAM[1023:0][12:0]</obj_property>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/i_eop">
+      <obj_property name="ElementShortName">i_eop</obj_property>
+      <obj_property name="ObjectShortName">i_eop</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_memory[0].u_mem /dout_reg">
-      <obj_property name="ElementShortName">dout_reg[12:0]</obj_property>
-      <obj_property name="ObjectShortName">dout_reg[12:0]</obj_property>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/\gen_memory[0].u_mem /ram_index">
-      <obj_property name="ElementShortName">ram_index[31:0]</obj_property>
-      <obj_property name="ObjectShortName">ram_index[31:0]</obj_property>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/rst">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/i_chblk">
+      <obj_property name="ElementShortName">i_chblk</obj_property>
+      <obj_property name="ObjectShortName">i_chblk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/o_we">
+      <obj_property name="ElementShortName">o_we[3:0]</obj_property>
+      <obj_property name="ObjectShortName">o_we[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/o_state">
+      <obj_property name="ElementShortName">o_state[1:0]</obj_property>
+      <obj_property name="ObjectShortName">o_state[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/o_substate">
+      <obj_property name="ElementShortName">o_substate[0:0]</obj_property>
+      <obj_property name="ObjectShortName">o_substate[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/o_memSelect">
+      <obj_property name="ElementShortName">o_memSelect[1:0]</obj_property>
+      <obj_property name="ObjectShortName">o_memSelect[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/we_rw_status">
+      <obj_property name="ElementShortName">we_rw_status[3:0]</obj_property>
+      <obj_property name="ObjectShortName">we_rw_status[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/we_proc_status">
+      <obj_property name="ElementShortName">we_proc_status[3:0]</obj_property>
+      <obj_property name="ObjectShortName">we_proc_status[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/memSelect_load">
+      <obj_property name="ElementShortName">memSelect_load[1:0]</obj_property>
+      <obj_property name="ObjectShortName">memSelect_load[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/memSelect_out">
+      <obj_property name="ElementShortName">memSelect_out[1:0]</obj_property>
+      <obj_property name="ObjectShortName">memSelect_out[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/substate">
+      <obj_property name="ElementShortName">substate[0:0]</obj_property>
+      <obj_property name="ObjectShortName">substate[0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/state">
+      <obj_property name="ElementShortName">state[1:0]</obj_property>
+      <obj_property name="ObjectShortName">state[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/next_state">
+      <obj_property name="ElementShortName">next_state[1:0]</obj_property>
+      <obj_property name="ObjectShortName">next_state[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/chblk">
+      <obj_property name="ElementShortName">chblk</obj_property>
+      <obj_property name="ObjectShortName">chblk</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/N">
+      <obj_property name="ElementShortName">N[31:0]</obj_property>
+      <obj_property name="ObjectShortName">N[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/STATES">
+      <obj_property name="ElementShortName">STATES[31:0]</obj_property>
+      <obj_property name="ObjectShortName">STATES[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/LOAD">
+      <obj_property name="ElementShortName">LOAD[1:0]</obj_property>
+      <obj_property name="ObjectShortName">LOAD[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/PROC">
+      <obj_property name="ElementShortName">PROC[1:0]</obj_property>
+      <obj_property name="ObjectShortName">PROC[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/OUT">
+      <obj_property name="ElementShortName">OUT[1:0]</obj_property>
+      <obj_property name="ObjectShortName">OUT[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/micro_sim_tb/u_micro/u_MemCU/u_MCU_CTRL/SUB">
+      <obj_property name="ElementShortName">SUB[31:0]</obj_property>
+      <obj_property name="ObjectShortName">SUB[31:0]</obj_property>
    </wvobject>
 </wave_config>
