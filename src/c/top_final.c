@@ -141,54 +141,34 @@ int main()
 					u32 ctr = 2<<GPIOctrl;
 					XGpio_DiscreteWrite(&GpioOutput, 1, ctr);
 					send_ack();
-					do{
 						//upload
-						i=0;
-						while (contador <= imageSize && i < def_bufzise){
+					while (contador <= imageSize ){
 							read(stdin, &cabecera, 1);
-							datos = cabecera[0] ;
-							bufImagen[contador] = datos & 0xff;
-							contador++; i++;
+							datos = cabecera[0]  <<GPIOdata;
 							send_ack();
-						}
-						//download
-						for(int j=0; j<i ; j++){
-							//dato mas el valid = 1;
-							datos = bufImagen[j]<<GPIOdata;
 							XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  |  1 <<GPIOvalid);
 							XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  & ~(1<<GPIOvalid)); //bajo el valid
-						}
-					}while(contador < imageSize);
-
+							contador++;
+					}
 				send(def_load); //ack final de caraga de columna
 				break;
 			case def_loadend:
 				//loadImage((unsigned char*) &cabecera, imageSize, 1);
 				contador = 0;
-				i = 0;
 				datos = 0;
 				ctr = 2<<GPIOctrl;
 				XGpio_DiscreteWrite(&GpioOutput, 1, ctr);
 				send_ack();
-				do{
 					//upload
-					i=0;
-					while (contador <= imageSize && i < def_bufzise){
+				while (contador <= imageSize ){
 						read(stdin, &cabecera, 1);
-						bufImagen[contador] = cabecera[0] ;
-						contador++; i++;
+						datos = cabecera[0]  <<GPIOdata;
 						send_ack();
-					}
-					//download
-					for(int j=0; j<i ; j++){
-						//dato mas el valid = 1;
-						datos = bufImagen[j]<<GPIOdata;
-						ctr =(contador == imageSize+1 && j==i-1)? 4<<GPIOctrl : 2<<GPIOctrl;
+						ctr =(contador == imageSize)? 4<<GPIOctrl : 2<<GPIOctrl;
 						XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  |  1 <<GPIOvalid);
 						XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  & ~(1<<GPIOvalid)); //bajo el valid
-					}
-				}while(contador < imageSize);
-
+						contador++;
+				}
 				send(def_loadend);
 				//dataReq((unsigned char*) &cabecera);
 				break;
