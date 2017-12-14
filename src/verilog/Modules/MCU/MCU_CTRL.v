@@ -29,12 +29,12 @@ module MCU_CTRL
     
     always @ (posedge clk) begin
         if(rst) begin
-            substate <= {clog2(SUB-1){1'b1}};
+            substate <= {clog2(SUB-1){1'b0}};
             next_state <= {clog2(STATES-1){1'b0}};
-            memSelect_load <= {clog2(N+1){1'b1}};
-            memSelect_out <= {clog2(N+1){1'b1}};
-            we_rw_status <= {1'b1, {(N+1){1'b0}}};
-            we_proc_status <= {{N{1'b1}}, 2'b00};
+            memSelect_load <= {clog2(N+1){1'b0}};
+            memSelect_out <= {clog2(N+1){1'b0}};
+            we_rw_status <= {{(N+1){1'b0}}, 1'b1};
+            we_proc_status <= {2'b00, {N{1'b1}}};
             chblk <= 1'b0;
         end
         else begin
@@ -42,9 +42,7 @@ module MCU_CTRL
             case(state)
                 LOAD: begin // LOAD
                     if(next_state == state) begin
-                        we_rw_status <= {we_rw_status[N:0], we_rw_status[N+1]};
-                        memSelect_load <= (memSelect_load == N + 1) ? {clog2(N+1){1'b0}} : memSelect_load + 1;
-                        next_state <= (next_state == STATES  - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
+                        next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
                     end
                     else begin
                         if(i_chblk && (i_chblk != chblk)) begin
@@ -55,15 +53,16 @@ module MCU_CTRL
                 end
                 PROC: begin
                     if(next_state == state) begin
-                        we_proc_status <= {we_proc_status[1:0], we_proc_status[N+1:2]};
-                        substate <= (substate == SUB-1) ? {clog2(SUB-1){1'b0}} : substate + 1;
-                        next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
-                    end
+                        next_state <= (next_state == STATES  - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
+                   end else begin
+                       if(i_chblk && (i_chblk != chblk))
+                           we_proc_status <= {we_proc_status[1:0], we_proc_status[N+1:2]};
+                   end
                 end
 
                 OUT: begin
                     if(next_state == state) begin
-                        memSelect_out <= (memSelect_out == N + 1) ? 0 : memSelect_out + 1;
+                        substate <= (substate == SUB-1) ? {clog2(SUB-1){1'b0}} : substate + 1;
                         next_state <= (next_state == STATES - 1) ? {clog2(STATES-1){1'b0}} : next_state + 1;
                     end
                     else begin

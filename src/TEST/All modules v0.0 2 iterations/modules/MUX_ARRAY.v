@@ -1,3 +1,6 @@
+`timescale 1ns / 1ps
+
+
 module MUX_ARRAY
     #(
       parameter N = 2,
@@ -84,3 +87,4 @@ module MUX_ARRAY
     endfunction
 
 endmodule
+

@@ -23,7 +23,7 @@ module tb_MCU();
         
         i_Data     = {BITS_IMAGEN/2{1'b1,1'b0}};
         i_MemData  = {13'h3,13'h2,13'h1,13'h0};
-        i_DataConv = {(N*BITS_DATA){1'b1}};
+        i_DataConv = {13'hc1,13'hc0};
         i_WAddr = 1;
         i_RAddr = 1;
         
