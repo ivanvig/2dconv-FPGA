@@ -136,6 +136,15 @@
      Por ejemplo: si N= 3 convolucionadores, y escribiste por último la memoria número 4, en la siguiente etapa escribirías las 5, la 1 y la 2 (respetando orden).
 
      *ROUTING:*
+     
+     De forma generalizada para N convolucionadores con un kernel de KxK, se tendran N+K-1 memorias, en cada iteracion se escriben unicamente N memorias, quedando las K-1 restantes con informacion que sera utilizada en la iteracion siguiente. La primer memoria en escribirse en cada ciclo ira rotando N lugares a la izquierda (si se escriben las memorias de izquierda a derecha).
+
+     El rotar N lugares a la izquierda un arreglo de N+K-1 elementos, es equivalente a rotar (N+K-1)-N = K-1 elementos a la derecha. Si se considera cada posicion posible que puede tomar un elemento del arreglo como un estado, se tendran entonces
+
+     E = p*(N+K-1)/(K-1) estados, donde p = min{x | x e Z ^ x*(N+K-1)/(K-1) e Z+}
+
+     Para el caso particular de un kernel de 3x3:
+
      Van a haber E= N/2 + 1 estados. si N es par (siendo N el número de convolucionadores); y E = N+2 si N es impar. El primer estado se conformará de la siguiente forma:
 
      - M1: C11
@@ -166,3 +175,4 @@
 
      *JUSTIFICACION*
      Se optó por este algoritmo porque con esta implementación se hace uso de N + 2 memorias, siendo N el número de convolucionadores. Con otros algoritmos analizados, como por ejemplo que cada módulo se encargue de cierto sector, comenzando desde los extremos, no se tiene la misma eficiencia en cuanto a la economía de recursos, ya que se necesitan 3N memorias, e inclusive existía una etapa de solapamiento donde más de una memoria tenía cargado en los mismos datos.
+     
