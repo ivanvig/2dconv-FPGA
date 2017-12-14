@@ -56,7 +56,7 @@ module micro_sim
 
     wire                        ctrl_valid_conv, ctrl_ki_conv;
     wire [BITS_IMAGEN-1:0]      ctrl_Data_mcu;
-    wire                        ctrl_load_fsm, ctrl_sop_fsm, ctrl_valid_fsm, ctrl_eop_mcu;
+    wire                        ctrl_load_fsm, ctrl_sop_fsm, ctrl_valid_fsm;
     wire [NB_ADDRESS-1:0]       ctrl_imglen_fsm;
     wire [23:0]                 ctrl_kernel_conv;
 
@@ -66,7 +66,6 @@ module micro_sim
 
     
     
-    // Microconotrolador
     
     generate
         for (i = 0; i < N; i = i+1) begin
@@ -103,7 +102,6 @@ module micro_sim
              .o_KNLdata(ctrl_kernel_conv),
              .o_MCUdata(ctrl_Data_mcu),
              .o_imgLength(ctrl_imglen_fsm),
-             .o_EOP_to_MCU(ctrl_eop_mcu),
              .o_run(ctrl_sop_fsm),
              .o_valid_to_FSM(ctrl_valid_fsm),
              .o_valid_to_CONV(ctrl_valid_conv),
