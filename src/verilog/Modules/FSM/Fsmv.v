@@ -125,20 +125,20 @@ module Fsmv#(
                     counterAdd   <= counterAdd;
                 //Shifteo para el write address, teniendo en cuenta la latencia.
                 if(counterAdd>=LATENCIA && counter_with_latency < i_imgLength-2) begin
+                    if(counter_with_latency == i_imgLength-3)begin 
+                        fms2conVld              <= 1'b0;
+                    end
                     counter_with_latency    <= counter_with_latency +1;
-                    fms2conVld              <= fms2conVld;
                     states                  <= states;
                 end
                 else if(counter_with_latency == i_imgLength-2)begin 
                     //si se llega la tamaño de la imagen reseteo los contadores 
                     changeBlock     <= 1'b1;
                     counter_with_latency    <= counter_with_latency;
-                    fms2conVld              <= 1'b0;
                     states                  <= 2'b11;
                 end
                 else begin
                     counter_with_latency    <= counter_with_latency;
-                    fms2conVld              <= fms2conVld;
                     states                  <= states;
                     end
             end
