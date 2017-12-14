@@ -62,38 +62,39 @@ module ControlBlock(    //Definicion de puertos
         */
       
   //Parametrización
-  localparam Kernel_load     = 0; 
-  localparam ImgSize_load    = 1; 
-  localparam Img_load        = 2;
-  localparam Data_request    = 3;
-  localparam LoadFinish_goToRun     = 4;  
+    parameter NB_DATA = 13;
+    localparam Kernel_load     = 0; 
+    localparam ImgSize_load    = 1; 
+    localparam Img_load        = 2;
+    localparam Data_request    = 3;
+    localparam LoadFinish_goToRun     = 4;  
 
  
 
-  reg    [23:0] dataKERNEL;
-  reg    [23:0] dataGPIO;
-  reg    [7:0] dataMCU;  
-  reg    [9:0] imgLength;   
-  reg           validFSM;
-  reg           validCONV;
-  reg           GPIO_valid_previous_state;
-  reg           KI;
-  reg           load_reg;
-  reg           run_reg;
+    reg [23:0]                      dataKERNEL;
+    reg [NB_DATA-1:0]               dataGPIO;
+    reg [7:0]                       dataMCU;  
+    reg [9:0]                       imgLength;   
+    reg                             validFSM;
+    reg                             validCONV;
+    reg                             GPIO_valid_previous_state;
+    reg                             KI;
+    reg                             load_reg;
+    reg                             run_reg;
   //reg           go_to_leds;
   // En principio no haria falta el latcheo: reg [3:0] controlGPIO;
     
  //Registers:
-  assign {o_valid_to_FSM}  = validFSM;
-  assign {o_valid_to_CONV} = validCONV;
-  assign {o_KNorIMG}       = KI;
-  assign {o_imgLength}     = imgLength;
-  assign {o_GPIOdata}      = dataGPIO;
-  assign {o_MCUdata}       = dataMCU;
-  assign {o_run}           = run_reg;
-  assign {o_KNLdata}       = dataKERNEL;
-  assign {o_load}          = load_reg;   
-  
+    assign {o_valid_to_FSM}  = validFSM;
+    assign {o_valid_to_CONV} = validCONV;
+    assign {o_KNorIMG}       = KI;
+    assign {o_imgLength}     = imgLength;
+    assign {o_GPIOdata}      = {i_EOP_from_FSM, {(32-1-NB_DATA){1'b0}},dataGPIO};
+    assign {o_MCUdata}       = dataMCU;
+    assign {o_run}           = run_reg;
+    assign {o_KNLdata}       = dataKERNEL;
+    assign {o_load}          = load_reg;   
+    
    
   //assign {o_led} = (i_GPIOctrl == Kernel_load )? 3'b001 : ( i_GPIOctrl == ImgSize_load)? 3'b010 : ( i_GPIOctrl == Img_load)? 3'b100: (i_GPIOctrl == Data_request )? 3'b011: (i_GPIOctrl == LoadFinish_goToRun)?3'b111: 3'b000 ;
   
