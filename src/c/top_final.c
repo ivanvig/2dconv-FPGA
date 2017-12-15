@@ -29,11 +29,11 @@
 #define def_load 	0xa0030040
 #define def_loadend 0xa1300040
 #define def_run		0xa0040040
-#define def_dreq	0xa0050040
+#define def_dreq	0x9001//0xa0050040
 #define def_bufzise 150
 
 //funciones
-void send(int id);
+void send(int id, int bytes);
 void send_trama(int id);
 void send_ack(void);
 void send_num(unsigned char a ,unsigned char b);
@@ -56,9 +56,7 @@ short int num_ber;
 int main()
 {
 	init_platform();
-
 	XUartLite_Initialize(&uart_module, 0);
-
 	GPO_Value=0x00000000;
 	GPO_Param=0x00000000;
 
@@ -67,9 +65,8 @@ int main()
 	u32 imageSize = 0;
 	u32 crt = 0;
 	u32 datos =0;
-	u8 bufImagen[def_bufzise];
 	unsigned char cabecera[4];
-	unsigned int i, contador;
+	unsigned int contador;
 
 	Status=XGpio_Initialize(&GpioInput, PORT_IN);
 	if(Status!=XST_SUCCESS){
@@ -84,7 +81,6 @@ int main()
 	}
 
 	XGpio_SetDataDirection(&GpioOutput, 1, 0x00000000);
-	//XGpio_SetDataDirection(&GpioParameter, 1, 0x00000000);
 	XGpio_SetDataDirection(&GpioInput, 1, 0xFFFFFFFF);
 
 	while(1){
@@ -95,7 +91,7 @@ int main()
 			case def_reset:
 				imageSize = 0;
 				initialize();  //resee all
-				send(def_reset);
+				send(def_reset,4);
 				break;
 			case def_kernel:
 				//loadKernel((unsigned char *) &cabecera);
@@ -111,7 +107,7 @@ int main()
 					XGpio_DiscreteWrite(&GpioOutput, 1, datos & ~(1<<GPIOvalid)); // bajo el valid
 					send_ack();
 				}
-				send(def_kernel); //echo para finalizado la operacion
+				send(def_kernel,4); //echo para finalizado la operacion
 				break;
 			case def_imgzise:
 				//imageZise((unsigned char*)&cabecera, (u32)&imageSize); //cargo la imgaen
@@ -119,20 +115,18 @@ int main()
 				XGpio_DiscreteWrite(&GpioOutput, 1, crt);
 				send_ack();
 				read(stdin, &cabecera, 2);
-				imageSize = cabecera[1]<<8 | cabecera[0];
-					//0x0001b705 ; //latch de la imgen
+				imageSize = cabecera[1]<<8 | cabecera[0]; //latch de la imgen
 				XGpio_DiscreteWrite(&GpioOutput,1,imageSize<<GPIOdata | crt);
-				send(def_imgzise); //echo
+				send(def_imgzise,4); //echo
 				break;
 			case def_load:
 				//loadImage((unsigned char*) &cabecera, imageSize, 0);
 					contador = 0;
-					i = 0;
 					datos = 0;
 					u32 ctr = 2<<GPIOctrl;
 					XGpio_DiscreteWrite(&GpioOutput, 1, ctr);
 					send_ack();
-						//upload
+					//upload
 					while (contador <= imageSize ){
 							read(stdin, &cabecera, 1);
 							datos = cabecera[0]  <<GPIOdata;
@@ -141,7 +135,7 @@ int main()
 							XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  & ~(1<<GPIOvalid)); //bajo el valid
 							contador++;
 					}
-				send(def_load); //ack final de caraga de columna
+				send(def_load,4); //ack final de caraga de columna
 				break;
 			case def_loadend:
 				//loadImage((unsigned char*) &cabecera, imageSize, 1);
@@ -160,7 +154,7 @@ int main()
 						XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  & ~(1<<GPIOvalid)); //bajo el valid
 						contador++;
 				}
-				send(def_loadend);
+				send(def_loadend,4);
 
 				while (!(XGpio_DiscreteRead(&GpioOutput,1) & (1<<31))){}
 				crt = 3<<GPIOctrl;
@@ -170,29 +164,17 @@ int main()
 					datos = XGpio_DiscreteRead(&GpioOutput,1) & ~(1<<31);
 					XGpio_DiscreteWrite(&GpioOutput, 1, crt |  1 <<GPIOvalid);
 					XGpio_DiscreteWrite(&GpioOutput, 1,  crt & ~(1<<GPIOvalid));
-					send(datos);
+					send(datos, 2);
+
 				}
-				send(def_dreq);
+				send(def_dreq, 2);
+				XUartLite_ResetFifos(&uart_module);
 				//dataReq((unsigned char*) &cabecera);
 				break;
 
-			case def_dreq:
-				crt = 3<<GPIOctrl;
-				datos =0;
-				contador=0;
-				//if(XGpio_DiscreteRead(&GpioOutput,1) && (1<<GPIOout)){ //0x1B400
-				while (contador <imageSize-1){
-					datos = XGpio_DiscreteRead(&GpioOutput,1);
-					XGpio_DiscreteWrite(&GpioOutput, 1, crt |  1 <<GPIOvalid);
-					XGpio_DiscreteWrite(&GpioOutput, 1,  crt & ~(1<<GPIOvalid));
-					send(datos);
-					contador++;
-				}
-				send(def_dreq);
-				//else {send_ack();}
 			default:
 				XUartLite_ResetFifos(&uart_module);
-				send(trama);
+				send(trama,4);
 				break;
 		}
 		XUartLite_ResetFifos(&uart_module);
@@ -222,12 +204,12 @@ void send_ack(void){
  * envia datos por el puerto uart
  * @param id dato de 4 bytes para enviar
  */
-void send(int id){
-	unsigned char sendBuffer[4];
-	for(int i=0;i<4;i++){
-		sendBuffer[i]=(id>>(8*(3-i)))&0xFF;
+void send(int id, int bytes){
+	unsigned char sendBuffer[bytes];
+	for(int i=0;i<bytes;i++){
+		sendBuffer[i]=(id>>(8*(bytes-1-i)))&0xFF;
 	}
-	XUartLite_Send(&uart_module, sendBuffer,4);
+	XUartLite_Send(&uart_module, sendBuffer,bytes);
 	while(XUartLite_IsSending(&uart_module)){}
 }
 
@@ -312,6 +294,7 @@ void loadImage(unsigned char* cabecera, u32 image,u32 end){
 /*
  * Data request
  */
+/*
 void dataReq(unsigned char* cabecera){
 	u32 crt = 3<<GPIOctrl;
 	u32 datos =0;
@@ -328,6 +311,7 @@ void dataReq(unsigned char* cabecera){
 	}
 	send(def_dreq);
 }
+*/
 
 void send_trama(int id){
 	unsigned char cabecera[4]={0xA0,0x00,0x00,0x00};
