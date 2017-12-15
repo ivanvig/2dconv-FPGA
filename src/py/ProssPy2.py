@@ -1,33 +1,14 @@
 import serial
-import matplotlib.image as img
+import numpy as np
+from matplotlib import image as img, pyplot as plt
 from imgconv import *
 from Metrica.funciones import fix_matriz
 
 imagen = img.imread("D:\Documents\Tarpuy\Python\ProssPy2\Metrica\img\da_bossGS.jpg")
 imagen = (torange(imagen, 1, 0))
 imagen = np.asarray(fix_matriz(imagen, 8, 7, 'S', 'round', 'saturate', 1))
-
-ser = serial.Serial(
-    port='COM15',  # configurar con el puerto serie
-    baudrate=115200,
-    parity=serial.PARITY_NONE,
-    stopbits=serial.STOPBITS_ONE,
-    bytesize=serial.EIGHTBITS
-)
-ser.isOpen()  # se abre el puerto
-ser.timeout = None  # le interesa esperar una recepcion
-ser.flushInput()
-ser.flushInput()
-
-
-def send_data(data, byts=4):
-    """
-    :param data: datos a enviar por el puerto serie
-    :param byts: cantidad de bytes a enviar
-    """
-    for i in range(byts):
-        ser.write(chr(data >> (i * 8) & 0xff))
-
+dim = np.shape(imagen)
+ouput = np.zeros((dim[0]-2, dim[1]-2))
 
 def_error = "Un error a ocurrido..."
 def_ack = 0xa1000141
@@ -41,8 +22,8 @@ def_dreq = 0xa0050040
 def_loadend = 0xa1300040
 N = 2
 
-kernel_data = [0x002000, 0x208020, 0x002000]
-img_size = 439 # 439
+kernel_data = [0x000000, 0x007f00, 0x000000]
+img_size = dim[0]-1  # 439
 """
 imag0 = []
 
@@ -81,11 +62,46 @@ imag0.append([0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e, 0x7e,
 columa = 0
 first = True
 count = 0
-while 1:
+row_o = 0
+column_o = 0
+
+ser = serial.Serial(
+    port='COM15',  # configurar con el puerto serie
+    baudrate=115200,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS
+)
+ser.isOpen()  # se abre el puerto
+ser.timeout = None  # le interesa esperar una recepcion
+ser.flushInput()
+ser.flushInput()
+
+
+def send_data(data, byts=4):
+    """
+    :param data: datos a enviar por el puerto serie
+    :param byts: cantidad de bytes a enviar
+    """
+    for i in range(byts):
+        ser.write(chr(data >> (i * 8) & 0xff))
+
+lista = ['0', '1', '2', '3', '4']
+index = 0
+inter = 0
+
+while inter < dim[0]:
+    inter += 1
     ser.flushInput()
     ser.flushOutput()
     # print "incio del proceso "
-    inPut = str(raw_input("comand 2 Sent: "))
+    # inPut = str(raw_input("comand 2 Sent: "))
+    inPut = lista[index]
+    if index == 4:
+        index = 3
+    else :
+        index += 1
+
     if inPut == 'exit':
         print "Fin de transmicion"
         ser.close()
@@ -136,23 +152,25 @@ while 1:
         else: limit = N-1
         # for i in limit:
         i = 0
-        while i < limit and columa < 12:
+        while i < limit and columa < dim[1]:
             send_data(def_load)
             if int(ser.read(4).encode("hex"), 16) == def_ack:
                 print "\033[34mcargando filas de la imagen...\033[37m"
                 for j in range(img_size + 1):
                     send_data(imagen[j][columa], 1)
-                    if int(ser.read(4).encode("hex"), 16) == def_ack:
-                        print "\033[34mimagen[" + str(j) + "][" + str(columa) + "] cargado\033[37m"
+                    # if int(ser.read(4).encode("hex"), 16) == def_ack:
+                    print "\033[34mimagen[" + str(j) + "][" + str(columa) + "] cargado\033[37m"
+                    """
                     else:
                         print "\033[31m" + def_error + "(" + inPut + ")\033[37m"
                         erorr = True
                         break
+                    """
             else:
                 print "\033[31m" + def_error + "(" + inPut + ")\033[37m"
                 break
-            if erorr:
-                break
+            # if erorr:
+            #     break
             if int(ser.read(4).encode("hex"), 16) == def_load:
                 print "\033[34mimagen[][" + str(columa) + "] cargada..\033[37m"
             else:
@@ -166,11 +184,13 @@ while 1:
             print "\033[34mcargando filas de la imagen...\033[37m"
             for i in range(img_size + 1):
                 send_data(imagen[i][columa], 1)
-                if int(ser.read(4).encode("hex"), 16) == def_ack:
-                    print "\033[34mimagen[" + str(i) + "]["+ str(columa)+"] cargado\033[37m"
+                # if int(ser.read(4).encode("hex"), 16) == def_ack:
+                print "\033[34mimagen[" + str(i) + "]["+ str(columa)+"] cargado\033[37m"
+                """
                 else:
                     print "\033[31m" + def_error + "(" + inPut + ")\033[37m"
                     break
+                """
         else:
             print "\033[31m" + def_error + "(" + inPut + ")\033[37m"
 
@@ -180,23 +200,24 @@ while 1:
             print "\033[31m" + def_error + "(" + inPut + ")\033[37m"
         columa += 1
 
+        # OTRA COSA-------------------------------------------------------------
+        s = int(ser.read(4).encode("hex"), 16)
+        while s != def_dreq:
+            ouput[row_o][column_o] = s
+            s = int(ser.read(4).encode("hex"), 16)
+            if row_o == (img_size-2) and row_o > 0:
+                print "--------------"
+                print "\033[34mcolumna "+str(column_o)+" leida\033[37m"
+                column_o += 1
+                row_o = 0
+            else:
+                row_o += 1
+
+        if column_o >= 2:
+            first = False
+
     elif inPut == '5':
-        """
-        f = open("D:\Documents\Tarpuy\Python\ProssPy2\output.txt", 'w')
-        t = time.time()
-        for i in range(img_size+1):
-            ser.write(inPut)
-            # time.sleep(0.1)
-            s = ''
-            # while ser.inWaiting() > 0:
-            s += str(ser.read(4).encode("hex"))
-            f.write(s+'\n')
-        t = time.time()-t
-        f.close()
-        print t
-    else:
-        print "datos erroneos"
-        """
+
         f = open("D:\Documents\Tarpuy\Python\ProssPy2\out_mem"+str(count)+".txt", "w")
         send_data(def_dreq)
         s = int(ser.read(4).encode("hex"), 16)
@@ -211,3 +232,23 @@ while 1:
         print "archivo cerrado"
         if count >= 2:
             first = False
+    elif inPut == '9':
+        print ouput[:, 0]
+        print ouput[:, 1]
+        # print ouput[0:15][1]
+
+ser.close()
+print "llegue a este lugar "
+f = open("D:\Documents\Tarpuy\Python\ProssPy2\datos_salida.txt", "w")
+np.savetxt(f, ouput[:,:-1])
+f.close()
+print "min ",np.amin(ouput[:,:-20]),"max ", np.amax(ouput[:,:-20])
+
+plt.imshow(ouput[:,:-20], cmap="gray", vmin=np.amin(ouput[:,:-20]), vmax=np.amax(ouput[:,:-20]))
+plt.show()
+
+"""
+lo = torange(ouput[:,:-1],255,0)
+plt.imshow(lo, cmap="gray",)
+plt.show()
+"""

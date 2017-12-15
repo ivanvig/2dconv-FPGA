@@ -144,7 +144,7 @@ int main()
 					while (contador <= imageSize ){
 							read(stdin, &cabecera, 1);
 							datos = cabecera[0]  <<GPIOdata;
-							send_ack();
+							//send_ack();
 							XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  |  1 <<GPIOvalid);
 							XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  & ~(1<<GPIOvalid)); //bajo el valid
 							contador++;
@@ -162,13 +162,25 @@ int main()
 				while (contador <= imageSize ){
 						read(stdin, &cabecera, 1);
 						datos = cabecera[0]  <<GPIOdata;
-						send_ack();
+						//send_ack();
 						ctr =(contador == imageSize)? 4<<GPIOctrl : 2<<GPIOctrl;
 						XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  |  1 <<GPIOvalid);
 						XGpio_DiscreteWrite(&GpioOutput, 1, (datos | ctr )  & ~(1<<GPIOvalid)); //bajo el valid
 						contador++;
 				}
 				send(def_loadend);
+
+				while (!(XGpio_DiscreteRead(&GpioOutput,1) & (1<<31))){}
+				crt = 3<<GPIOctrl;
+				datos =0;
+				contador =0;
+				while (XGpio_DiscreteRead(&GpioOutput,1) & (1<<31)){
+					datos = XGpio_DiscreteRead(&GpioOutput,1) & ~(1<<31);
+					XGpio_DiscreteWrite(&GpioOutput, 1, crt |  1 <<GPIOvalid);
+					XGpio_DiscreteWrite(&GpioOutput, 1,  crt & ~(1<<GPIOvalid));
+					send(datos);
+				}
+				send(def_dreq);
 				//dataReq((unsigned char*) &cabecera);
 				break;
 			case def_dreq:
