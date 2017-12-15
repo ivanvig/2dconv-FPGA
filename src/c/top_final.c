@@ -9,7 +9,6 @@
 //#include "microblaze_sleep.h"
 
 
-
 #define PORT_IN	 		XPAR_GPIO_0_DEVICE_ID
 #define PORT_OUT 		XPAR_GPIO_0_DEVICE_ID
 //Device_ID Operaciones

@@ -8,7 +8,7 @@ imagen = (torange(imagen, 1, 0))
 imagen = np.asarray(fix_matriz(imagen, 8, 7, 'S', 'round', 'saturate', 1))
 
 ser = serial.Serial(
-    port='COM5',  # configurar con el puerto serie
+    port='COM15',  # configurar con el puerto serie
     baudrate=115200,
     parity=serial.PARITY_NONE,
     stopbits=serial.STOPBITS_ONE,
@@ -42,7 +42,7 @@ def_loadend = 0xa1300040
 N = 2
 
 kernel_data = [0x002000, 0x208020, 0x002000]
-img_size = 10 # 439
+img_size = 439 # 439
 """
 imag0 = []
 
@@ -136,7 +136,7 @@ while 1:
         else: limit = N-1
         # for i in limit:
         i = 0
-        while i < limit and columa < 10:
+        while i < limit and columa < 12:
             send_data(def_load)
             if int(ser.read(4).encode("hex"), 16) == def_ack:
                 print "\033[34mcargando filas de la imagen...\033[37m"
@@ -205,7 +205,7 @@ while 1:
             # print "\033[92m" + "{:04x}".format(s) + "\033[37m"
             s = int(ser.read(4).encode("hex"), 16)
         print "--------------"
-        print "\033[34mcolumna leida\033[37m"
+        print "\033[34mcolumna leida en archivo out_mem"+str(count)+"\033[37m"
         count += 1
         f.close()
         print "archivo cerrado"
