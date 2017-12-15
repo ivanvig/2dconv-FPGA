@@ -57,20 +57,18 @@ int main()
 {
 	init_platform();
 
-	int Status;
-	//unsigned int operacion=0;
-
 	XUartLite_Initialize(&uart_module, 0);
 
 	GPO_Value=0x00000000;
 	GPO_Param=0x00000000;
-	unsigned char cabecera[4];
+
+	int Status;
 	u32 trama =0;
 	u32 imageSize = 0;
-
 	u32 crt = 0;
 	u32 datos =0;
 	u8 bufImagen[def_bufzise];
+	unsigned char cabecera[4];
 	unsigned int i, contador;
 
 	Status=XGpio_Initialize(&GpioInput, PORT_IN);
@@ -89,19 +87,16 @@ int main()
 	//XGpio_SetDataDirection(&GpioParameter, 1, 0x00000000);
 	XGpio_SetDataDirection(&GpioInput, 1, 0xFFFFFFFF);
 
-
 	while(1){
 
 		read(stdin, &cabecera, 4);
 		trama = cabecera[3]<<24 | cabecera[2]<<16|cabecera[1]<<8|cabecera[0];
-
 		switch(trama){
 			case def_reset:
 				imageSize = 0;
 				initialize();  //resee all
 				send(def_reset);
 				break;
-
 			case def_kernel:
 				//loadKernel((unsigned char *) &cabecera);
 				crt = 0<<GPIOctrl;
@@ -116,10 +111,8 @@ int main()
 					XGpio_DiscreteWrite(&GpioOutput, 1, datos & ~(1<<GPIOvalid)); // bajo el valid
 					send_ack();
 				}
-
 				send(def_kernel); //echo para finalizado la operacion
 				break;
-
 			case def_imgzise:
 				//imageZise((unsigned char*)&cabecera, (u32)&imageSize); //cargo la imgaen
 				crt = 1<<GPIOctrl;
@@ -131,7 +124,6 @@ int main()
 				XGpio_DiscreteWrite(&GpioOutput,1,imageSize<<GPIOdata | crt);
 				send(def_imgzise); //echo
 				break;
-
 			case def_load:
 				//loadImage((unsigned char*) &cabecera, imageSize, 0);
 					contador = 0;
@@ -183,6 +175,7 @@ int main()
 				send(def_dreq);
 				//dataReq((unsigned char*) &cabecera);
 				break;
+
 			case def_dreq:
 				crt = 3<<GPIOctrl;
 				datos =0;
@@ -202,14 +195,16 @@ int main()
 				send(trama);
 				break;
 		}
-
 		XUartLite_ResetFifos(&uart_module);
 	}
 	cleanup_platform();
 	return 0;
 }
 
-
+/*
+ * Envia ACK para para la comunicacion orientada a la conexion
+ * por UART
+ */
 void send_ack(void){
 	unsigned char cabecera[4]={0xA1,0x00,0x00,0x41};
 	/*unsigned char fin_trama[1]={0x41};
@@ -223,6 +218,10 @@ void send_ack(void){
 	*/
 }
 
+/*
+ * envia datos por el puerto uart
+ * @param id dato de 4 bytes para enviar
+ */
 void send(int id){
 	unsigned char sendBuffer[4];
 	for(int i=0;i<4;i++){
@@ -338,14 +337,3 @@ void send_trama(int id){
 	while(XUartLite_IsSending(&uart_module)){}
 	XUartLite_Send(&uart_module, fin_trama,1);
 }
-/*
-void send_num(unsigned char a ,unsigned char b){
-	unsigned char cabecera[4]={0xA0,0x00,0x00,0x00};
-	unsigned char fin_trama[1]={0x40};
-	cabecera[2]=a;
-	cabecera[3]=b;
-	XUartLite_Send(&uart_module, cabecera,4);
-	while(XUartLite_IsSending(&uart_module)){}
-	XUartLite_Send(&uart_module, fin_trama,1);
-}
-*/

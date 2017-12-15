@@ -22,7 +22,7 @@ def_dreq = 0xa0050040
 def_loadend = 0xa1300040
 N = 2
 
-kernel_data = [0x000000, 0x007f00, 0x000000]
+kernel_data = [0x002000, 0x208020, 0x002000]
 img_size = dim[0]-1  # 439
 """
 imag0 = []
@@ -90,7 +90,7 @@ lista = ['0', '1', '2', '3', '4']
 index = 0
 inter = 0
 
-while inter < dim[0]:
+while inter <= dim[0]:
     inter += 1
     ser.flushInput()
     ser.flushOutput()
@@ -240,15 +240,10 @@ while inter < dim[0]:
 ser.close()
 print "llegue a este lugar "
 f = open("D:\Documents\Tarpuy\Python\ProssPy2\datos_salida.txt", "w")
-np.savetxt(f, ouput[:,:-1])
+np.savetxt(f, ouput)
 f.close()
-print "min ",np.amin(ouput[:,:-20]),"max ", np.amax(ouput[:,:-20])
 
-plt.imshow(ouput[:,:-20], cmap="gray", vmin=np.amin(ouput[:,:-20]), vmax=np.amax(ouput[:,:-20]))
-plt.show()
+print "min ", np.amin(ouput), "max ", np.amax(ouput)
 
-"""
-lo = torange(ouput[:,:-1],255,0)
-plt.imshow(lo, cmap="gray",)
+plt.imshow(ouput, cmap="gray", vmin=np.amin(ouput), vmax=np.amax(ouput))
 plt.show()
-"""
