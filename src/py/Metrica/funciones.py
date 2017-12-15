@@ -64,7 +64,7 @@ def fix_append(vector, k):
     return fixed_vector
 
 
-def fix_matriz(matriz, intWidth, fractWidth, signedMode, roundMode, saturateMode , k=0):
+def fix_matriz(matriz, intWidth, fractWidth, signedMode, roundMode, saturateMode, k=0):
     """
     Lleva la matriz a punto fijo de acuerdo a los parametros pasados
     :param matriz: matriz para con distintos valores
@@ -117,8 +117,8 @@ def potencia(matriz):
 def pos(M, maxbits, nbits):
     """
     :param maxbits:
-    :param nbits:
-    :param matrix:
+    :param nbits: numero de bits resultantes
+    :param M:
     :return:
     """
     matrix = M.copy()
