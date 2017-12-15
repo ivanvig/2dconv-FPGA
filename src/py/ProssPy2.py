@@ -95,12 +95,13 @@ while inter <= dim[0]:
     ser.flushInput()
     ser.flushOutput()
     # print "incio del proceso "
-    # inPut = str(raw_input("comand 2 Sent: "))
     inPut = lista[index]
     if index == 4:
         index = 3
-    else :
+    else:
         index += 1
+    if inter == dim[0]:
+        index == 4
 
     if inPut == 'exit':
         print "Fin de transmicion"
@@ -202,7 +203,7 @@ while inter <= dim[0]:
 
         # OTRA COSA-------------------------------------------------------------
         s = int(ser.read(4).encode("hex"), 16)
-        while s != def_dreq:
+        while s != def_dreq and column_o < dim[1]-2:
             ouput[row_o][column_o] = s
             s = int(ser.read(4).encode("hex"), 16)
             if row_o == (img_size-2) and row_o > 0:
