@@ -10,15 +10,14 @@ module ControlBlock(    //Definicion de puertos
     output        o_valid_to_FSM,
     output        o_valid_to_CONV,
     output        o_KNorIMG,
-    output        o_load
-    
+    output        o_load,
     input  [23:0] i_GPIOdata,
     input  [12:0] i_MCUdata,
     input   [2:0] i_GPIOctrl,
     input         i_GPIOvalid,
     input         i_rst,
     input         i_CLK,
-    input         i_EOP_from_FSM,
+    input         i_EOP_from_FSM
     );
 
      /*      Register file:
@@ -39,7 +38,6 @@ module ControlBlock(    //Definicion de puertos
            LSB ( GPIOctrl) -> VALID (bit 28 desde top_microblaze; están los buses separados)
     
         */
-      
   //Parametrización
     parameter NB_DATA = 13;
     localparam Kernel_load     = 0; 
@@ -47,9 +45,6 @@ module ControlBlock(    //Definicion de puertos
     localparam Img_load        = 2;
     localparam Data_request    = 3;
     localparam LoadFinish_goToRun     = 4;  
-
- 
-
     reg [23:0]                      dataKERNEL;
     reg [NB_DATA-1:0]               dataGPIO;
     reg [7:0]                       dataMCU;  
@@ -62,7 +57,6 @@ module ControlBlock(    //Definicion de puertos
     reg                             run_reg;
   	//reg           go_to_leds;
   	// En principio no haria falta el latcheo: reg [3:0] controlGPIO;
-    
  	//Registers:
     assign {o_valid_to_FSM}  = validFSM;
     assign {o_valid_to_CONV} = validCONV;
@@ -77,7 +71,7 @@ module ControlBlock(    //Definicion de puertos
     always @(posedge i_CLK) begin
     
        if(i_rst) begin
-                 dataGPIO   <=    'd0;
+            dataGPIO   <=    'd0;
                  load_reg   <= 'd0;
                 dataKERNEL  <=  24'd0;
                    dataMCU  <=  8'd0;
@@ -152,8 +146,5 @@ module ControlBlock(    //Definicion de puertos
            end else if(i_EOP_from_FSM && run_reg)
                run_reg = 0;
         end//End if/else rst
-        
     end //End always
-    
-    
 endmodule

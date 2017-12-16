@@ -29,7 +29,7 @@ module Fsmv#(
     //Latcheo de salidas 
     reg [NB_ADDRESS-1:0]                     counterAdd;
     reg [NB_ADDRESS-1:0]           counter_with_latency;
-    reg [N_CONV-1:0]                       endOfProcess;
+    reg [clog2(N_CONV)-1:0]                endOfProcess;
     //registro utulizado para el estado de carga a las memoriras
     reg                                     changeBlock;
     reg                                      sopControl;
@@ -39,9 +39,17 @@ module Fsmv#(
     //Ni bien se crean los registros, toman esos valores.
     reg [NB_STATES-1:0]  states;
 
-    reg                  w_eop;                 
-    integer nconv;
+    reg                 w_eop;                 
+    integer             nconv;
 
+     //Assign          
+    assign     {o_writeAdd} =  (sopControl) ? counter_with_latency:counterAdd;//counterAdd;
+    assign     {o_readAdd}  =  counterAdd;
+    assign          {o_EoP} =  w_eop;
+    assign  {o_changeBlock} =  changeBlock;
+    assign  o_fms2conVld    = fms2conVld;
+    assign  o_sopross       = sopControl;
+    
     initial begin
         counterAdd              = `NB_ADDRESS'd0;
         counter_with_latency    = `NB_ADDRESS'd0;
@@ -54,17 +62,17 @@ module Fsmv#(
     end        
     
     always @(posedge i_CLK) begin  
-      	valid_previous_state<=i_valid;
-      	if(i_reset)begin
-        	counterAdd           <= `NB_ADDRESS'd0;
-        	counter_with_latency <= `NB_ADDRESS'd0;
-        	endOfProcess         <= `N_CONV'd0;
-        	changeBlock          <= 1'b0;
-        	sopControl           <= 1'b0;
+        valid_previous_state<=i_valid;
+        if(i_reset)begin
+            counterAdd           <= `NB_ADDRESS'd0;
+            counter_with_latency <= `NB_ADDRESS'd0;
+            endOfProcess         <= `N_CONV'd0;
+            changeBlock          <= 1'b0;
+            sopControl           <= 1'b0;
             fms2conVld           <= 1'b0;
             states               <= `NB_STATES'd0;
-      	end
-      	else begin
+        end
+        else begin
             if(states == 2'b00) begin
                 counter_with_latency  <= `NB_ADDRESS'd0;
                 counterAdd            <= `NB_ADDRESS'd0;
@@ -95,9 +103,9 @@ module Fsmv#(
                 end
             end
             else if(states == 2'b01)begin
-                //Manejo de direcciones en funciÃ³n del valid
+                //Manejo de direcciones en función del valid
                 if (i_valid && !valid_previous_state) begin 
-                    //VerificaciÃ³n si termino de leer/cargar un bloque
+                    //Verificación si termino de leer/cargar un bloque
                     if (endOfProcess > 0 && counterAdd==i_imgLength-2)begin
                         counterAdd      <= counterAdd;
                         changeBlock     <= 1'b1;
@@ -132,7 +140,7 @@ module Fsmv#(
                     states                  <= states;
                 end
                 else if(counter_with_latency == i_imgLength-2)begin 
-                    //si se llega la tamaÃ±o de la imagen reseteo los contadores 
+                    //si se llega la tamaño de la imagen reseteo los contadores 
                     changeBlock     <= 1'b1;
                     counter_with_latency    <= counter_with_latency;
                     states                  <= 2'b11;
@@ -142,29 +150,25 @@ module Fsmv#(
                     states                  <= states;
                     end
             end
-        	else if(states == 2'b11)begin
-              endOfProcess            <= N_CONV+1;
+            else if(states == 2'b11)begin
+                endOfProcess    <= N_CONV+1;
                 if (~i_SoP) 
-                    states   <= 2'b00;
+                    states  <= 2'b00;
                 else 
-                    states <= states;  
+                    states  <= states;  
             end
         end 
     end 
     //end always
-
     always @(*) begin
         w_eop = 0;
         for(nconv=0; nconv<N_CONV; nconv = nconv +1)
             w_eop = w_eop | endOfProcess[nconv];
     end
-
-     //Assign          
-    assign     {o_writeAdd} =  (sopControl) ? counter_with_latency:counterAdd;//counterAdd;
-    assign     {o_readAdd}  =  counterAdd;
-    assign          {o_EoP} =  w_eop;
-    assign  {o_changeBlock} =  changeBlock;
-    assign  o_fms2conVld    = fms2conVld;
-    assign  o_sopross       = sopControl;
-
+    
+    function integer clog2;
+        input integer   depth;
+        for (clog2=0; depth>0; clog2=clog2+1)
+            depth = depth >> 1;
+    endfunction
 endmodule

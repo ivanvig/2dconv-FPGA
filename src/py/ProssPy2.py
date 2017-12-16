@@ -4,7 +4,7 @@ from matplotlib import image as img, pyplot as plt
 from imgconv import *
 from Metrica.funciones import fix_matriz
 
-imagen = img.imread("D:\Documents\Tarpuy\Python\ProssPy2\Metrica\img\da_bossGS.jpg")
+imagen = img.imread("D:\Documents\Tarpuy\Python\ProssPy2\Metrica\img\Lenna.jpg")
 imagen = (torange(imagen, 1, 0))
 imagen = np.asarray(fix_matriz(imagen, 8, 7, 'S', 'round', 'saturate', 1))
 dim = np.shape(imagen)
@@ -32,7 +32,7 @@ row_o = 0
 column_o = 0
 
 ser = serial.Serial(
-    port='COM15',  # configurar con el puerto serie
+    port='COM12',  # configurar con el puerto serie
     baudrate=115200,
     parity=serial.PARITY_NONE,
     stopbits=serial.STOPBITS_ONE,
@@ -55,8 +55,8 @@ def send_data(data, byts=4):
 lista = ['0', '1', '2', '3', '4']
 index = 0
 inter = 0
-
-while inter <= dim[0]:
+raw_input("press ")
+while inter <= dim[1]:
     inter += 1
     ser.flushInput()
     ser.flushOutput()
@@ -179,11 +179,18 @@ while inter <= dim[0]:
 
 ser.close()
 print "llegue a este lugar "
-f = open("D:\Documents\Tarpuy\Python\ProssPy2\datos_salida.txt", "w")
-np.savetxt(f, ouput)
-f.close()
+# f = open("D:\Documents\Tarpuy\Python\ProssPy2\datos_salida.txt", "w")
+# np.savetxt(f, ouput)
+# f.close()
 
 print "min ", np.amin(ouput), "max ", np.amax(ouput)
 
-plt.imshow(ouput, cmap="gray", vmin=np.amin(ouput), vmax=np.amax(ouput))
+fig = plt.figure()
+ax = fig.add_subplot(1, 2, 1)
+ax.imshow(imagen, cmap="gray")
+ax.set_title("imagen Original")
+
+ax2 = fig.add_subplot(1, 2, 2)
+ax2.imshow(ouput, cmap="gray", vmin=np.amin(ouput), vmax=np.amax(ouput))
+ax2.set_title("Convolucion en Placa")
 plt.show()
