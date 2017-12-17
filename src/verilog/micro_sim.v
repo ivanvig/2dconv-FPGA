@@ -1,17 +1,16 @@
 `timescale 1ns / 1ps
 
-`define BIT_LEN 8
-`define CONV_LEN 20
-`define CONV_LPOS 13
-`define M_LEN 3
-`timescale 1ns / 1ps
+`define BIT_LEN     8
+`define CONV_LEN    20
+`define CONV_LPOS   13
+`define M_LEN       3
 
-`define BIT_LEN 8
-`define CONV_LEN 20
-`define CONV_LPOS 13
-`define M_LEN 3
-`define GPIO_D 32
-`define NB_ADDRESS 10
+`define BIT_LEN     8
+`define CONV_LEN    20
+`define CONV_LPOS   13
+`define M_LEN       3
+`define GPIO_D      32
+`define NB_ADDRESS  10
 
 module micro_sim
     #(
@@ -70,9 +69,6 @@ module micro_sim
     wire                        validCONV;
     wire [3*N*BITS_IMAGEN-1:0]  dataCONV;
 
-    
-    
-    
     generate
         for (i = 0; i < N; i = i+1) begin
             assign dataCONV[(i+1)*3*BITS_IMAGEN-1 -: 3*BITS_IMAGEN] = (ctrl_ki_conv) ? mcu_DataConv_conv[(i+1)*3*BITS_IMAGEN-1 -: 3*BITS_IMAGEN] : ctrl_kernel_conv;
@@ -171,11 +167,9 @@ module micro_sim
              .o_RAddr(mcu_RAddr_mem),
              .o_MemData(mcu_MemData_mem)
              );
-
-
+            
     //intancia de la memoria
 
-    
     generate
         for (i = 0; i < (N+2); i = i+1) begin : gen_memory
             //memory#(.INIT_FILE({"mem0" + i, ".txt"}), .NB_ADDRESS(NB_ADDRESS)) u_mem
