@@ -4,7 +4,6 @@
 `define CONV_LEN 20
 `define CONV_LPOS 13
 `define M_LEN 3
-`timescale 1ns / 1ps
 
 `define BIT_LEN 8
 `define CONV_LEN 20
@@ -150,7 +149,7 @@ module micro_sim
     
     
     //instancia MCU
-    MCU#(.BITS_ADDR(NB_ADDRESS))
+    MCU#(.BITS_ADDR(NB_ADDRESS), .N(N))
         u_MemCU
             (
              .i_DataConv(conv_DataConv_mcu),
