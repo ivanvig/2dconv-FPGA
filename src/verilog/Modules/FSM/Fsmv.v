@@ -4,7 +4,7 @@
 `define NB_IMAGE        10
 `define NB_STATES       2
 `define N_CONV          1
-`define LATENCIA        5
+`define LATENCIA        6
 module Fsmv#(
     parameter NB_ADDRESS= `NB_ADDRESS,
     parameter NB_IMAGE  = `NB_IMAGE,
@@ -160,11 +160,14 @@ module Fsmv#(
         end 
     end 
     //end always
-    always @(*) begin
+    /*always @(*) begin
         w_eop = 0;
         for(nconv=0; nconv<N_CONV; nconv = nconv +1)
             w_eop = w_eop | endOfProcess[nconv];
-    end
+    end*/
+    always@(*)
+        w_eop = endOfProcess > 0;
+    
     
     function integer clog2;
         input integer   depth;

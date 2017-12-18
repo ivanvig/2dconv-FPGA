@@ -146,7 +146,7 @@ module micro_sim
     
     
     //instancia MCU
-    MCU#(.BITS_ADDR(NB_ADDRESS))
+    MCU#(.BITS_ADDR(NB_ADDRESS), .N(N))
         u_MemCU
             (
              .i_DataConv(conv_DataConv_mcu),

@@ -3,9 +3,9 @@
 module micro_sim_tb();
     
     parameter GPIO_D        = `GPIO_D;
-    parameter N = 2;
-    parameter IMG_SIZE = 15;
-    localparam PATH = "/home/iv/Xilinx/2dconv-FPGA/src/TEST/MEM_CONV_MCU/";
+    parameter N = 4;
+    parameter IMG_SIZE = 439;
+    localparam PATH = "/home/ivan/XilinxProjects/2dconv-FPGA/src/TEST/MEM_CONV_MCU/";
     localparam FILENAME = "mem0";
     localparam OUTFNAME = "out_mem0";
 
@@ -57,7 +57,7 @@ module micro_sim_tb();
         #500 i_GPIOctrl = 3'b001;
         i_GPIOdata = IMG_SIZE;
         
-        for(k = 0; k < 4; k = k+1) begin
+        for(k = 0; k < 2; k = k+1) begin
             if(k == 0)
                 aux = N+2;
             else
@@ -94,7 +94,7 @@ module micro_sim_tb();
                 file[j] = $fopen({PATH, OUTFNAME+j+k*N,".txt"}, "w");
             end
             j = 0;
-            for (i = 0; i <= N*(IMG_SIZE-2)+1; i = i+1) begin
+            for (i = 0; i < N*(IMG_SIZE-1); i = i+1) begin
                 if (i % (IMG_SIZE-1) == 0 && i > IMG_SIZE-2) begin
                     j = j+1;
                     $display("Paso a memoria %d", j);
@@ -113,7 +113,7 @@ module micro_sim_tb();
 
     always #2 CLK100MHZ = ~CLK100MHZ;
 
-    micro_sim
+    micro_sim#(.N(N))
         u_micro
             (
              .gpio_o_data_tri_o(gpio_o_data_tri_o),
