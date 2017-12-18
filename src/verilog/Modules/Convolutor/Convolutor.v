@@ -34,9 +34,9 @@ module Conv #(
 
     wire signed [CONV_LEN-1:0]   resultado;
     
-    wire signed [(2*BIT_LEN)-1:0] array_prod [0:(M_LEN*M_LEN)-1];
+    reg signed [(2*BIT_LEN)-1:0] array_prod [0:(M_LEN*M_LEN)-1];
 
-    integer ptr0 , ptr1;
+    integer ptr0 , ptr1, i;
     integer shift;
 
     //Asigancion de Convolucion a la salida
@@ -84,6 +84,7 @@ module Conv #(
         end
     end
     //Arbol de Suma
+    /*
     generate
         genvar i;
         for(i = 0 ; i < (M_LEN*M_LEN) ; i=i+1) 
@@ -91,7 +92,15 @@ module Conv #(
                                     $signed(imagen[i/3][((i%3)+1)*BIT_LEN-1 -: BIT_LEN]);
         
     endgenerate
+     */
 
+    always@(posedge CLK100MHZ)
+        for(i = 0 ; i < (M_LEN*M_LEN) ; i=i+1) begin
+            array_prod[i] =
+                $signed(kernel[i/3][((i%3)+1)*BIT_LEN-1 -: BIT_LEN])*
+                $signed(imagen[i/3][((i%3)+1)*BIT_LEN-1 -: BIT_LEN]);
+        end
+    
     always @(*) begin
         parcial0=0;
         for(ptr0 = 0 ; ptr0 < 4; ptr0 = ptr0 +1)begin

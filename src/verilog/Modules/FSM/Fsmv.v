@@ -4,7 +4,7 @@
 `define NB_IMAGE        10
 `define NB_STATES       2
 `define N_CONV          1
-`define LATENCIA        5
+`define LATENCIA        6
 module Fsmv#(
     parameter NB_ADDRESS= `NB_ADDRESS,
     parameter NB_IMAGE  = `NB_IMAGE,
