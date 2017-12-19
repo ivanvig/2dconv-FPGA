@@ -40,7 +40,7 @@ module Fsmv#(
     reg [NB_STATES-1:0]  states;
 
     reg                 w_eop;                 
-    integer             nconv;
+    //integer             nconv;
 
      //Assign          
     assign     {o_writeAdd} =  (sopControl) ? counter_with_latency:counterAdd;//counterAdd;

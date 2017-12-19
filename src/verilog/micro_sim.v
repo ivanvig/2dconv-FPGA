@@ -21,7 +21,7 @@ module micro_sim
       parameter NB_ADDRESS    = `NB_ADDRESS,
       parameter RAM_WIDTH     = 13,
       parameter GPIO_D        = `GPIO_D,
-      parameter N = 2,
+      parameter N = 4,
       parameter BITS_IMAGEN = 8,
       parameter BITS_DATA = 13,
       localparam Kernel_load            = 0, 
@@ -111,7 +111,8 @@ module micro_sim
              .o_load(ctrl_load_fsm)
              );
     //instancia FSM
-    Fsmv#(.NB_ADDRESS(NB_ADDRESS), .N_CONV(N))
+    Fsmv#(.NB_ADDRESS(NB_ADDRESS),
+         .N_CONV(N))
         u_FSM
             (
              .o_writeAdd(fsm_WAddr_mcu),
@@ -146,7 +147,8 @@ module micro_sim
     
     
     //instancia MCU
-    MCU#(.BITS_ADDR(NB_ADDRESS), .N(N))
+    MCU#(.BITS_ADDR(NB_ADDRESS), 
+        .N(N))
         u_MemCU
             (
              .i_DataConv(conv_DataConv_mcu),

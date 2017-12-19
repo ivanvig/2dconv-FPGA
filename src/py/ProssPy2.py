@@ -1,9 +1,9 @@
 import serial
 from matplotlib import image as img, pyplot as plt
-from imgconv import *
+from Metrica.imgconv import *
 from Metrica.funciones import fix_matriz
 import kernel
-
+import time
 # datos imagen
 imagen = img.imread("D:\Documents\Tarpuy\Python\ProssPy2\Metrica\img\Lenna.jpg")
 imagen = (torange(imagen, 1, 0))
@@ -22,7 +22,7 @@ def_run = 0xa0040040
 def_dreq = 0x9001
 def_loadend = 0xa1300040
 # Numero de convolucionadores
-N = 2
+N = 4
 # vaiables para el control del proesamiento
 columa = 0
 first = True
@@ -62,7 +62,7 @@ inter = 0
 
 raw_input("press tecla cualquiera ")
 print "incio del proceso "
-
+t = time.clock()
 while inter <= dim[1]:
     inter += 1
     ser.flushInput()
@@ -72,7 +72,7 @@ while inter <= dim[1]:
         index = 3
     else:
         index += 1
-    if inter == dim[0]:
+    if inter == dim[1]-1:
         index == 4
 
     if inPut == 'exit':
@@ -123,13 +123,13 @@ while inter <= dim[1]:
         if first: limit = N + 1
         else: limit = N-1
         i = 0
-        while i < limit and columa < dim[1]:
+        while i < limit and columa < dim[1]-1:
             send_data(def_load)
             if int(ser.read(4).encode("hex"), 16) == def_ack:
                 print "\033[34mcargando filas de la imagen...\033[37m"
                 for j in range(img_size + 1):
                     send_data(imagen[j][columa], 1)
-                    print "\033[34mimagen[" + str(j) + "][" + str(columa) + "] cargado\033[37m"
+                    # print "\033[34mimagen[" + str(j) + "][" + str(columa) + "] cargado\033[37m"
             else:
                 print "\033[31m" + def_error + "(" + inPut + ")\033[37m"
                 break
@@ -147,7 +147,7 @@ while inter <= dim[1]:
             for i in range(img_size + 1):
                 send_data(imagen[i][columa], 1)
                 # if int(ser.read(4).encode("hex"), 16) == def_ack:
-                print "\033[34mimagen[" + str(i) + "][" + str(columa)+"] cargado\033[37m"
+                # print "\033[34mimagen[" + str(i) + "][" + str(columa)+"] cargado\033[37m"
                 """
                 else:
                     print "\033[31m" + def_error + "(" + inPut + ")\033[37m"
@@ -178,13 +178,16 @@ while inter <= dim[1]:
 
         if column_o >= 2:
             first = False
+        if column_o == dim[1]-2:
+            t = time.clock() - t
+            break
     else:
         # solo limpia los bufers del lado de C
         send_data(def_ack)
         print "\033[31m" + str(def_ack) + "(" + inPut + ")\033[37m"
 
 ser.close()
-print "fin de procesamiento "
+print "fin de procesamiento, tiempo : ",t
 print "min ", np.amin(ouput), "max ", np.amax(ouput)
 # muestran los dos figuras
 fig = plt.figure()

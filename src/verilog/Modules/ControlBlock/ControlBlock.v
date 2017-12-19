@@ -13,7 +13,7 @@ module ControlBlock#(
     parameter NB_IMAGE      = `NB_ADDRESS,
     parameter NB_DATA       = `CONV_LPOS,
         //Parametrización
-    localparam BIT_ARRAY            = BIT_LEN*M_LEN,
+    localparam BIT_ARRAY            = BIT_LEN*`M_LEN,
     localparam DAT_MCU              = BIT_LEN*2,
     localparam Kernel_load          = 0,
     localparam ImgSize_load         = 1, 

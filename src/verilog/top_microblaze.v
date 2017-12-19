@@ -18,7 +18,7 @@ module top_microblaze
       parameter NB_ADDRESS    = `NB_ADDRESS,
       parameter RAM_WIDTH     = `RAM_WIDTH,
       parameter GPIO_D        = `GPIO_D,
-      parameter N = 2,
+      parameter N = 4,
       parameter BITS_IMAGEN = 8,
       parameter BITS_DATA = 13
       )(
@@ -60,7 +60,8 @@ module top_microblaze
              .usb_uart_rxd(uart_txd_in),
              .usb_uart_txd(uart_rxd_out)
              );
-    micro_sim
+    micro_sim#(
+        .N(N))
         u_ALL
             (
              .gpio_i_data_tri_i(gpio_i_data_tri_i),
