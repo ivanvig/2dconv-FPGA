@@ -3,7 +3,7 @@
 `define RAM_WIDTH 13
 
 
-module memory( i_wrEnable, i_CLK, i_writeAdd, i_readAdd, i_data, o_data );
+module BRAM( i_wrEnable, i_CLK, i_writeAdd, i_readAdd, i_data, o_data );
     
     parameter RAM_WIDTH = `RAM_WIDTH;    
     parameter NB_ADDRESS= 10;
@@ -48,4 +48,3 @@ module memory( i_wrEnable, i_CLK, i_writeAdd, i_readAdd, i_data, o_data );
     assign{o_data}=dout_reg;
     
 endmodule
-

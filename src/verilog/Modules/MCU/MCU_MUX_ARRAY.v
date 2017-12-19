@@ -1,6 +1,6 @@
 module MUX_ARRAY
     #(
-      parameter N = 2,
+      parameter N = 16,
       parameter BITS_IMAGEN = 8,
       parameter BITS_DATA = 13,
       parameter STATES = 3,

@@ -3,9 +3,9 @@
 `define NB_ADDRESS      10
 `define NB_IMAGE        10
 `define NB_STATES       2
-`define N_CONV          1
+`define N_CONV          16
 `define LATENCIA        6
-module Fsmv#(
+module FSM#(
     parameter NB_ADDRESS= `NB_ADDRESS,
     parameter NB_IMAGE  = `NB_IMAGE,
     parameter NB_STATES = `NB_STATES,
@@ -16,9 +16,9 @@ module Fsmv#(
     output [NB_ADDRESS-1:0]  o_writeAdd,
     output [NB_ADDRESS-1:0]  o_readAdd,
     output                   o_EoP,
-    output                   o_sopross,
+    output                   o_fsm_SOP,
     output                   o_changeBlock,
-    output                   o_fms2conVld,
+    output                   o_fsm_valid_conv,
     input  [NB_IMAGE-1:0]    i_imgLength,
     input                    i_CLK,
     input                    i_reset,
@@ -39,16 +39,15 @@ module Fsmv#(
     //Ni bien se crean los registros, toman esos valores.
     reg [NB_STATES-1:0]  states;
 
-    reg                 w_eop;                 
-    //integer             nconv;
+    reg                 w_eop;  
 
      //Assign          
     assign     {o_writeAdd} =  (sopControl) ? counter_with_latency:counterAdd;//counterAdd;
     assign     {o_readAdd}  =  counterAdd;
     assign          {o_EoP} =  w_eop;
     assign  {o_changeBlock} =  changeBlock;
-    assign  o_fms2conVld    = fms2conVld;
-    assign  o_sopross       = sopControl;
+    assign  o_fsm_valid_conv    = fms2conVld;
+    assign  o_fsm_SOP       = sopControl;
     
     initial begin
         counterAdd              = `NB_ADDRESS'd0;

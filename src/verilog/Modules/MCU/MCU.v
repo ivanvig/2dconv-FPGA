@@ -1,6 +1,6 @@
 module MCU
     #(
-      parameter N = 2,
+      parameter N = 16,
       parameter STATES = 3,
       parameter BITS_IMAGEN = 8,
       parameter BITS_DATA = 13,
