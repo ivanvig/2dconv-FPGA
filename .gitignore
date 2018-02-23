@@ -2,6 +2,8 @@
 *.aux
 *.log
 *.synctex.gz
+.directory
+auto
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

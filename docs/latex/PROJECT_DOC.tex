@@ -132,10 +132,10 @@
 \ifCLASSINFOpdf
   \usepackage[pdftex]{graphicx}
   % declare the path(s) where your graphic files are
-  \graphicspath{{schematics/}}
+  \graphicspath{{../schematics/svg/}}
   % and their extensions so you won't have to specify these with
   % every instance of \includegraphics
-  \DeclareGraphicsExtensions{.pdf,.jpeg,.png,.svg}
+  \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 \else
   % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
   % will default to the driver specified in the system graphics.cfg if no
@@ -320,7 +320,6 @@
 % There should be no need to do such things with IEEEtran.cls V1.6 and later.
 % (Unless specifically asked to do so by the journal or conference you plan
 % to submit to, of course. )
-
 
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
@@ -587,6 +586,14 @@ conocer el maximo y el mínimo valor de pixel de la imagen luego de filtrar, est
 requiere que toda la imagen se encuentre en la memoria. Debido a las limitación
 esto no se podía llevar a cabo.
 
+\section{Arquitectura del sistema}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3in]{dibujo.pdf}
+\caption{Simulation results for the network.}
+\label{fig_sim}
+\end{figure}
 
 
 
