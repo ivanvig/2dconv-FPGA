@@ -28,7 +28,7 @@
 %% consequential, or any other damages, resulting from the use or misuse
 %% of any information contained here.
 %%
-%% All comments are the opinions of their respective authors and are not
+%% All comments are the opinions http://www.bibtex.org/Using/of their respective authors and are not
 %% necessarily endorsed by the IEEE.
 %%
 %% This work is distributed under the LaTeX Project Public License (LPPL)
@@ -129,6 +129,7 @@
 
 % *** GRAPHICS RELATED PACKAGES ***
 %
+\renewcommand{\figurename}{Fig.}
 \ifCLASSINFOpdf
   \usepackage[pdftex]{graphicx}
   % declare the path(s) where your graphic files are
@@ -322,6 +323,7 @@
 % to submit to, of course. )
 
 % correct bad hyphenation here
+\usepackage{amssymb}
 \hyphenation{op-tical net-works semi-conduc-tor}
 
 
@@ -414,7 +416,7 @@
 
 
 
-\section{Introduction}
+\section{Introducci\'on}
 La convoluci\'on bidimensional discreta es ampliamente usada en multiples campos de la
 ingenieria, siendo uno de ellos la visi\'on artificial que ha tomado fuerza en la
 ultima d\'ecada con los resultados obtenidos con las redes neuronales
@@ -428,30 +430,34 @@ procesamiento respecta. Se utilizaron FPGAs para la implementacion, pues
 resuelven la necesidad de paralelismo como tambi\'en la de poder
 probar distintos prototipos de arquitecturas de hardware.
 
-La convoluci\'on discreta en 2D esta definida matem\'aticamente por la
-siguiente ecuaci\'on:
+La convoluci\'on discreta en 2D esta definida por la siguiente
+ecuaci\'on: 
+
 \begin{equation}\label{conv-org}
 S(x,y) = \sum_{i} \sum_{j}I(x-i,y-j)K(i, j)
 \end{equation}
-Al no ser necesaria la propiedad de conmutatividad en nuestro caso, es posible
-eliminar la necesidad de espejar una de las matrices [CITA DE DEEPLEARNING BOOK], obteniendo la funci\'on de
-correlacion cruzada
+
+Al no ser necesaria la propiedad de conmutatividad en este caso, es posible
+eliminar el proceso de espejar una de las matrices\cite{Goodfellow-et-al-2016} ,
+obteniendo la funci\'on de correlacion cruzada
+
 \begin{equation}\label{conv}
 S(x,y) = \sum_{i} \sum_{j}I(x+i,y+j)K(i, j)
 \end{equation}
+
 La cual ser\'a en realidad  implementada, por lo que en lo que resta
 del art\'iculo, cada vez que se nombre a la operaci\'on de convoluci\'on,
 se estar\'a haciendo referencia a la ecuaci\'on \ref{conv}.
 
 Uno de los mayores desaf\'ios fue trabajar con memoria RAM lo suficientemente
 escaza que no fuera capaz de alojar todos los pixels de la imagen que se desea
-procesar. Por lo que la im\'agen debe ser fraccionada y procesada en lotes.
+procesar. Por lo que la im\'agen debe ser fraccionada y procesada en lotes, con
+todo el procesamiento adicional que esto implica.
+
+Por una cuesti\'on de simplicidad, todo el trabajo se desarroll\'o utilizando
+imagenes en escala de grises, al tener estas un \'unico canal.
 
 
-% no \IEEEPARstart
-
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
 \section{An\'alisis en punto flotante y punto fijo}
 No se arranca con un simulador en python ya que las cuestiones del procesamiento
 de la imagen están más enfocada a la etapa de implementación, sin embargo en la
@@ -562,9 +568,10 @@ aprecia que si nos quedamos con 8 bits de salida (lo que intuye al principio por
 las resoluciones el filtro y de la imagen)  se tiene una calidad muy baja. pero
 a medida que se aumenta la cantidad de bits, la imagen se va mejorando.
 
-[IMAGEN LA ESTRUCTURA DE LOS BITS (SIGNO/ENTERO/FRACCIONARIO)]
+\textbf{[IMAGEN LA ESTRUCTURA DE LOS BITS (SIGNO/ENTERO/FRACCIONARIO)]}
 
-[IMAGEN DE LENA CON DISTINTAS RESOLUCIONES]
+\textbf{[IMAGEN DE LENA CON DISTINTAS RESOLUCIONES]}
+
 
 Al nivel de 13 bits se tiene una mejor apreciación de la imagen. Aunque si se
 realiza un análisis más finos se nota una degradación respecto de la original.
@@ -588,14 +595,59 @@ esto no se podía llevar a cabo.
 
 \section{Arquitectura del sistema}
 
+\subsection{Flujo de trabajo}
+El flujo de trabajo consta de tres instancias como se observa en la figura
+\ref{fig_workflow}. En la primer instancia, se desarroll\'o un cliente en python
+donde se ingresa la imagen a procesar junto con los coeficientes del filtro que
+se desea aplicar, el filtro o kernel es una matriz que pertence al conjunto
+$\mathbb{R}^{3{\times}3}$. Toda la arquitectura del sistema ha sido dise\~nada
+para trabajar con filtros de esa dimensi\'on, aunque no deber\'ia ser dificil
+generalizarla a filtros de otras dimensiones.
 \begin{figure}[!t]
 \centering
-\includegraphics[width=3in]{dibujo.pdf}
-\caption{Simulation results for the network.}
-\label{fig_sim}
+\includegraphics[width=3in]{workflow.pdf}
+\caption{Flujo de trabajo del sistema y lenguajes en los que se trabaj\'o en
+  cada instancia.}
+\label{fig_workflow}
 \end{figure}
+La informaci\'on es entonces separada en lotes, el cliente env\'ia un
+lote, espera a recibir el lote procesado y luego env\'ia el lote siguiente.
+
+Un microprocesador instanciado en la FPGA es el encargado de recibir los lotes,
+hace un desempaquetado de los datos y adem\'as le a\~nade a los mismos una 
+cabecera necesaria para la comunicaci\'on con el m\'odulo de convoluci\'on.
+Asimismo una vez que el m\'odulo finaliz\'o el procesamiento, el microprocesador 
+toma esa informaci\'on procesada, la empaqueta y env\'ia nuevamente a la
+computadora.
+
+El m\'odulo de convoluci\'on procesa el lote, internamente es el Bloque de
+Control (Control Block) quien hace de interfaz entre el resto del m\'odulo y el
+exterior. La porci\'on de la imagen es almacenada, los bloques de convoluci\'on
+(Conv) realizan la suma de los productos de los coeficientes del filtro con una
+secci\'on de la imagen igual al tama\~no del filtro, una vez que toda la
+porci\'on de la imagen fue procesada, se env\'ia el resultado y se espera a
+recibir una nueva porci\'on. Una maquina de estados finita (FSM) lleva cuenta
+del ciclo de entrada$\rightarrow$procesamiento$\rightarrow$salida que ocurre en
+el m\'odulo.
+
+\subsection{M\'odulo de convoluci\'on}
+En esta secci\'on se describe en detalle la arquitectura del m\'odulo de
+convoluci\'on.
+
+\subsubsection{Almacenamiento de la informaci\'on}
+El kernel o filtro que se quiere aplicar a la imagen se configura durante la
+etapa de carga y es almacenado en registros de los bloques de convoluci\'on. Con
+respecto a la imagen, se opt\'o por utilizar columnas de memoria, donde cada
+columna almacena una columna de pixels. Queda entonces limitada la imagen a una
+altura m\'axima dada por el n\'umero de direcciones accesibles en las columnas
+de memoria.
 
 
+
+\subsubsection{Estados}
+Durante todo el ciclo de trabajo, el m\'odulo atraviesa distintos estados, en
+primera instancia, est\'a en un estado inicial de \textbf{reset} esperando a ser
+configurado
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
@@ -742,13 +794,15 @@ The authors would like to thank...
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
-
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
-
-\end{thebibliography}
+\bibliographystyle{IEEEtran}
+\bibliography{PROJECT_DOC}
+%\begin{thebibliography}{1}
+%
+%\bibitem{IEEEhowto:kopka}
+%H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
+  %0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+%
+%\end{thebibliography}
 
 
 
