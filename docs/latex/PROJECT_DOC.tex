@@ -420,7 +420,7 @@
 La convoluci\'on bidimensional discreta es ampliamente usada en multiples campos de la
 ingenieria, siendo uno de ellos la visi\'on artificial que ha tomado fuerza en la
 ultima d\'ecada con los resultados obtenidos con las redes neuronales
-convolucionales. El creciente tama\~no en los modelos, como asi tambien en la
+convolucionales. El creciente tama\~no en los modelos, como tambien en la
 informacion disponible para el entrenamiento hacen de la velocidad de
 procesamiento un factor de gran importancia.
 
@@ -611,7 +611,7 @@ generalizarla a filtros de otras dimensiones.
 \label{fig_workflow}
 \end{figure}
 La informaci\'on es entonces separada en lotes, el cliente env\'ia un
-lote, espera a recibir el lote procesado y luego env\'ia el lote siguiente.
+lote, espera a recibir el mismo procesado y luego env\'ia el lote siguiente.
 
 Un microprocesador instanciado en la FPGA es el encargado de recibir los lotes,
 hace un desempaquetado de los datos y adem\'as le a\~nade a los mismos una 
@@ -638,10 +638,34 @@ convoluci\'on.
 El kernel o filtro que se quiere aplicar a la imagen se configura durante la
 etapa de carga y es almacenado en registros de los bloques de convoluci\'on. Con
 respecto a la imagen, se opt\'o por utilizar columnas de memoria, donde cada
-columna almacena una columna de pixels. Queda entonces limitada la imagen a una
-altura m\'axima dada por el n\'umero de direcciones accesibles en las columnas
-de memoria.
+columna almacena una columna de pixels. Queda entonces como una limitaci\'on la
+altura m\'axima de la imagen dada por el n\'umero m\'aximo de pixels que es
+posible almacenar en una columna de memoria.
 
+Cada bloque de convoluci\'on toma los valores de tres (o $k$, para un filtro que
+pertence a $\mathbb{R}^{k{\times}k}$) columnas adyacentes.
+Comienza cargando los tres primeros valores de las tres columnas en sus registros,
+realiza la suma del producto con los coeficientes del filtro, y hace un
+desplazamiento de los registros con los valores de la imagen, de forma que se
+descarten los valores mas antiguos de cada columna, y se cargue un nuevo valor
+de cada columna, como en una estructura FIFO (first in, first out). Como muestra
+la figura \ref{proc_conv}, esto es equivalente a ubicar el filtro sobre tres
+columnas de la imagen y desplazarlo verticalemente.
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{proc_conv.pdf}
+\caption{En gris se observan los datos que han sido cargados a los registros del
+bloque de convoluci\'on, en el ciclo siguiente es posible ver como los valores
+de cada columna que ingresaron primero han sido decartados, y nuevos valores han
+sido cargados, produciendo un efecto de desplazamiento hacia abajo.}
+\label{proc_conv}
+\end{figure}
+
+Luego de analizar distintas alternativas, se decidi\'o que cada bloque de
+convoluci\'on que se tiene trabajando en paralelo produzca columnas procesadas
+adyacentes, es decir, que el bloque de convoluci\'on 1 produzca la primer
+columna de la imagen, el bloque 2 la segunda y asi sucesivamente. Una de las
+razones 
 
 
 \subsubsection{Estados}
