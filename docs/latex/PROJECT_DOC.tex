@@ -25,7 +25,7 @@
 %% User assumes all risk.
 %% In no event shall the IEEE or any contributor to this code be liable for
 %% any damages or losses, including, but not limited to, incidental,
-%% consequential, or any other damages, resulting from the use or misuse
+%% consequential, o_diagramr any other damages, resulting from the use or misuse
 %% of any information contained here.
 %%
 %% All comments are the opinions http://www.bibtex.org/Using/of their respective authors and are not
@@ -510,11 +510,11 @@ siguiente.
 
 
 Teniendo en cuenta que el kernel tiene componentes negativos:
-$$
-Representaci\'on utilizada en imagen     S(8,7)
-$$
-Representaci\'on utilizada en Kernel    S(8,7)
-$$
+
+\begin{itemize}
+  \item Representaci\'on utilizada en imagen     S(8,7)
+  \item Representaci\'on utilizada en Kernel    S(8,7)
+\end{itemize}
 
 En la operaci\'on inicial de la convoluci\'on se tendr\'ia como resultado en S(16,14)
 por cada producto , y al tener un kernel de 3x3 se tiene un suma de 9 elementos, 
@@ -628,13 +628,45 @@ exterior. La porci\'on de la imagen es almacenada, los bloques de convoluci\'on
 (Conv) realizan la suma de los productos de los coeficientes del filtro con una
 secci\'on de la imagen igual al tama\~no del filtro, una vez que toda la
 porci\'on de la imagen fue procesada, se env\'ia el resultado y se espera a
-recibir una nueva porci\'on. Una maquina de estados finita (FSM) lleva cuenta
+recibir una nueva porci\'on. Una maquina de estados finitos (FSM) lleva cuenta
 del ciclo de entrada$\rightarrow$procesamiento$\rightarrow$salida que ocurre en
 el m\'odulo.
 
 \subsection{M\'odulo de convoluci\'on}
 En esta secci\'on se describe en detalle la arquitectura del m\'odulo de
 convoluci\'on.
+
+\subsubsection{Estados}
+Durante todo el ciclo de trabajo, el m\'odulo atraviesa distintos estados como
+se aprecia en la figura \ref{state}. En primera instancia, est\'a en un estado
+inicial de \textbf{reset} esperando a ser configurado. Permanecer\'a en ese
+estado hasta recibir la intruccion para pasar al estado de \textbf{kernel load}
+(carga de kernel) donde se carga al m\'odulo el filtro que se desea aplicar. Una
+vez que se termina de cargar los coeficientes 
+del filtro, se espera la instrucci\'on para pasar a \textbf{size load} (carga
+de tama\~no), en este estado se debe informar al m\'odulo la altura de la
+imagen. Habiendo ocurrido la transici\'on al estado siguiente, no se retornar\'a
+a los estados previos hasta finalizar el procesamiento completo de la imagen.
+Al salir del estado de \textbf{size load} se pasa al de \textbf{image load}
+donde se carga una secci\'on de la imagen. Pasados estos tres estados se
+finaliza la etapa de carga. En la instacia siguiente el m\'odulo se encuentra en
+el estado de \textbf{run}. En este estado se realiza el procesamiento del lote
+de forma ininterrumpida, es decir, toda instrucci\'on ser\'a ignorada hasta
+finalizar el filtrado donde una se\~nal de aviso es emitida. Se espera entonces
+la instrucci\'on para pasar al estado \textbf{out}. Con el lote ya procesado y
+la intrucci\'on recibida se da inicio al env\'io de los datos filtrados. La
+sucesi\'on de los ultimos tres estados mensionados \textbf{image load}
+$\rightarrow$ \textbf{run} $\rightarrow$ \textbf{out} se repetir\'a por cada
+nuevo lote hasta obtener la imagen procesada en su totalidad.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=2.5in]{states.pdf}
+  \caption{Diagrama de estados del m\'odulo de convoluci\'on.
+    A - Carga de kernel, B - Carga de tama\~no, C - Carga de imagen, D -
+    Procesamiento, E - Out, F - Reset}
+  \label{state}
+\end{figure}
 
 \subsubsection{Almacenamiento de la informaci\'on}
 El kernel o filtro que se quiere aplicar a la imagen se configura durante la
@@ -650,7 +682,7 @@ Comienza cargando los tres primeros valores de las tres columnas en sus registro
 realiza la suma del producto con los coeficientes del filtro, y hace un
 desplazamiento de los registros con los valores de la imagen, de forma que se
 descarten los valores mas antiguos de cada columna, y se cargue un nuevo valor
-de cada columna, como en una estructura FIFO (first in, first out). Como muestra
+por columna, como en una estructura FIFO (first in, first out). Como muestra
 la figura \ref{proc_conv}, esto es equivalente a ubicar el filtro sobre tres
 columnas de la imagen y desplazarlo verticalemente.
 \begin{figure}[!t]
@@ -670,10 +702,6 @@ columna de la imagen, el bloque 2 la segunda y asi sucesivamente. Una de las
 razones 
 
 
-\subsubsection{Estados}
-Durante todo el ciclo de trabajo, el m\'odulo atraviesa distintos estados, en
-primera instancia, est\'a en un estado inicial de \textbf{reset} esperando a ser
-configurado
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
