@@ -687,22 +687,27 @@ nuevo lote hasta obtener la imagen procesada en su totalidad.
 \end{figure}
 
 \subsubsection{Almacenamiento de la informaci\'on}
-El kernel o filtro que se quiere aplicar a la imagen se configura durante la
-etapa de carga y es almacenado en registros de los bloques de convoluci\'on. Con
-respecto a la imagen, se opt\'o por utilizar columnas de memoria, donde cada
+El kernel o filtro que se quiere aplicar a la imagen es almacenado en registros de los bloques de convoluci\'on. Con
+respecto a la imagen, se opt\'o por ordenar la memoria en columnas, donde cada
 columna almacena una columna de pixels. Queda entonces como una limitaci\'on la
 altura m\'axima de la imagen dada por el n\'umero m\'aximo de pixels que es
 posible almacenar en una columna de memoria.
 
+El lote ya procesado es almacenado sobreescribiendo los datos que se utilizaron
+para producirlo, es decir, se utiliza la misma memoria tanto para los datos de
+entrada como los de salida.
+
+\subsubsection{Procesamiento de la informaci\'on}
 Cada bloque de convoluci\'on toma los valores de tres (o $k$, para un filtro que
-pertence a $\mathbb{R}^{k{\times}k}$) columnas adyacentes.
-Comienza cargando los tres primeros valores de las tres columnas en sus registros,
-realiza la suma del producto con los coeficientes del filtro, y hace un
+pertence a $\mathbb{R}^{k{\times}k}$) columnas adyacentes. Comienza cargando los
+tres primeros valores de cada columna en sus registros, realiza la suma del
+producto con los coeficientes del filtro, y hace un 
 desplazamiento de los registros con los valores de la imagen, de forma que se
 descarten los valores mas antiguos de cada columna, y se cargue un nuevo valor
 por columna, como en una estructura FIFO (first in, first out). Como muestra
 la figura \ref{proc_conv}, esto es equivalente a ubicar el filtro sobre tres
 columnas de la imagen y desplazarlo verticalemente.
+
 \begin{figure}[!t]
 \centering
 \includegraphics[width=2.5in]{proc_conv.pdf}
@@ -713,12 +718,17 @@ sido cargados, produciendo un efecto de desplazamiento hacia abajo.}
 \label{proc_conv}
 \end{figure}
 
-Luego de analizar distintas alternativas, se decidi\'o que cada bloque de
-convoluci\'on que se tiene trabajando en paralelo produzca columnas procesadas
-adyacentes, es decir, que el bloque de convoluci\'on 1 produzca la primer
-columna de la imagen, el bloque 2 la segunda y asi sucesivamente. Una de las
-razones 
-
+Luego de analizar distintas alternativas, se decidi\'o que los bloques de
+convoluci\'on que se tienen trabajando en paralelo produzcan columnas procesadas
+contiguas, es decir, que el bloque de convoluci\'on 1 produzca la primer
+columna del lote, el bloque 2 la segunda y asi sucesivamente. Una de las
+razones por la que se tomo esta decisi\'on es la naturaleza de la operaci\'on de
+la convoluci\'on: se necesitan $k$ columnas de imagen para generar una columna procesada, para generar la
+columna contigua es necesario desplazarse un lugar en la imagen de entrada,
+por lo que existe unicamente una columna de diferencia en la entrada de dos
+bloques que generan dos columnas adyacentes. Esta superposici\'on en la entrada implica una
+reduccion del n\'umero de columnas necesarias de $k \cdot N$ a $N+k-1$ para N
+bloques de convoluci\'on si estos generan columnas adyacentes.
 
 
 % An example of a floating figure using the graphicx package.
