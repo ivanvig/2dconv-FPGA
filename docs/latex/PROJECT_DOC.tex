@@ -459,19 +459,35 @@ imagenes en escala de grises, al tener estas un \'unico canal.
 
 
 \section{An\'alisis Previo}
-Este an\'alisis tiene por objeto el trabajar con una m\'inima representaci\'on finita para los p\'ixeles de la imagen y los valores del kernel. Para ello se necesita efectuar un estudio acerca de la cantidad de bits de resoluci\'on m\'inimos  con una p\'erdida
-de informaci\'on aceptable.
+Este an\'alisis tiene por objeto el trabajar con una m\'inima representaci\'on
+finita para los p\'ixeles de la imagen y los valores del kernel.
+Para ello se necesita efectuar un estudio acerca de la cantidad de bits de
+resoluci\'on m\'inimos  con una p\'erdida de informaci\'on aceptable.
 
-Los valores de los p\'ixeles \(I_{ij}\) se encuentran en el rango 0 a 255 . Con la normalizacion dynamic range expansion (referecia) se lo lleva al rango 0 a 1. Los valores del kernel \(K_{ij}\) pueden ser tanto positivos como negativos. Utilizando Maximum norm (referencia) se obtiene el m\'aximo valor absoluto y se divide los \(K_{ij}\) por este valor para llevar al kernel al rango -1 a 1 manteniendo su efecto. 
+Los valores de los p\'ixeles \(I_{ij}\) se encuentran en el rango 0 a 255 .
+Con la normalizacion dynamic range expansion (referecia) se lo lleva al rango 0 a 1.
+Los valores del kernel \(K_{ij}\) pueden ser tanto positivos como negativos.
+Utilizando Maximum norm (referencia) se obtiene el m\'aximo valor absoluto y se
+divide los \(K_{ij}\) por este valor para llevar al kernel al rango -1 a 1 manteniendo su efecto. 
 
-Para poder operar los rangos anteriores en una representaci\'on de 8 bits se utiliza representac\'ion Signed Fixed Point(referencia) \(S(8,7)\). 
+Para poder operar los rangos anteriores en una representaci\'on de 8 bits se
+utiliza representac\'ion Signed Fixed Point(referencia) \(S(8,7)\). 
 
-La convoluci\'on de una imagen con un \(K^{3x3}\) resulta en una salida de 20 bits \(S(20,14)\). Entonces se realiza un post procesamiento donde se lleva el
-resultado a un rango positivo y truncamiento. Se establece una comparaci\'on a fines de decidir la cantidad de bits de salida del procesamiento. 
+La convoluci\'on de una imagen con un \(K^{3x3}\) resulta en una salida de 20
+bits \(S(20,14)\).Entonces se realiza un post procesamiento donde se lleva el
+resultado a un rango positivo y truncamiento. Se establece una comparaci\'on a
+fines de decidir la cantidad de bits de salida del procesamiento. 
 
-Se utiliza la relaci\'on SNR (referencia) de la operaci\'on a m\'axima resoluci\'on \(S(20,14)\) y el error pruducido al reducir la cantidad de bits \(e_r=f(x)_{20b}-f(x)_{pos}\). Una representacion \(S(13,8)\) tiene una SNR aprimada de \(30 [dB]\) que permite observar el efecto de la convolucion con una m\'inima perdida de informaci\'on recordando que nuestro objetivo no es no es representar una imagen en su totalidad.
+Se utiliza la relaci\'on SNR (referencia) de la operaci\'on a m\'axima
+resoluci\'on \(S(20,14)\) y el error pruducido al reducir la cantidad de bits
+\(e_r=f(x)_{20b}-f(x)_{pos}\). Una representacion \(S(13,8)\) tiene una SNR
+aprimada de \(30 [dB]\) que permite observar el efecto de la convolucion con una
+m\'inima perdida de informaci\'on recordando que nuestro objetivo no es no es
+representar una imagen en su totalidad.
 
-Se puede llevar el rango final a 8 bits si se utiliza dynamic range expansion (referecia). Pero se requiere conocer el m\'aximo y el m\'inimo valor de p\'ixel de la imagen luego de filtrar, lo que implica que toda la imagen se encuentre en memoria.
+Se puede llevar el rango final a 8 bits si se utiliza dynamic range expansion
+(referecia). Pero se requiere conocer el m\'aximo y el m\'inimo valor de p\'ixel
+de la imagen luego de filtrar, lo que implica que toda la imagen se encuentre en memoria.
 
 \section{Arquitectura del sistema}
 
