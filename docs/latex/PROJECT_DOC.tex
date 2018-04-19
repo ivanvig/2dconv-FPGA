@@ -458,160 +458,20 @@ Por una cuesti\'on de simplicidad, todo el trabajo se desarroll\'o utilizando
 imagenes en escala de grises, al tener estas un \'unico canal.
 
 
-\section{An\'alisis en punto flotante y punto fijo}
-No se arranca con un simulador del sistema completo desarrolado en python ya que las cuestiones del procesamiento
-de la imagen est\'an m\'as enfocadas a la etapa de implementaci\'on, sin embargo en la
-etapa de verificaci\'on del sistema hubo que hacer un an\'alisis de como influyen
-los distintos filtros (kernels).
+\section{An\'alisis Previo}
+Este an\'alisis tiene por objeto el trabajar con una m\'inima representaci\'on finita para los p\'ixeles de la imagen y los valores del kernel. Para ello se necesita efectuar un estudio acerca de la cantidad de bits de resoluci\'on m\'inimos  con una p\'erdida
+de informaci\'on aceptable.
 
-Como primer paso se tiene una imagen destinada a procesamiento, para el cual se debe
-tener en consideración el uso de una resolución finita, por ende se necesita efectuar un estudio
-riguroso acerca de cuantos bits de resoluci\'on m\'inimos admite el sistema con una p\'erdida
-de informaci\'on m\'inima.
+Los valores de los p\'ixeles \(I_{ij}\) se encuentran en el rango 0 a 255 . Con la normalizacion dynamic range expansion (referecia) se lo lleva al rango 0 a 1. Los valores del kernel \(K_{ij}\) pueden ser tanto positivos como negativos. Utilizando Maximum norm (referencia) se obtiene el m\'aximo valor absoluto y se divide los \(K_{ij}\) por este valor para llevar al kernel al rango -1 a 1 manteniendo su efecto. 
 
-\subsection{An\'alisis de comportamiento}
-Trabajado con un an\'alisis a nivel del comportamiento del kernel en python, se
-observa que el rango de la imagen deben ser modificadas,  para trabajar en un
-rango de 8 bits, entonces surge.
+Para poder operar los rangos anteriores en una representaci\'on de 8 bits se utiliza representac\'ion Signed Fixed Point(referencia) \(S(8,7)\). 
 
-\subsubsection{Maximum norm}
-Toma como norma el mayor valor absoluto de una tupla con “n” elementos
-$$
-\left \|\mathbf{x}  \right \|_\infty:= \textrm{max}(\left | x_1 \right |,...,\left | x_n \right |)
-$$
+La convoluci\'on de una imagen con un \(K^{3x3}\) resulta en una salida de 20 bits \(S(20,14)\). Entonces se realiza un post procesamiento donde se lleva el
+resultado a un rango positivo y truncamiento. Se establece una comparaci\'on a fines de decidir la cantidad de bits de salida del procesamiento. 
 
-\subsubsection{Divisi\'on con respecto a la norma}
-Tomando el valor m\'aximo de la tupla en valor absoluta y dividiendo cada uno de
-los elementos del kernel
-$$
-\hat{k}_{ij}=\frac{k_{ij}}{\left \| \mathbf{k} \right \|}
-$$
-la raz\'on de todo esto es llevar los valores iniciales del kernel al rango [-1 ;
-1). Para poder tener una representaci\'on de 8 bits, para los mismos.
+Se utiliza la relaci\'on SNR (referencia) de la operaci\'on a m\'axima resoluci\'on \(S(20,14)\) y el error pruducido al reducir la cantidad de bits \(e_r=f(x)_{20b}-f(x)_{pos}\). Una representacion \(S(13,8)\) tiene una SNR aprimada de \(30 [dB]\) que permite observar el efecto de la convolucion con una m\'inima perdida de informaci\'on recordando que nuestro objetivo no es no es representar una imagen en su totalidad.
 
-\subsubsection{Expansi\'on lineal din\'amica de rango}
-Utilizados para el procesamiento de im\'agenes donde usualmente se traslada la
-imagen a un rango conveniente de trabajo.
-$$
-I_N=(I-Min)\frac{newMax-newMin}{Max-Min}+newMin
-$$
-As\'i como en el kernel, el objetivo aqu\'i es llevar los valores de cada p\'ixel de
-la imagen a [0 ; 1). Con el fin de tener una representaci\'on en 8 bits.
-
-Para reducir el n\'umero bits a manejar en la implementaci\'on en hardware , ya sea
-en la etapa de c\'alculo de convoluci\'on como en la de transferencia de los datos
-por UART se escoge como ancho de palabra 8 bits (para la etapa de env\'io de
-datos).
-
-Al obtener un cambio en el rango de la imagen que nos permite decir, que el producto de normalizar la se\~nal, en principio, el rango de los
-datos cabe en 8 bits y 7 bits, al trabajar en python y al tener en cuenta que el kernel tiene componentes negativos se tiene.
-\begin{itemize}
-\item Representaci\'on utilizada en Imagen S(8,7)
-\item Representaci\'on utilizada en Kernel S(8,7)
-\end{itemize}
-
-En la operaci\'on inicial de la convoluci\'on se obtiene como resultado en S(16,14)
-por cada producto , y al tener un kernel de 3x3 se genera una suma de 9 elementos. Esto resulta en una representaci\'on S(20,14). Es decir, la salida del convolucionador
-consta de 20 bits.
-
-Por las restricciones impuestas por los m\'odulos UART, la m\'axima unidad de
-informaci\'on son 8 bits, lo que implica que para enviar un solo dato , se requieren tres env\'ios.
-
-Esto nos lleva a realizar una etapa de post procesamiento. Esta consistente en llevar el
-resultado de la convoluci\'on  a rango positivo y mapear los bits menos
-significativos a  uno m\'as significativo, realizando un truncado de los menos significativos.
-
-\subsubsection{M\'etrica}
-Para poder establecer una M\'etrica y realizar una comparaci\'on , a fines de decidir la
-cantidad de bits de salida del procesamiento, con el fin de reducir ya sea la parte fraccionaria,
-o la entera, se forma una relaci\'on entre la operaci\'on a m\'axima resoluci\'on y otra
-en la cual se le reducen los bits.
-
-Se genera una relaci\'on se\~nal ruido de la estimaci\'on a 20 bits y el error
-pruducido al reducir la cantidad de bits. Esto para determinar la
-cantidad de bits m\'inima de trabajo.
-
-\begin{itemize}
-\item Error: $$e_r=f(x)_{20b}-f(x)_{pos}$$
-
-\item Energia: $$E=\frac{1}{n}\sum_{i=0}^{n-1}x^2_i$$
-
-\item SNR: $$SNR=\frac{E_{20b}}{E_{error}}$$
-
-\end{itemize}
-
-\subsubsection{Representaci\'on en punto fijo}
-Al efectuar la convoluci\'on con un filtro unitario.
-$$
-\begin{bmatrix}
-0 & 0 & 0\\ 
-0 & 1 & 0\\ 
-0 & 0 & 0
-\end{bmatrix}
-$$
-Al realizar el an\'alisis luego de reducir los bits de la parte fraccionaria. Se parte
-de 8 bits en totales, en d\'onde se observa que la im\'agen mejora, y que a
-partir de 13 bits totales, 1 bit de signo, 5 bits parte entera y 7 en parte
-fraccionaria(figura \ref{fig_pas1})  se tiene una SNR aproximada a 30 dB, la c\'ual se considera suficiente como se observa en la figura \ref{fig_pos1}.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=3in]{posprocesamiento1.pdf}
-\caption{Relaci\'on se\~nal ruido de la estimaci\'on a 20 bits y el error
-pruducido al reducir la cantidad de bits.}
-\label{fig_pos1}
-\end{figure}
-
-Se considera suficiente debido a observaci\'on de las im\'agenes, en d\'onde se
-aprecia que si nos quedamos con 8 bits de salida (lo que intuye al principio por
-las resoluciones el filtro y de la im\'agen)  se tiene una calidad muy baja. pero
-a medida que se aumenta la cantidad de bits, la im\'agen mejora.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=2in]{pasted_02}
-\caption{Estructura de los bits resultante.}
-\label{fig_pas1}
-\end{figure}
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=2in]{posprocesanto1.pdf}
-\includegraphics[width=2in]{posprocesanto2.pdf}
-\caption{Resultados de tomar distintos bits totales.}
-\label{posprocesanto1}
-\end{figure}
-
-
-
-Al nivel de 13 bits se tiene una mejor apreciaci\'on de la im\'agen. Aunque si se
-realiza un an\'alisis m\'as fino se nota una degradaci\'on respecto de la original.
-Pero como el objetivo no es no es representar una imagen en su totalidad sino,
-hacer detección de borde o detectar elementos, etc. para la cual la precisión de
-la im\'agen queda en un segundo plano, esto se ve en la figura \ref{posprocesanto1}.
-
-Para avanzar un paso m\'as en la reducci\'on de bits se realiza el mismo an\'alisis
-al eliminar el bit m\'as significativo de la parte entera. lo cual permite quedarse
-con una resoluci\'on de 12 bits como se oberva en la figura \ref{fig_pos2} y su estructura en la figura \ref{fig_pas2}.
-\begin{figure}[!t]
-\centering
-\includegraphics[width=3in]{posprocesamiento2}
-\caption{Nueva SNR al reducir un 1 bit de la parte entera usando el mismo filtro.}
-\label{fig_pos2}
-\end{figure}
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=2in]{pasted_01}
-\caption{Nueva estructura de los bits resultante.}
-\label{fig_pas2}
-\end{figure}
-
-Se puede llevar el rango final a 8 bits, si se hace un cambio de rango igual al
-que se realiz\'o para la im\'agen antes de procesarla. Para ello se requiere
-conocer el m\'aximo y el m\'inimo valor de p\'ixel de la im\'agen luego de filtrar, esto
-requiere que toda la im\'agen se encuentre en la memoria. Debido a las limitaci\'on
-esto no se pod\'ia llevar a cabo.
+Se puede llevar el rango final a 8 bits si se utiliza dynamic range expansion (referecia). Pero se requiere conocer el m\'aximo y el m\'inimo valor de p\'ixel de la imagen luego de filtrar, lo que implica que toda la imagen se encuentre en memoria.
 
 \section{Arquitectura del sistema}
 
