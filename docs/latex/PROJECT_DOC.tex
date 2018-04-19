@@ -25,7 +25,7 @@
 %% User assumes all risk.
 %% In no event shall the IEEE or any contributor to this code be liable for
 %% any damages or losses, including, but not limited to, incidental,
-%% consequential, or any other damages, resulting from the use or misuse
+%% consequential, o_diagramr any other damages, resulting from the use or misuse
 %% of any information contained here.
 %%
 %% All comments are the opinions http://www.bibtex.org/Using/of their respective authors and are not
@@ -646,7 +646,7 @@ exterior. La porci\'on de la imagen es almacenada, los bloques de convoluci\'on
 (Conv) realizan la suma de los productos de los coeficientes del filtro con una
 secci\'on de la imagen igual al tama\~no del filtro, una vez que toda la
 porci\'on de la imagen fue procesada, se env\'ia el resultado y se espera a
-recibir una nueva porci\'on. Una maquina de estados finita (FSM) lleva cuenta
+recibir una nueva porci\'on. Una maquina de estados finitos (FSM) lleva cuenta
 del ciclo de entrada$\rightarrow$procesamiento$\rightarrow$salida que ocurre en
 el m\'odulo.
 
@@ -654,23 +654,60 @@ el m\'odulo.
 En esta secci\'on se describe en detalle la arquitectura del m\'odulo de
 convoluci\'on.
 
+\subsubsection{Estados}
+Durante todo el ciclo de trabajo, el m\'odulo atraviesa distintos estados como
+se aprecia en la figura \ref{state}. En primera instancia, est\'a en un estado
+inicial de \textbf{reset} esperando a ser configurado. Permanecer\'a en ese
+estado hasta recibir la intruccion para pasar al estado de \textbf{kernel load}
+(carga de kernel) donde se carga al m\'odulo el filtro que se desea aplicar. Una
+vez que se termina de cargar los coeficientes 
+del filtro, se espera la instrucci\'on para pasar a \textbf{size load} (carga
+de tama\~no), en este estado se debe informar al m\'odulo la altura de la
+imagen. Habiendo ocurrido la transici\'on al estado siguiente, no se retornar\'a
+a los estados previos hasta finalizar el procesamiento completo de la imagen.
+Al salir del estado de \textbf{size load} se pasa al de \textbf{image load}
+donde se carga una secci\'on de la imagen. Pasados estos tres estados se
+finaliza la etapa de carga. En la instacia siguiente el m\'odulo se encuentra en
+el estado de \textbf{run}. En este estado se realiza el procesamiento del lote
+de forma ininterrumpida, es decir, toda instrucci\'on ser\'a ignorada hasta
+finalizar el filtrado donde una se\~nal de aviso es emitida. Se espera entonces
+la instrucci\'on para pasar al estado \textbf{out}. Con el lote ya procesado y
+la intrucci\'on recibida se da inicio al env\'io de los datos filtrados. La
+sucesi\'on de los ultimos tres estados mensionados \textbf{image load}
+$\rightarrow$ \textbf{run} $\rightarrow$ \textbf{out} se repetir\'a por cada
+nuevo lote hasta obtener la imagen procesada en su totalidad.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=2.5in]{states.pdf}
+  \caption{Diagrama de estados del m\'odulo de convoluci\'on.
+    A - Carga de kernel, B - Carga de tama\~no, C - Carga de imagen, D -
+    Procesamiento, E - Out, F - Reset}
+  \label{state}
+\end{figure}
+
 \subsubsection{Almacenamiento de la informaci\'on}
-El kernel o filtro que se quiere aplicar a la imagen se configura durante la
-etapa de carga y es almacenado en registros de los bloques de convoluci\'on. Con
-respecto a la imagen, se opt\'o por utilizar columnas de memoria, donde cada
+El kernel o filtro que se quiere aplicar a la imagen es almacenado en registros de los bloques de convoluci\'on. Con
+respecto a la imagen, se opt\'o por ordenar la memoria en columnas, donde cada
 columna almacena una columna de pixels. Queda entonces como una limitaci\'on la
 altura m\'axima de la imagen dada por el n\'umero m\'aximo de pixels que es
 posible almacenar en una columna de memoria.
 
+El lote ya procesado es almacenado sobreescribiendo los datos que se utilizaron
+para producirlo, es decir, se utiliza la misma memoria tanto para los datos de
+entrada como los de salida.
+
+\subsubsection{Procesamiento de la informaci\'on}
 Cada bloque de convoluci\'on toma los valores de tres (o $k$, para un filtro que
-pertence a $\mathbb{R}^{k{\times}k}$) columnas adyacentes.
-Comienza cargando los tres primeros valores de las tres columnas en sus registros,
-realiza la suma del producto con los coeficientes del filtro, y hace un
+pertence a $\mathbb{R}^{k{\times}k}$) columnas adyacentes. Comienza cargando los
+tres primeros valores de cada columna en sus registros, realiza la suma del
+producto con los coeficientes del filtro, y hace un 
 desplazamiento de los registros con los valores de la imagen, de forma que se
 descarten los valores mas antiguos de cada columna, y se cargue un nuevo valor
-de cada columna, como en una estructura FIFO (first in, first out). Como muestra
+por columna, como en una estructura FIFO (first in, first out). Como muestra
 la figura \ref{proc_conv}, esto es equivalente a ubicar el filtro sobre tres
 columnas de la imagen y desplazarlo verticalemente.
+
 \begin{figure}[!t]
 \centering
 \includegraphics[width=2.5in]{proc_conv.pdf}
@@ -681,17 +718,18 @@ sido cargados, produciendo un efecto de desplazamiento hacia abajo.}
 \label{proc_conv}
 \end{figure}
 
-Luego de analizar distintas alternativas, se decidi\'o que cada bloque de
-convoluci\'on que se tiene trabajando en paralelo produzca columnas procesadas
-adyacentes, es decir, que el bloque de convoluci\'on 1 produzca la primer
-columna de la imagen, el bloque 2 la segunda y asi sucesivamente. Una de las
-razones 
+Luego de analizar distintas alternativas, se decidi\'o que los bloques de
+convoluci\'on que se tienen trabajando en paralelo produzcan columnas procesadas
+contiguas, es decir, que el bloque de convoluci\'on 1 produzca la primer
+columna del lote, el bloque 2 la segunda y asi sucesivamente. Una de las
+razones por la que se tomo esta decisi\'on es la naturaleza de la operaci\'on de
+la convoluci\'on: se necesitan $k$ columnas de imagen para generar una columna procesada, para generar la
+columna contigua es necesario desplazarse un lugar en la imagen de entrada,
+por lo que existe unicamente una columna de diferencia en la entrada de dos
+bloques que generan dos columnas adyacentes. Esta superposici\'on en la entrada implica una
+reduccion del n\'umero de columnas necesarias de $k \cdot N$ a $N+k-1$ para N
+bloques de convoluci\'on si estos generan columnas adyacentes.
 
-
-\subsubsection{Estados}
-Durante todo el ciclo de trabajo, el m\'odulo atraviesa distintos estados, en
-primera instancia, est\'a en un estado inicial de \textbf{reset} esperando a ser
-configurado
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
