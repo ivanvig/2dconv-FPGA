@@ -26,4 +26,22 @@ I.~Goodfellow, Y.~Bengio, and A.~Courville, \emph{Deep Learning}.\hskip 1em
   plus 0.5em minus 0.4em\relax MIT Press, 2016,
   \url{http://www.deeplearningbook.org}.
 
+\bibitem{dinamic_rango}
+R.~E.~W. Rafael C.~Gonz\'alez, \emph{Digital Image Processing}.\hskip 1em plus
+  0.5em minus 0.4em\relax Prentice Hall, 2007.
+
+\bibitem{max_norm}
+W.~Rudin, \emph{Principles of Mathematical Analysis}.\hskip 1em plus 0.5em
+  minus 0.4em\relax McGraw-Hill, 1964.
+
+\bibitem{fix_p}
+G.~C.~S. Keith B.~Cullen and N.~J. Hurley, ``Simulation tools for fixed point
+  dsp algorithms and architectures,'' \emph{International Journal of Signal
+  Processing}, vol.~1, no.~4, pp. 199--203, 2008.
+
+\bibitem{srntesis}
+H.~D. Ram\'on, ``An\'alisis del error en algoritmos de transmisi\'on de
+  im\'agenes comprimidas con p\'erdida,'' Master's thesis, Facultad de
+  Inform\'atica, U.N.L.P, hramon@lidi.info.unlp.edu.ar, 2002.
+
 \end{thebibliography}
