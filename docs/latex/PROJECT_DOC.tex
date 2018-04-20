@@ -458,20 +458,34 @@ Por una cuesti\'on de simplicidad, todo el trabajo se desarroll\'o utilizando
 imagenes en escala de grises, al tener estas un \'unico canal.
 
 
-\section{An\'alisis Previo}\label{preproc}
-Este an\'alisis tiene por objeto el trabajar con una m\'inima representaci\'on finita para los p\'ixeles de la imagen y los valores del kernel. Para ello se necesita efectuar un estudio acerca de la cantidad de bits de resoluci\'on m\'inimos  con una p\'erdida
-de informaci\'on aceptable.
+\section{An\'alisis Previo}
+The analysis purpose is work whit a finite minimum representation for image
+pixels and kernel values. To that is necessary make a study about bits number for
+a god image representation.
 
-Los valores de los p\'ixeles \(I_{ij}\) se encuentran en el rango 0 a 255 . Con la normalizacion dynamic range expansion (referecia) se lo lleva al rango 0 a 1. Los valores del kernel \(K_{ij}\) pueden ser tanto positivos como negativos. Utilizando Maximum norm (referencia) se obtiene el m\'aximo valor absoluto y se divide los \(K_{ij}\) por este valor para llevar al kernel al rango -1 a 1 manteniendo su efecto. 
+Pixels values \(I_{ij}\) have a range from 0 to 255. We use normalization
+dynamic range expansion\cite{dinamic_rango} in ordet to get a new range from
+0 to 1. Kernel values \(K_{ij}\) can to be negative or positive. Thus We use
+Maximum norm\cite{max_norm} to get maximum absolute value then it 
+divide to every \(K_{ij}\) to achieve a new range from -1 to 1. So kernel
+effect is maintain. 
 
-Para poder operar los rangos anteriores en una representaci\'on de 8 bits se utiliza representac\'ion Signed Fixed Point(referencia) \(S(8,7)\). 
+We use Signed Fixed Point representation\cite{fix_p} \(S(8,7)\) in order to use
+previos ranges.
 
-La convoluci\'on de una imagen con un \(K^{3x3}\) resulta en una salida de 20 bits \(S(20,14)\). Entonces se realiza un post procesamiento donde se lleva el
-resultado a un rango positivo y truncamiento. Se establece una comparaci\'on a fines de decidir la cantidad de bits de salida del procesamiento. 
+Convolution of image whit a kernel  $\mathbb{K}^{3{\times}3}$ results in 20-bits
+output \(S(20,14)\). Hence we make post-processing. It come result value to
+positive range and truncate value. We compare both output post-processing and
+20-bits so that find a minimum bits amount and do not lose important data. 
 
-Se utiliza la relaci\'on SNR (referencia) de la operaci\'on a m\'axima resoluci\'on \(S(20,14)\) y el error pruducido al reducir la cantidad de bits \(e_r=f(x)_{20b}-f(x)_{pos}\). Una representacion \(S(13,8)\) tiene una SNR aprimada de \(30 [dB]\) que permite observar el efecto de la convolucion con una m\'inima perdida de informaci\'on recordando que nuestro objetivo no es no es representar una imagen en su totalidad.
+We use SNR measure between ouput 20-bits \(S(20,14)\) and error that results from
+reduce bits number \(e_r=f(x)_{20b}-f(x)_{pos}\)\cite{srntesis}. Representation
+\(S(13,8)\) has a approximate SNR \(30 [dB]\) that show filter effect whit minimum
+data loss. It is acceptable becouse the objet in no show a perfect image.
 
-Se puede llevar el rango final a 8 bits si se utiliza dynamic range expansion (referecia). Pero se requiere conocer el m\'aximo y el m\'inimo valor de p\'ixel de la imagen luego de filtrar, lo que implica que toda la imagen se encuentre en memoria.
+The values can come to a 8-bits representatio using dynamic range
+expansion\cite{dinamic_rango} but it se need to get  maximum and minimum
+number pixel value after convolution. So image should be in memory totally.
 
 \section{Design and implementation}
 
@@ -616,7 +630,7 @@ overwritten. So this $k-1$ columns will be reused as the first columns of the
 next batch, therefore the batch width is reduced to $N$, with the exception of
 the first batch that will still have a $N+k-1$ width.
 A consequence of reusing the memory columns written by the previous batch is
-that in every iteration the position of the memory columns asociated with each
+that in every iteration the position of the memory columns associated with each
 convolution unit describes a circular shift by $N$ places. From the above it
 follows that a periodicity in the relation between the memory columns and the
 convolution units inputs must exist, where the period $It$ is the number of
