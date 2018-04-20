@@ -458,7 +458,7 @@ Por una cuesti\'on de simplicidad, todo el trabajo se desarroll\'o utilizando
 imagenes en escala de grises, al tener estas un \'unico canal.
 
 
-\section{An\'alisis Previo}
+\section{An\'alisis Previo}\label{preproc}
 Este an\'alisis tiene por objeto el trabajar con una m\'inima representaci\'on finita para los p\'ixeles de la imagen y los valores del kernel. Para ello se necesita efectuar un estudio acerca de la cantidad de bits de resoluci\'on m\'inimos  con una p\'erdida
 de informaci\'on aceptable.
 
@@ -473,69 +473,65 @@ Se utiliza la relaci\'on SNR (referencia) de la operaci\'on a m\'axima resoluci\
 
 Se puede llevar el rango final a 8 bits si se utiliza dynamic range expansion (referecia). Pero se requiere conocer el m\'aximo y el m\'inimo valor de p\'ixel de la imagen luego de filtrar, lo que implica que toda la imagen se encuentre en memoria.
 
-\section{Arquitectura del sistema}
+\section{Design and implementation}
 
-\subsection{Flujo de trabajo}
-El flujo de trabajo consta de tres instancias como se observa en la figura
-\ref{fig_workflow}. En la primer instancia, se desarroll\'o un cliente en python
-donde se ingresa la imagen a procesar junto con los coeficientes del filtro que
-se desea aplicar, el filtro o kernel es una matriz que pertence al conjunto
-$\mathbb{R}^{3{\times}3}$. Toda la arquitectura del sistema ha sido dise\~nada
-para trabajar con filtros de esa dimensi\'on, aunque no deber\'ia ser dificil
-generalizarla a filtros de otras dimensiones.
+\subsection{Workflow}
+As shown in figure \ref{fig_workflow}, the workflow consists of three
+instances: first, in the PC a python script does the preprocessing 
+described in section \ref{preproc}, separates the image in batches and then sends the kernel's
+coefficients and the first batch through an UART connection to the FPGA. In the
+FPGA a microprocessor receives the information and communicates it to the
+convolution module using a 32 bits GPIO port. The batch is then convolved with
+the kernel inside the module. When the operation is finished a notification is
+sent to the microprocessor, which gives the order to retrieve the processed batch
+from the module and sends it to the PC and then waits for the next batch to arrive.
+
 \begin{figure}[!t]
 \centering
-\includegraphics[width=3in]{workflow.pdf}
-\caption{Flujo de trabajo del sistema y lenguajes en los que se trabaj\'o en
-  cada instancia.}
+\includegraphics[width=3in]{workflow}
+\caption{System's workflow and languages used in every instance}
 \label{fig_workflow}
 \end{figure}
-La informaci\'on es entonces separada en lotes, el cliente env\'ia un
-lote, espera a recibir el mismo procesado y luego env\'ia el lote siguiente.
 
-Un microprocesador instanciado en la FPGA es el encargado de recibir los lotes,
-hace un desempaquetado de los datos y adem\'as le a\~nade a los mismos una 
-cabecera necesaria para la comunicaci\'on con el m\'odulo de convoluci\'on.
-Asimismo una vez que el m\'odulo finaliz\'o el procesamiento, el microprocesador 
-toma esa informaci\'on procesada, la empaqueta y env\'ia nuevamente a la
-computadora.
+\subsection{Convolution Module}
+The module was designed with three objectives: fast pixel processing rate,
+efficient use of the memory and parallel processing scalability.
 
-El m\'odulo de convoluci\'on procesa el lote, internamente es el Bloque de
-Control (Control Block) quien hace de interfaz entre el resto del m\'odulo y el
-exterior. La porci\'on de la imagen es almacenada, los bloques de convoluci\'on
-(Conv) realizan la suma de los productos de los coeficientes del filtro con una
-secci\'on de la imagen igual al tama\~no del filtro, una vez que toda la
-porci\'on de la imagen fue procesada, se env\'ia el resultado y se espera a
-recibir una nueva porci\'on. Una maquina de estados finitos (FSM) lleva cuenta
-del ciclo de entrada$\rightarrow$procesamiento$\rightarrow$salida que ocurre en
-el m\'odulo.
+The module's architecture is shown in figure \textbf{REFERENCIAAIMAGENQUEFALTA},
+the \textbf{control unit} is the one in charge of handling the communication
+with the processor, in the \textbf{convolution unit} is where the sum of
+the products of the kernel's coefficients with the pixels happen, the
+\textbf{address generation unit (AGU)} manages the memory addresses, the
+\textbf{memory management unit (MMU)} manages how the values in memory must be
+read and written, and finally the \textbf{storage}, which is implemented with a
+set of columns of the FPGA's block RAM.
 
-\subsection{M\'odulo de convoluci\'on}
-En esta secci\'on se describe en detalle la arquitectura del m\'odulo de
-convoluci\'on.
+\subsubsection{States}
+It is possible to see that during the work cycle, the convolution module goes
+through several states, as shown in figure \ref{state}.
 
-\subsubsection{Estados}
-Durante todo el ciclo de trabajo, el m\'odulo atraviesa distintos estados como
-se aprecia en la figura \ref{state}. En primera instancia, est\'a en un estado
-inicial de \textbf{reset} esperando a ser configurado. Permanecer\'a en ese
-estado hasta recibir la intruccion para pasar al estado de \textbf{kernel load}
-(carga de kernel) donde se carga al m\'odulo el filtro que se desea aplicar. Una
-vez que se termina de cargar los coeficientes 
-del filtro, se espera la instrucci\'on para pasar a \textbf{size load} (carga
-de tama\~no), en este estado se debe informar al m\'odulo la altura de la
-imagen. Habiendo ocurrido la transici\'on al estado siguiente, no se retornar\'a
-a los estados previos hasta finalizar el procesamiento completo de la imagen.
-Al salir del estado de \textbf{size load} se pasa al de \textbf{image load}
-donde se carga una secci\'on de la imagen. Pasados estos tres estados se
-finaliza la etapa de carga. En la instacia siguiente el m\'odulo se encuentra en
-el estado de \textbf{run}. En este estado se realiza el procesamiento del lote
-de forma ininterrumpida, es decir, toda instrucci\'on ser\'a ignorada hasta
-finalizar el filtrado donde una se\~nal de aviso es emitida. Se espera entonces
-la instrucci\'on para pasar al estado \textbf{out}. Con el lote ya procesado y
-la intrucci\'on recibida se da inicio al env\'io de los datos filtrados. La
-sucesi\'on de los ultimos tres estados mensionados \textbf{image load}
-$\rightarrow$ \textbf{run} $\rightarrow$ \textbf{out} se repetir\'a por cada
-nuevo lote hasta obtener la imagen procesada en su totalidad.
+At the beginning the module must be in a \textbf{reset} state, waiting to be
+configured, to do so the most significant bit of the 32 bits input in the module
+must be set to high. The figure \textbf{FIGURABITS} shows the 32 bits input
+frame structure and the binary code for the instructions.
+
+The module will stay in the \textbf{reset} state until it receives the
+instruction to go to the \textbf{KernelLoad} state, in which state the kernel
+coefficients are loaded into the module. Then it goes to the \textbf{SizeLoad}
+state where the image's height is loaded, the need for this is explained in
+section \ref{infstorage}. Once the module has gone through this setup states it
+will not come back to them until the entire image is processed. Now the
+processing loop start, first the module goes to the \textbf{ImageLoad} state and
+saves in the memory the batch, then is goes to the \textbf{Run} state where the
+processing occurs, while in processing the module can not be interrupted, i.e.
+it will ignore all instructions till the batch is processed, as soon as the
+processing is ended a notification will be emitted through Control Block's
+\textit{EoP} pin and the module will wait the instruction to got to the
+\textbf{Out} state where the already processed batch is send back to the microprocessor.
+
+All this states logic is managed by the control unit, which depending on the
+state will communicate the corresponding control signal to the other components
+of the module.
 
 \begin{figure}[!t]
   \centering
@@ -546,27 +542,42 @@ nuevo lote hasta obtener la imagen procesada en su totalidad.
   \label{state}
 \end{figure}
 
-\subsubsection{Almacenamiento de la informaci\'on}
-El kernel o filtro que se quiere aplicar a la imagen es almacenado en registros de los bloques de convoluci\'on. Con
-respecto a la imagen, se opt\'o por ordenar la memoria en columnas, donde cada
-columna almacena una columna de pixels. Queda entonces como una limitaci\'on la
-altura m\'axima de la imagen dada por el n\'umero m\'aximo de pixels que es
-posible almacenar en una columna de memoria.
+\subsubsection{Data storage}\label{infstorage}
+The kernel coefficients are stored in registers inside each convolution unit. In
+order to store a batch, the proposed approach is to arrange the block RAM memory
+in columns, where each of them will store a image's pixel column. Therefore a
+batch size is given by the height of the image and the number of memory columns,
+also the maximum height of the image will be restricted by the number of entries
+that each memory columns has.
 
-El lote ya procesado es almacenado sobreescribiendo los datos que se utilizaron
-para producirlo, es decir, se utiliza la misma memoria tanto para los datos de
-entrada como los de salida.
+During a batch processing, every pixel is read only once, so in order to do a
+more efficient use of the memory, the pixels that were already used are
+overwritten with processed pixels. This approach reduces drastically the amount
+of memory needed because it reuses the same memory to store the input batch and the
+processed batch. In the section \ref{dataproc} additional aspects of the design
+that reduces even more the memory use and the MMU are explained.
 
-\subsubsection{Procesamiento de la informaci\'on}
-Cada bloque de convoluci\'on toma los valores de tres (o $k$, para un filtro que
-pertence a $\mathbb{R}^{k{\times}k}$) columnas adyacentes. Comienza cargando los
-tres primeros valores de cada columna en sus registros, realiza la suma del
-producto con los coeficientes del filtro, y hace un 
-desplazamiento de los registros con los valores de la imagen, de forma que se
-descarten los valores mas antiguos de cada columna, y se cargue un nuevo valor
-por columna, como en una estructura FIFO (first in, first out). Como muestra
-la figura \ref{proc_conv}, esto es equivalente a ubicar el filtro sobre tres
-columnas de la imagen y desplazarlo verticalemente.
+\subsubsection{Data processing}\label{dataproc}
+Given a $k\times k$ kernel, each convolution unit takes $k$ adjacent memory columns as
+input. To produce the first processed pixel, a convolution unit first needs to
+load $k$ pixels from each columns in such a way as to have $k\times
+k$ pixels loaded into it, then proceeds to multiply the pixels with the kernel's
+coefficients and sum everything. Finally, it truncates the result to reduce the
+bit length and the result is saved into the first position of the memory.
+
+Once a pixel is processed, it is saved into the memory while the convolution unit
+shifts its image register, discarding the oldest $k$ pixels and loading new $k$
+pixels, i.e. one from each input column, like a FIFO structure. As shown in
+figure \ref{proc_conv}, this procedure is equivalent to shit the kernel
+vertically on the image. All this procedure is synchronized in such a way that
+one processed pixel is generated in every clock cycle.
+
+The AGU manages the memory's read and write address, it takes into account the
+latency between the clock cycle where the first pixel in the memory is read and
+the clock cycle where the first processed pixel is written in memory. This latency is
+equal to $k$ plus some more clock cycles needed to latch values during the
+convolution, and the difference between the read address and the write address
+must be equal to it.
 
 \begin{figure}[!t]
 \centering
@@ -578,17 +589,153 @@ sido cargados, produciendo un efecto de desplazamiento hacia abajo.}
 \label{proc_conv}
 \end{figure}
 
-Luego de analizar distintas alternativas, se decidi\'o que los bloques de
-convoluci\'on que se tienen trabajando en paralelo produzcan columnas procesadas
-contiguas, es decir, que el bloque de convoluci\'on 1 produzca la primer
-columna del lote, el bloque 2 la segunda y asi sucesivamente. Una de las
-razones por la que se tomo esta decisi\'on es la naturaleza de la operaci\'on de
-la convoluci\'on: se necesitan $k$ columnas de imagen para generar una columna procesada, para generar la
-columna contigua es necesario desplazarse un lugar en la imagen de entrada,
-por lo que existe unicamente una columna de diferencia en la entrada de dos
-bloques que generan dos columnas adyacentes. Esta superposici\'on en la entrada implica una
-reduccion del n\'umero de columnas necesarias de $k \cdot N$ a $N+k-1$ para N
-bloques de convoluci\'on si estos generan columnas adyacentes.
+Until this point the analysis was over a single convolution unit, now the
+approach to work with multiple convolution units working in parallel is
+described.
+
+As mentioned above, $k$ columns are needed as input to produce one processed
+column in a convolution unit, that means that $2k$ columns are needed for two
+convolution units, however given the nature of the convolution operation, to
+produce a contiguous column it is necessary to shift the input columns by one.
+Hence, there is an overlap between the two inputs and this produces that even that $k$ input columns are still needed per convolution unit, only
+$k+1$ different input columns are needed. For that reason, it was decided that
+multiple convolution units in parallel will produce contiguous processed
+columns, sharing the common input columns. With this approach, for $N$
+convolution units the number of memory columns needed gets reduced from $N\cdot
+k$ to $N+k-1$.
+
+\textbf{IMAGEN DE OVERLAP}
+
+The same overlap explained above produces also that repeated data will be needed
+between one batch and the next one. In order to eliminate the need to send data
+that already is in the memory, and algorithm was designed. Given $N$ convolution
+units and a $k\times k$ kernel, a $N+k-1$ width batch is needed, but the
+processed batch has a width of $N$ ,i.e. one for each convolution unit, this
+leaves the last $k-1$ memory columns with the input data, because they weren't
+overwritten. So this $k-1$ columns will be reused as the first columns of the
+next batch, therefore the batch width is reduced to $N$, with the exception of
+the first batch that will still have a $N+k-1$ width.
+A consequence of reusing the memory columns written by the previous batch is
+that in every iteration the position of the memory columns asociated with each
+convolution unit describes a circular shift by $N$ places. From the above it
+follows that a periodicity in the relation between the memory columns and the
+convolution units inputs must exist, where the period $It$ is the number of
+iterations necessary to get to the original memory columns - convolution units
+inputs relation, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
+must be an integer $m$ such that 
+
+\begin{equation}\label{niter}
+  \frac{It}{m} = \frac{N}{k-1} + 1
+\end{equation}
+
+%\section{Arquitectura del sistema}
+%
+%\subsection{Flujo de trabajo}
+%El flujo de trabajo consta de tres instancias como se observa en la figura
+%\ref{fig_workflow}. En la primer instancia, se desarroll\'o un cliente en python
+%donde se ingresa la imagen a procesar junto con los coeficientes del filtro que
+%se desea aplicar, el filtro o kernel es una matriz que pertence al conjunto
+%$\mathbb{R}^{3{\times}3}$. Toda la arquitectura del sistema ha sido dise\~nada
+%para trabajar con filtros de esa dimensi\'on, aunque no deber\'ia ser dificil
+%generalizarla a filtros de otras dimensiones.
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=3in]{workflow.pdf}
+%\caption{Flujo de trabajo del sistema y lenguajes en los que se trabaj\'o en
+%  cada instancia.}
+%\label{fig_workflow}
+%\end{figure}
+%La informaci\'on es entonces separada en lotes, el cliente env\'ia un
+%lote, espera a recibir el mismo procesado y luego env\'ia el lote siguiente.
+%
+%Un microprocesador instanciado en la FPGA es el encargado de recibir los lotes,
+%hace un desempaquetado de los datos y adem\'as le a\~nade a los mismos una 
+%cabecera necesaria para la comunicaci\'on con el m\'odulo de convoluci\'on.
+%Asimismo una vez que el m\'odulo finaliz\'o el procesamiento, el microprocesador 
+%toma esa informaci\'on procesada, la empaqueta y env\'ia nuevamente a la
+%computadora.
+%
+%El m\'odulo de convoluci\'on procesa el lote, internamente es el Bloque de
+%Control (Control Block) quien hace de interfaz entre el resto del m\'odulo y el
+%exterior. La porci\'on de la imagen es almacenada, los bloques de convoluci\'on
+%(Conv) realizan la suma de los productos de los coeficientes del filtro con una
+%secci\'on de la imagen igual al tama\~no del filtro, una vez que toda la
+%porci\'on de la imagen fue procesada, se env\'ia el resultado y se espera a
+%recibir una nueva porci\'on. Una maquina de estados finitos (FSM) lleva cuenta
+%del ciclo de entrada$\rightarrow$procesamiento$\rightarrow$salida que ocurre en
+%el m\'odulo.
+%
+%\subsection{M\'odulo de convoluci\'on}
+%En esta secci\'on se describe en detalle la arquitectura del m\'odulo de
+%convoluci\'on.
+%
+%\subsubsection{Estados}
+%Durante todo el ciclo de trabajo, el m\'odulo atraviesa distintos estados como
+%se aprecia en la figura \ref{state}. En primera instancia, est\'a en un estado
+%inicial de \textbf{reset} esperando a ser configurado. Permanecer\'a en ese
+%estado hasta recibir la intruccion para pasar al estado de \textbf{kernel load}
+%(carga de kernel) donde se carga al m\'odulo el filtro que se desea aplicar. Una
+%vez que se termina de cargar los coeficientes 
+%del filtro, se espera la instrucci\'on para pasar a \textbf{size load} (carga
+%de tama\~no), en este estado se debe informar al m\'odulo la altura de la
+%imagen. Habiendo ocurrido la transici\'on al estado siguiente, no se retornar\'a
+%a los estados previos hasta finalizar el procesamiento completo de la imagen.
+%Al salir del estado de \textbf{size load} se pasa al de \textbf{image load}
+%donde se carga una secci\'on de la imagen. Pasados estos tres estados se
+%finaliza la etapa de carga. En la instacia siguiente el m\'odulo se encuentra en
+%el estado de \textbf{run}. En este estado se realiza el procesamiento del lote
+%de forma ininterrumpida, es decir, toda instrucci\'on ser\'a ignorada hasta
+%finalizar el filtrado donde una se\~nal de aviso es emitida. Se espera entonces
+%la instrucci\'on para pasar al estado \textbf{out}. Con el lote ya procesado y
+%la intrucci\'on recibida se da inicio al env\'io de los datos filtrados. La
+%sucesi\'on de los ultimos tres estados mensionados \textbf{image load}
+%$\rightarrow$ \textbf{run} $\rightarrow$ \textbf{out} se repetir\'a por cada
+%nuevo lote hasta obtener la imagen procesada en su totalidad.
+%
+%
+%\subsubsection{Almacenamiento de la informaci\'on}
+%El kernel o filtro que se quiere aplicar a la imagen es almacenado en registros de los bloques de convoluci\'on. Con
+%respecto a la imagen, se opt\'o por ordenar la memoria en columnas, donde cada
+%columna almacena una columna de pixels. Queda entonces como una limitaci\'on la
+%altura m\'axima de la imagen dada por el n\'umero m\'aximo de pixels que es
+%posible almacenar en una columna de memoria.
+%
+%El lote ya procesado es almacenado sobreescribiendo los datos que se utilizaron
+%para producirlo, es decir, se utiliza la misma memoria tanto para los datos de
+%entrada como los de salida.
+%
+%\subsubsection{Procesamiento de la informaci\'on}
+%Cada bloque de convoluci\'on toma los valores de tres (o $k$, para un filtro que
+%pertence a $\mathbb{R}^{k{\times}k}$) columnas adyacentes. Comienza cargando los
+%tres primeros valores de cada columna en sus registros, realiza la suma del
+%producto con los coeficientes del filtro, y hace un 
+%desplazamiento de los registros con los valores de la imagen, de forma que se
+%descarten los valores mas antiguos de cada columna, y se cargue un nuevo valor
+%por columna, como en una estructura FIFO (first in, first out). Como muestra
+%la figura \ref{proc_conv}, esto es equivalente a ubicar el filtro sobre tres
+%columnas de la imagen y desplazarlo verticalemente.
+%
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=2.5in]{proc_conv.pdf}
+%\caption{En gris se observan los datos que han sido cargados a los registros del
+%bloque de convoluci\'on, en el ciclo siguiente es posible ver como los valores
+%de cada columna que ingresaron primero han sido decartados, y nuevos valores han
+%sido cargados, produciendo un efecto de desplazamiento hacia abajo.}
+%\label{proc_conv}
+%\end{figure}
+%
+%Luego de analizar distintas alternativas, se decidi\'o que los bloques de
+%convoluci\'on que se tienen trabajando en paralelo produzcan columnas procesadas
+%contiguas, es decir, que el bloque de convoluci\'on 1 produzca la primer
+%columna del lote, el bloque 2 la segunda y asi sucesivamente. Una de las
+%razones por la que se tomo esta decisi\'on es la naturaleza de la operaci\'on de
+%la convoluci\'on: se necesitan $k$ columnas de imagen para generar una columna procesada, para generar la
+%columna contigua es necesario desplazarse un lugar en la imagen de entrada,
+%por lo que existe unicamente una columna de diferencia en la entrada de dos
+%bloques que generan dos columnas adyacentes. Esta superposici\'on en la entrada implica una
+%reduccion del n\'umero de columnas necesarias de $k \cdot N$ a $N+k-1$ para N
+%bloques de convoluci\'on si estos generan columnas adyacentes.
 
 
 % An example of a floating figure using the graphicx package.
