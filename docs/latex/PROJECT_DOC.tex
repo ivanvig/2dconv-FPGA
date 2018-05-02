@@ -539,7 +539,7 @@ processing loop start, first the module goes to the \textbf{ImageLoad} state and
 saves in the memory the batch, then is goes to the \textbf{Run} state where the
 processing occurs, while in processing the module can not be interrupted, i.e.
 it will ignore all instructions till the batch is processed, as soon as the
-processing is ended a notification will be emitted through Control Block's
+processing is ended a notification will be emitted through Control Unit's
 \textit{EoP} pin and the module will wait the instruction to got to the
 \textbf{Out} state where the already processed batch is send back to the microprocessor.
 
@@ -569,7 +569,7 @@ more efficient use of the memory, the pixels that were already used are
 overwritten with processed pixels. This approach reduces drastically the amount
 of memory needed because it reuses the same memory to store the input batch and the
 processed batch. In the section \ref{dataproc} additional aspects of the design
-that reduces even more the memory use and the MMU are explained.
+that reduces even more the memory use are explained.
 
 \subsubsection{Data processing}\label{dataproc}
 Given a $k\times k$ kernel, each convolution unit takes $k$ adjacent memory columns as
@@ -622,18 +622,19 @@ k$ to $N+k-1$.
 
 The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
-that already is in the memory, and algorithm was designed. Given $N$ convolution
-units and a $k\times k$ kernel, a $N+k-1$ width batch is needed, but the
-processed batch has a width of $N$ ,i.e. one for each convolution unit, this
-leaves the last $k-1$ memory columns with the input data, because they weren't
-overwritten. So this $k-1$ columns will be reused as the first columns of the
-next batch, therefore the batch width is reduced to $N$, with the exception of
+that already is in the memory, an algorithm was designed. Given $N$ convolution
+units and a $k\times k$ kernel, a $N+k-1$ batch width is needed, but the
+processed batch has a width of $N$ columns, i.e. one for each convolution unit,
+therefore the last $k-1$ memory columns are not overwritten and maintain the
+input data. This $k-1$ columns will be reused as the first columns of the 
+next batch, thus the batch width is reduced to $N$, with the exception of
 the first batch that will still have a $N+k-1$ width.
+
 A consequence of reusing the memory columns written by the previous batch is
 that in every iteration the position of the memory columns associated with each
 convolution unit describes a circular shift by $N$ places. From the above it
 follows that a periodicity in the relation between the memory columns and the
-convolution units inputs must exist, where the period $It$ is the number of
+convolution units' inputs must exist, where the period $It$ is the number of
 iterations necessary to get to the original memory columns - convolution units
 inputs relation, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
 must be an integer $m$ such that 
@@ -641,6 +642,11 @@ must be an integer $m$ such that
 \begin{equation}\label{niter}
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
+
+\textbf{AGREGAR CUADRITO DE ALGORITMO CON CARGA, PROCESAMIENTO Y SALIDA}
+The algorithm is implemented in the MMU, which serves as an interface between
+the memories and the rest of the components, keeping them independent from the
+level of parallelism and the iteration number.
 
 %\section{Arquitectura del sistema}
 %
