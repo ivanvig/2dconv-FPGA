@@ -416,7 +416,12 @@
 
 
 
-\section{Introducci\'on}
+\section{Introduction}
+The 2D discrete convolution is an operation widely used in multiple engineering
+fields, in particular, it is one of the main operation in computer vision and
+image processing. Recently the convolutional neural networks
+(CNN)\cite{Lecun-et-al-1998} have dominated the field, hence a fast and
+efficient convolution implementation is important. 
 La convoluci\'on bidimensional discreta es ampliamente usada en múltiples campos de la
 ingenieria, siendo uno de ellos la visi\'on artificial que ha tomado fuerza en la
 ultima d\'ecada con los resultados obtenidos con las redes neuronales
@@ -458,7 +463,7 @@ Por una cuesti\'on de simplicidad, todo el trabajo se desarroll\'o utilizando
 imagenes en escala de grises, al tener estas un \'unico canal.
 
 
-\section{An\'alisis Previo}
+\section{An\'alisis Previo}\label{preproc}
 The analysis purpose is work whit a finite minimum representation for image
 pixels and kernel values. To that is necessary make a study about bits number for
 a god image representation.
@@ -490,7 +495,7 @@ number pixel value after convolution. So image should be in memory totally.
 \section{Design and implementation}
 
 \subsection{Workflow}
-As shown in figure \ref{fig_workflow}, the workflow consists of three
+As shown in Fig. \ref{fig_workflow}, the workflow consists of three
 instances: first, in the PC a python script does the preprocessing 
 described in section \ref{preproc}, separates the image in batches and then sends the kernel's
 coefficients and the first batch through an UART connection to the FPGA. In the
@@ -511,7 +516,7 @@ from the module and sends it to the PC and then waits for the next batch to arri
 The module was designed with three objectives: fast pixel processing rate,
 efficient use of the memory and parallel processing scalability.
 
-The module's architecture is shown in figure \textbf{REFERENCIAAIMAGENQUEFALTA},
+A simplified architecture of the module is shown in Fig. \ref{general},
 the \textbf{control unit} is the one in charge of handling the communication
 with the processor, in the \textbf{convolution unit} is where the sum of
 the products of the kernel's coefficients with the pixels happen, the
@@ -520,13 +525,20 @@ the products of the kernel's coefficients with the pixels happen, the
 read and written, and finally the \textbf{storage}, which is implemented with a
 set of columns of the FPGA's block RAM.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{general.pdf}
+\caption{Simplified block diagram of the convolution module.}
+\label{general}
+\end{figure}
+
 \subsubsection{States}
 It is possible to see that during the work cycle, the convolution module goes
-through several states, as shown in figure \ref{state}.
+through several states, as shown in Fig. \ref{state}.
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
 configured, to do so the most significant bit of the 32 bits input in the module
-must be set to high. The figure \textbf{FIGURABITS} shows the 32 bits input
+must be set to high. The Fig. \textbf{FIGURABITS} shows the 32 bits input
 frame structure and the binary code for the instructions.
 
 The module will stay in the \textbf{reset} state until it receives the
@@ -582,7 +594,7 @@ bit length and the result is saved into the first position of the memory.
 Once a pixel is processed, it is saved into the memory while the convolution unit
 shifts its image register, discarding the oldest $k$ pixels and loading new $k$
 pixels, i.e. one from each input column, like a FIFO structure. As shown in
-figure \ref{proc_conv}, this procedure is equivalent to shit the kernel
+Fig. \ref{proc_conv}, this procedure is equivalent to shit the kernel
 vertically on the image. All this procedure is synchronized in such a way that
 one processed pixel is generated in every clock cycle.
 
