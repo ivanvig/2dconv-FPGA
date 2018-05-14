@@ -626,17 +626,15 @@ column in a convolution unit, that means that $2k$ columns are needed for two
 convolution units, however given the nature of the convolution operation, to
 produce a contiguous column it is necessary to shift the input columns by one.
 Hence, there is an overlap between the two inputs and this produces that even that $k$ input columns are still needed per convolution unit, only
-$k+1$ different input columns are needed. For that reason, it was decided that
+$k+1$ different input columns are needed for all the units. For that reason, it was decided that
 multiple convolution units in parallel will produce contiguous processed
 columns, sharing the common input columns. With this approach, for $N$
 convolution units the number of memory columns needed gets reduced from $N\cdot
 k$ to $N+k-1$.
 
-\textbf{IMAGEN DE OVERLAP}
-
 The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
-that already is in the memory, an algorithm was designed. Given $N$ convolution
+that already is in the memory, some data is reused between iterations. Given $N$ convolution
 units and a $k\times k$ kernel, a $N+k-1$ batch width is needed, but the
 processed batch has a width of $N$ columns, i.e. one for each convolution unit,
 therefore the last $k-1$ memory columns are not overwritten and maintain the
@@ -657,10 +655,20 @@ must be an integer $m$ such that
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
 
-\textbf{AGREGAR CUADRITO DE ALGORITMO CON CARGA, PROCESAMIENTO Y SALIDA}
-The algorithm is implemented in the MMU, which serves as an interface between
+This logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
 parallelism degree and the iteration number.
+
+The MMU keeps track of the memory
+positions where it must save the input batch, the information which must feed
+to every convolution unit, the memory position where the processed data must be
+stored and the order in which the processed data must be returned, for each iteration.
+To do so, it has a finite state machine where each state corresponds to a set of
+positions named above. The number of states is given by eq. \ref{niter}.
+
+To route the incoming and outgoing data, the MMU has a set of multiplexers whose
+select lines are managed by the finite state machine (Data multiplexer and FSM
+in Fig. \ref{general}).
 
 %\section{Arquitectura del sistema}
 %
