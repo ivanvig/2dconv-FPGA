@@ -418,38 +418,47 @@
 
 \section{Introduction}
 
-Existen diferentes tipos de arquitecturas para realizar la convolucion 2D en una FPGA, pero 
-muchas de ellas referencia no se no tiene en cuenta el uso de la memoria. 
-
-En \cite{paper1} platea una arqutecura paralelizable, posee una tasa de 221 MP/s pero no tiene en cuenta las limitaciones de memoria. El kenel no es configurable.
-
-En \cite{paper2} realiza un preprocemiento, posprocesamiento y una carga de la imagen por lotes desde
-una PC. Sin embargo se obtiene un restultado cada 9 ciclos de reloj.
-
-En \cite{paper3} se enfoca en el uso eficiente de la energia. Anque esta limitado a una imagen NxN y almacenada en memoria de la placa, esto utiliza el 90\% de los recursos.
-
-En \cite{paper4} al igual que \cite{paper2} se procesa y se carga la imagen por lotes. Pero la
-cantidad de pixeles procesados por segundo es relativamente baja con respecto a \cite{paper2}.
-
-En \cite{paper5} similar a \cite{paper4}, con resutlados cada 9 ciclos de reloj y no se tiene en cuenta el uso de memoria.
- 
-Nosotros proponemos una arquitectura que permita la configuracion del kernel, 
-haga un uso eficiente de memoria, tenga un high throughput , sea paralelizable y escalable.
-
-\section{Convolucion}
 The 2D discrete convolution is an operation widely used in multiple engineering
 fields, in particular, it is one of the main operation in computer vision and
 image processing. Recently the convolutional neural networks
 (CNN)\cite{Lecun-et-al-1998} have dominated the field, hence a fast and
 efficient convolution implementation is important.
 
+There are different architectures to do a convolution in a FPGA, but most of them
+ignore the FPGA's memory limitation, the ones who take it into account like
+\cite{paper3} waste lots of resources to store the entire image. Another
+approach is to work with batches like \cite{paper2} and \cite{paper4} which is the
+approach we adopt.
 
-La convoluci\'on bidimensional discreta es ampliamente usada en múltiples campos de la
-ingenieria, siendo uno de ellos la visi\'on artificial que ha tomado fuerza en la
-ultima d\'ecada con los resultados obtenidos con las redes neuronales
-convolucionales. El creciente tama\~no en los modelos, como tambien en la
-informacion disponible para el entrenamiento hacen de la velocidad de
-procesamiento un factor de gran importancia.
+Other important aspect is the pixel processing rate, the architectures in \cite{paper2} and
+\cite{paper5} take 9 clock cycles to produce a processed pixel, \cite{paper1}
+achieves a speed up to 221MP/sec but has a fixed kernel and does not take into
+account the memory limitations.
+
+In this paper, we propose a high throughput, parallelizable, memory efficient
+hardware architecture with customizable kernel that can achieve up to 2.4GP/sec in pixel processing rate
+and 135MP/sec if the load and output stage are taken into account.
+
+%Existen diferentes tipos de arquitecturas para realizar la convolucion 2D en una FPGA, pero 
+%muchas de ellas referencia no se no tiene en cuenta el uso de la memoria. 
+%
+%En \cite{paper1} platea una arqutecura paralelizable, posee una tasa de 221 MP/s pero no tiene en cuenta las limitaciones de memoria. El kenel no es configurable.
+%
+%En \cite{paper2} realiza un preprocemiento, posprocesamiento y una carga de la imagen por lotes desde
+%una PC. Sin embargo se obtiene un restultado cada 9 ciclos de reloj.
+%
+%En \cite{paper3} se enfoca en el uso eficiente de la energia. Anque esta limitado a una imagen NxN y almacenada en memoria de la placa, esto utiliza el 90\% de los recursos.
+%
+%En \cite{paper4} al igual que \cite{paper2} se procesa y se carga la imagen por lotes. Pero la
+%cantidad de pixeles procesados por segundo es relativamente baja con respecto a \cite{paper2}.
+%
+%En \cite{paper5} similar a \cite{paper4}, con resutlados cada 9 ciclos de reloj y no se tiene en cuenta el uso de memoria.
+% 
+%Nosotros proponemos una arquitectura que permita la configuracion del kernel, 
+%haga un uso eficiente de memoria, tenga un high throughput , sea paralelizable y escalable.
+
+\section{Convolucion}
+
 
 Por la naturaleza de los datos y de la operaci\'on de la convoluci\'on, un enfoque
 paralelo resulta mucho m\'as eficiente que uno secuencial en lo que a velocidad de
@@ -464,9 +473,9 @@ ecuaci\'on:
 S(x,y) = \sum_{i} \sum_{j}I(x-i,y-j)K(i, j)
 \end{equation}
 
-Al no ser necesaria la propiedad de conmutatividad en este caso, es posible
-eliminar el proceso de espejar una de las matrices\cite{Goodfellow-et-al-2016} ,
-obteniendo la funci\'on de correlacion cruzada
+Siguiendo la tendencia actual en la comunidad de deep learning de no
+espejar el filtro, pues este debe ser aprendido de todas formas
+\cite{Goodfellow-et-al-2016}, se obteniendo la funci\'on de correlacion cruzada
 
 \begin{equation}\label{conv}
 S(x,y) = \sum_{i} \sum_{j}I(x+i,y+j)K(i, j)
@@ -475,11 +484,6 @@ S(x,y) = \sum_{i} \sum_{j}I(x+i,y+j)K(i, j)
 la cual ser\'a en realidad  implementada, por lo que en lo que resta
 del art\'iculo, cada vez que se nombre a la operaci\'on de convoluci\'on,
 se estar\'a haciendo referencia a la ecuaci\'on \ref{conv}.
-
-Uno de los mayores desaf\'ios fue trabajar con memoria RAM lo suficientemente
-escaza que no fuera capaz de alojar todos los pixels de la imagen que se desea
-procesar. Por lo que la im\'agen debe ser fraccionada y procesada en lotes, con
-todo el procesamiento adicional que esto implica.
 
 Por una cuesti\'on de simplicidad, todo el trabajo se desarroll\'o utilizando
 imagenes en escala de grises, al tener estas un \'unico canal.
@@ -517,7 +521,8 @@ number pixel value after convolution. So image should be in memory totally.
 \section{Design and implementation}
 
 \subsection{Workflow}
-As shown in Fig. \ref{fig_workflow}, the workflow consists of three
+%As shown in Fig. \ref{fig_workflow}, the workflow consists of three
+The workflow consists of three
 instances: first, in the PC a python script does the preprocessing 
 described in section \ref{preproc}, separates the image in batches and then sends the kernel's
 coefficients and the first batch through an UART connection to the FPGA. In the
@@ -527,17 +532,14 @@ the kernel inside the module. When the operation is finished a notification is
 sent to the microprocessor, which gives the order to retrieve the processed batch
 from the module and sends it to the PC and then waits for the next batch to arrive.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=3in]{workflow}
-\caption{System's workflow and languages used in every instance}
-\label{fig_workflow}
-\end{figure}
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=3in]{workflow}
+%\caption{System's workflow and languages used in every instance}
+%\label{fig_workflow}
+%\end{figure}
 
 \subsection{Convolution Module}
-The module was designed with three objectives: fast pixel processing rate,
-efficient use of the memory and parallel processing scalability.
-
 A simplified architecture of the module is shown in Fig. \ref{general},
 the \textbf{control unit} is the one in charge of handling the communication
 with the processor, in the \textbf{convolution unit} is where the sum of
@@ -549,7 +551,7 @@ set of columns of the FPGA's block RAM.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=2.5in]{general.pdf}
+\includegraphics[width=3in]{general.pdf}
 \caption{Simplified block diagram of the convolution module.}
 \label{general}
 \end{figure}
@@ -602,7 +604,7 @@ During a batch processing, every pixel is read only once, so in order to do a
 more efficient use of the memory, the pixels that were already used are
 overwritten with processed pixels. This approach reduces drastically the amount
 of memory needed because it reuses the same memory to store the input batch and the
-processed batch. In the section \ref{dataproc} additional aspects of the design
+processed batch. In section \ref{dataproc} additional aspects of the design
 that reduces even more the memory use are explained.
 
 \subsubsection{Data processing}\label{dataproc}
@@ -615,9 +617,9 @@ bit length and the result is saved into the first position of the memory.
 
 Once a pixel is processed, it is saved into the memory while the convolution unit
 shifts its image register, discarding the oldest $k$ pixels and loading new $k$
-pixels, i.e. one from each input column, like a FIFO structure. As shown in
-Fig. \ref{proc_conv}, this procedure is equivalent to shit the kernel
-vertically on the image. All this procedure is synchronized in such a way that
+pixels, i.e. one from each input column, like a FIFO structure.
+% As shown in Fig. \ref{proc_conv},
+This procedure is equivalent to shit the kernel vertically on the image. All this steps are synchronized in such a way that
 one processed pixel is generated in every clock cycle.
 
 The AGU manages the memory's read and write address, it takes into account the
@@ -627,15 +629,15 @@ equal to $k$ plus some more clock cycles needed to latch values during the
 convolution, and the difference between the read address and the write address
 must be equal to it.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=2.5in]{proc_conv.pdf}
-\caption{En gris se observan los datos que han sido cargados a los registros del
-bloque de convoluci\'on, en el ciclo siguiente es posible ver como los valores
-de cada columna que ingresaron primero han sido decartados, y nuevos valores han
-sido cargados, produciendo un efecto de desplazamiento hacia abajo.}
-\label{proc_conv}
-\end{figure}
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=2.5in]{proc_conv.pdf}
+%\caption{En gris se observan los datos que han sido cargados a los registros del
+%bloque de convoluci\'on, en el ciclo siguiente es posible ver como los valores
+%de cada columna que ingresaron primero han sido decartados, y nuevos valores han
+%sido cargados, produciendo un efecto de desplazamiento hacia abajo.}
+%\label{proc_conv}
+%\end{figure}
 
 Until this point the analysis was over a single convolution unit, now the
 approach to work with multiple convolution units working in parallel is
@@ -675,7 +677,26 @@ must be an integer $m$ such that
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
 
-This logic is implemented in the MMU, which serves as an interface between
+Figure \ref{algorithm} shows how the memories are written using this logic.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3in]{algorithm}
+\caption{Memory writing process using circular shift for $N = 4$ and $k = 3$.}
+\label{algorithm}
+\end{figure}
+
+\begin{figure*}[!t]
+\centering
+\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{mem_space}%
+\label{mem}}
+\hfil
+\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{data_sent}%
+\label{transmitted}}
+\caption{Comparison between different approaches.}
+\label{comp}
+\end{figure*}
+The logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
 parallelism degree and the iteration number.
 
@@ -690,114 +711,26 @@ To route the incoming and outgoing data, the MMU has a set of multiplexers whose
 select lines are managed by the finite state machine (Data multiplexer and FSM
 in Fig. \ref{general}).
 
-%\section{Arquitectura del sistema}
-%
-%\subsection{Flujo de trabajo}
-%El flujo de trabajo consta de tres instancias como se observa en la figura
-%\ref{fig_workflow}. En la primer instancia, se desarroll\'o un cliente en python
-%donde se ingresa la imagen a procesar junto con los coeficientes del filtro que
-%se desea aplicar, el filtro o kernel es una matriz que pertence al conjunto
-%$\mathbb{R}^{3{\times}3}$. Toda la arquitectura del sistema ha sido dise\~nada
-%para trabajar con filtros de esa dimensi\'on, aunque no deber\'ia ser dificil
-%generalizarla a filtros de otras dimensiones.
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=3in]{workflow.pdf}
-%\caption{Flujo de trabajo del sistema y lenguajes en los que se trabaj\'o en
-%  cada instancia.}
-%\label{fig_workflow}
-%\end{figure}
-%La informaci\'on es entonces separada en lotes, el cliente env\'ia un
-%lote, espera a recibir el mismo procesado y luego env\'ia el lote siguiente.
-%
-%Un microprocesador instanciado en la FPGA es el encargado de recibir los lotes,
-%hace un desempaquetado de los datos y adem\'as le a\~nade a los mismos una 
-%cabecera necesaria para la comunicaci\'on con el m\'odulo de convoluci\'on.
-%Asimismo una vez que el m\'odulo finaliz\'o el procesamiento, el microprocesador 
-%toma esa informaci\'on procesada, la empaqueta y env\'ia nuevamente a la
-%computadora.
-%
-%El m\'odulo de convoluci\'on procesa el lote, internamente es el Bloque de
-%Control (Control Block) quien hace de interfaz entre el resto del m\'odulo y el
-%exterior. La porci\'on de la imagen es almacenada, los bloques de convoluci\'on
-%(Conv) realizan la suma de los productos de los coeficientes del filtro con una
-%secci\'on de la imagen igual al tama\~no del filtro, una vez que toda la
-%porci\'on de la imagen fue procesada, se env\'ia el resultado y se espera a
-%recibir una nueva porci\'on. Una maquina de estados finitos (FSM) lleva cuenta
-%del ciclo de entrada$\rightarrow$procesamiento$\rightarrow$salida que ocurre en
-%el m\'odulo.
-%
-%\subsection{M\'odulo de convoluci\'on}
-%En esta secci\'on se describe en detalle la arquitectura del m\'odulo de
-%convoluci\'on.
-%
-%\subsubsection{Estados}
-%Durante todo el ciclo de trabajo, el m\'odulo atraviesa distintos estados como
-%se aprecia en la figura \ref{state}. En primera instancia, est\'a en un estado
-%inicial de \textbf{reset} esperando a ser configurado. Permanecer\'a en ese
-%estado hasta recibir la intruccion para pasar al estado de \textbf{kernel load}
-%(carga de kernel) donde se carga al m\'odulo el filtro que se desea aplicar. Una
-%vez que se termina de cargar los coeficientes 
-%del filtro, se espera la instrucci\'on para pasar a \textbf{size load} (carga
-%de tama\~no), en este estado se debe informar al m\'odulo la altura de la
-%imagen. Habiendo ocurrido la transici\'on al estado siguiente, no se retornar\'a
-%a los estados previos hasta finalizar el procesamiento completo de la imagen.
-%Al salir del estado de \textbf{size load} se pasa al de \textbf{image load}
-%donde se carga una secci\'on de la imagen. Pasados estos tres estados se
-%finaliza la etapa de carga. En la instacia siguiente el m\'odulo se encuentra en
-%el estado de \textbf{run}. En este estado se realiza el procesamiento del lote
-%de forma ininterrumpida, es decir, toda instrucci\'on ser\'a ignorada hasta
-%finalizar el filtrado donde una se\~nal de aviso es emitida. Se espera entonces
-%la instrucci\'on para pasar al estado \textbf{out}. Con el lote ya procesado y
-%la intrucci\'on recibida se da inicio al env\'io de los datos filtrados. La
-%sucesi\'on de los ultimos tres estados mensionados \textbf{image load}
-%$\rightarrow$ \textbf{run} $\rightarrow$ \textbf{out} se repetir\'a por cada
-%nuevo lote hasta obtener la imagen procesada en su totalidad.
-%
-%
-%\subsubsection{Almacenamiento de la informaci\'on}
-%El kernel o filtro que se quiere aplicar a la imagen es almacenado en registros de los bloques de convoluci\'on. Con
-%respecto a la imagen, se opt\'o por ordenar la memoria en columnas, donde cada
-%columna almacena una columna de pixels. Queda entonces como una limitaci\'on la
-%altura m\'axima de la imagen dada por el n\'umero m\'aximo de pixels que es
-%posible almacenar en una columna de memoria.
-%
-%El lote ya procesado es almacenado sobreescribiendo los datos que se utilizaron
-%para producirlo, es decir, se utiliza la misma memoria tanto para los datos de
-%entrada como los de salida.
-%
-%\subsubsection{Procesamiento de la informaci\'on}
-%Cada bloque de convoluci\'on toma los valores de tres (o $k$, para un filtro que
-%pertence a $\mathbb{R}^{k{\times}k}$) columnas adyacentes. Comienza cargando los
-%tres primeros valores de cada columna en sus registros, realiza la suma del
-%producto con los coeficientes del filtro, y hace un 
-%desplazamiento de los registros con los valores de la imagen, de forma que se
-%descarten los valores mas antiguos de cada columna, y se cargue un nuevo valor
-%por columna, como en una estructura FIFO (first in, first out). Como muestra
-%la figura \ref{proc_conv}, esto es equivalente a ubicar el filtro sobre tres
-%columnas de la imagen y desplazarlo verticalemente.
-%
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=2.5in]{proc_conv.pdf}
-%\caption{En gris se observan los datos que han sido cargados a los registros del
-%bloque de convoluci\'on, en el ciclo siguiente es posible ver como los valores
-%de cada columna que ingresaron primero han sido decartados, y nuevos valores han
-%sido cargados, produciendo un efecto de desplazamiento hacia abajo.}
-%\label{proc_conv}
-%\end{figure}
-%
-%Luego de analizar distintas alternativas, se decidi\'o que los bloques de
-%convoluci\'on que se tienen trabajando en paralelo produzcan columnas procesadas
-%contiguas, es decir, que el bloque de convoluci\'on 1 produzca la primer
-%columna del lote, el bloque 2 la segunda y asi sucesivamente. Una de las
-%razones por la que se tomo esta decisi\'on es la naturaleza de la operaci\'on de
-%la convoluci\'on: se necesitan $k$ columnas de imagen para generar una columna procesada, para generar la
-%columna contigua es necesario desplazarse un lugar en la imagen de entrada,
-%por lo que existe unicamente una columna de diferencia en la entrada de dos
-%bloques que generan dos columnas adyacentes. Esta superposici\'on en la entrada implica una
-%reduccion del n\'umero de columnas necesarias de $k \cdot N$ a $N+k-1$ para N
-%bloques de convoluci\'on si estos generan columnas adyacentes.
+A comparison between the naive (which would be assign $k-1$ independent
+memory columns to each convolution unit), the shared inputs and the
+shared inputs with circular shift approaches is shown in Fig. \ref{comp}. Figure
+\ref{mem} shows the amount of memory required in function of the parallelism
+degree while Fig. \ref{transmitted} shows the amount of transferred bytes
+(considering that every byte transmitted is stored in only one memory register)
+for the processing of a $1600\times1024$ image and a $3\times3$ kernel.
+
+\section{Implementation}
+
+Figure \ref{LUT} shows the LUT usage.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{grafico_LUT}
+\caption{LUT usage vs parallelism degree}
+\label{LUT}
+\end{figure}
+
+
 
 
 % An example of a floating figure using the graphicx package.
@@ -898,7 +831,7 @@ in Fig. \ref{general}).
 
 
 \section{Conclusion}
-The conclusion goes here.
+Being an engineer is pain
 
 
 
@@ -917,7 +850,7 @@ The conclusion goes here.
 \fi
 
 
-The authors would like to thank...
+The authors would like to thank... mucha gracia' ariel
 
 
 
