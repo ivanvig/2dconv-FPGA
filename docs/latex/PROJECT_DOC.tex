@@ -417,6 +417,26 @@
 
 
 \section{Introduction}
+
+Existen diferentes tipos de arquitecturas para realizar la convolucion 2D en una FPGA, pero 
+muchas de ellas referencia no se no tiene en cuenta el uso de la memoria. 
+
+En \cite{paper1} platea una arqutecura paralelizable, posee una tasa de 221 MP/s pero no tiene en cuenta las limitaciones de memoria. El kenel no es configurable.
+
+En \cite{paper2} realiza un preprocemiento, posprocesamiento y una carga de la imagen por lotes desde
+una PC. Sin embargo se obtiene un restultado cada 9 ciclos de reloj.
+
+En \cite{paper3} se enfoca en el uso eficiente de la energia. Anque esta limitado a una imagen NxN y almacenada en memoria de la placa, esto utiliza el 90\% de los recursos.
+
+En \cite{paper4} al igual que \cite{paper2} se procesa y se carga la imagen por lotes. Pero la
+cantidad de pixeles procesados por segundo es relativamente baja con respecto a \cite{paper2}.
+
+En \cite{paper5} similar a \cite{paper4}, con resutlados cada 9 ciclos de reloj y no se tiene en cuenta el uso de memoria.
+ 
+Nosotros proponemos una arquitectura que permita la configuracion del kernel, 
+haga un uso eficiente de memoria, tenga un high throughput , sea paralelizable y escalable.
+
+\section{Convolucion}
 The 2D discrete convolution is an operation widely used in multiple engineering
 fields, in particular, it is one of the main operation in computer vision and
 image processing. Recently the convolutional neural networks
