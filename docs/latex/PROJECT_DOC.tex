@@ -25,7 +25,7 @@
 %% User assumes all risk.
 %% In no event shall the IEEE or any contributor to this code be liable for
 %% any damages or losses, including, but not limited to, incidental,
-%% consequential, o_diagramr any other damages, resulting from the use or misuse
+%% consequential,https://www.google.com/search?q=attention+convolutional+neural+network&ie=utf-8&oe=utf-8&client=firefox-b-ab o_diagramr any other damages, resulting from the use or misuse
 %% of any information contained here.
 %%
 %% All comments are the opinions http://www.bibtex.org/Using/of their respective authors and are not
@@ -336,8 +336,7 @@
 % Linebreaks \\ can be used within to get better formatting as desired.
 % Do not put math or special symbols in the title.
 %\title{Bare Demo of IEEEtran.cls for\\ IEEE Computer Society Conferences}
-\title{Arquitectura de Hardware para Convoluci\'on Bidimensional\\ con Memoria
-  Limitada Aplicada al Procesamiento de Im\'agenes}
+\title{Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing}
 
 
 % author names and affiliations
@@ -457,37 +456,28 @@ and 135MP/sec if the load and output stage are taken into account.
 %Nosotros proponemos una arquitectura que permita la configuracion del kernel, 
 %haga un uso eficiente de memoria, tenga un high throughput , sea paralelizable y escalable.
 
-\section{Convolucion}
+\section{Convolution Operation}
 
+Due to the data and convolution operation nature, a parallel approach it is much
+more efficient than a sequential one in terms of speed. FPGAs were used for
+system implementation, owing to the fact that these devices not only solve
+parallelism requirement but also allow different hardware prototypes testing.
 
-Por la naturaleza de los datos y de la operaci\'on de la convoluci\'on, un enfoque
-paralelo resulta mucho m\'as eficiente que uno secuencial en lo que a velocidad de
-procesamiento respecta. Se utilizaron FPGAs para la implementacion, pues
-resuelven la necesidad de paralelismo como tambi\'en la de poder
-probar distintos prototipos de arquitecturas de hardware.
-
-La convoluci\'on discreta en 2D esta definida por la siguiente
-ecuaci\'on: 
+2D discrete convolution is defined by the following equation:
 
 \begin{equation}\label{conv-org}
 S(x,y) = \sum_{i} \sum_{j}I(x-i,y-j)K(i, j)
 \end{equation}
-
-Siguiendo la tendencia actual en la comunidad de deep learning de no
-espejar el filtro, pues este debe ser aprendido de todas formas
-\cite{Goodfellow-et-al-2016}, se obteniendo la funci\'on de correlacion cruzada
+Following nowadays deep learning community tendency of no filter flipping, since
+filter must be learnt anyway \cite{Goodfellow-et-al-2016}, cross correlation function is obtained:
 
 \begin{equation}\label{conv}
 S(x,y) = \sum_{i} \sum_{j}I(x+i,y+j)K(i, j)
 \end{equation}
+which will be implemented, so in the following sections every time convolution
+operation is mentioned indicates a reference to eq. \ref{conv}
 
-la cual ser\'a en realidad  implementada, por lo que en lo que resta
-del art\'iculo, cada vez que se nombre a la operaci\'on de convoluci\'on,
-se estar\'a haciendo referencia a la ecuaci\'on \ref{conv}.
-
-Por una cuesti\'on de simplicidad, todo el trabajo se desarroll\'o utilizando
-imagenes en escala de grises, al tener estas un \'unico canal.
-
+For simplicity, grey scale images were used, since only one channel is needed.
 
 \section{An\'alisis Previo}\label{preproc}
 The analysis purpose is work whit a finite minimum representation for image
@@ -518,11 +508,11 @@ The values can come to a 8-bits representatio using dynamic range
 expansion\cite{dinamic_rango} but it se need to get  maximum and minimum
 number pixel value after convolution. So image should be in memory totally.
 
-\section{Design and implementation}
+\section{Architecture Design}
 
 \subsection{Workflow}
-%As shown in Fig. \ref{fig_workflow}, the workflow consists of three
-The workflow consists of three
+As shown in Fig. \ref{fig_workflow}, the workflow consists of three
+%The workflow consists of three
 instances: first, in the PC a python script does the preprocessing 
 described in section \ref{preproc}, separates the image in batches and then sends the kernel's
 coefficients and the first batch through an UART connection to the FPGA. In the
@@ -532,12 +522,12 @@ the kernel inside the module. When the operation is finished a notification is
 sent to the microprocessor, which gives the order to retrieve the processed batch
 from the module and sends it to the PC and then waits for the next batch to arrive.
 
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=3in]{workflow}
-%\caption{System's workflow and languages used in every instance}
-%\label{fig_workflow}
-%\end{figure}
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3in]{workflow}
+\caption{System's workflow and languages used in every instance}
+\label{fig_workflow}
+\end{figure}
 
 \subsection{Convolution Module}
 A simplified architecture of the module is shown in Fig. \ref{general},
@@ -558,12 +548,15 @@ set of columns of the FPGA's block RAM.
 
 \subsubsection{States}
 It is possible to see that during the work cycle, the convolution module goes
-through several states, as shown in Fig. \ref{state}.
+through several states, as shown in Fig.\ref{state}.
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
-configured, to do so the most significant bit of the 32 bits input in the module
-must be set to high. The Fig. \textbf{FIGURABITS} shows the 32 bits input
-frame structure and the binary code for the instructions.
+configured, to do so it must receive a reset signal.
+
+State transition are controlled by coded instructions embedded in the 32 bits input frame.
+%he most significant bit of the 32 bits input in the module
+%must be set to high. The Fig. \textbf{FIGURABITS} shows the 32 bits input
+%frame structure and the binary code for the instructions.
 
 The module will stay in the \textbf{reset} state until it receives the
 instruction to go to the \textbf{KernelLoad} state, in which state the kernel
@@ -586,9 +579,9 @@ of the module.
 \begin{figure}[!t]
   \centering
   \includegraphics[width=2.5in]{states.pdf}
-  \caption{Diagrama de estados del m\'odulo de convoluci\'on.
-    A - Carga de kernel, B - Carga de tama\~no, C - Carga de imagen, D -
-    Procesamiento, E - Out, F - Reset}
+  \caption{Module's state diagram.
+    A - Kernel load, B - Size load, C - Image load, D - Proccesing, E - Output,
+    F - Reset}
   \label{state}
 \end{figure}
 
@@ -719,7 +712,7 @@ degree while Fig. \ref{transmitted} shows the amount of transferred bytes
 (considering that every byte transmitted is stored in only one memory register)
 for the processing of a $1600\times1024$ image and a $3\times3$ kernel.
 
-\section{Implementation}
+\section{Implementation and Results}
 
 Figure \ref{LUT} shows the LUT usage.
 
