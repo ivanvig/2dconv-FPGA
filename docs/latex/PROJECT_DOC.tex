@@ -690,6 +690,18 @@ Figure \ref{algorithm} shows how the memories are written using this logic.
 \caption{Comparison between different approaches.}
 \label{comp}
 \end{figure*}
+
+\begin{figure*}[!t]
+\centering
+\subfloat[filtration in Python.]{\includegraphics[width=1.5in]{lenapy}%
+\label{mem}}
+\hfil
+\subfloat[filtration in Board.]{\includegraphics[width=1.5in]{pasted0}%
+\label{transmitted}}
+\caption{Comparison between different proccesing.}
+\label{comp}
+\end{figure*}
+
 The logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
 parallelism degree and the iteration number.
@@ -723,7 +735,6 @@ Figure \ref{LUT} shows the LUT usage.
 \caption{LUT usage vs parallelism degree}
 \label{LUT}
 \end{figure}
-
 
 
 
