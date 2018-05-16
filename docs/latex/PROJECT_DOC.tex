@@ -479,34 +479,35 @@ operation is mentioned indicates a reference to eq. \ref{conv}
 
 For simplicity, grey scale images were used, since only one channel is needed.
 
-\section{An\'alisis Previo}\label{preproc}
-The analysis purpose is work whit a finite minimum representation for image
-pixels and kernel values. To that is necessary make a study about bits number for
-a god image representation.
+\section{Previous Analysis}\label{preproc}
+The anlysis puropose is to work with a finite minimum representation for image
+pixels and kernel values. To do this, a study about number of bits used effects
+in image representation was made. 
 
-Pixels values \(I_{ij}\) have a range from 0 to 255. We use normalization
-dynamic range expansion\cite{dinamic_rango} in ordet to get a new range from
-0 to 1. Kernel values \(K_{ij}\) can to be negative or positive. Thus We use
-Maximum norm\cite{max_norm} to get maximum absolute value then it 
-divide to every \(K_{ij}\) to achieve a new range from -1 to 1. So kernel
-effect is maintain. 
+Pixels values (\(I_{ij}\) range is 0 to 255. Dynamic range expansion
+\cite{dinamic_rango} was used in order to rearrange values from 0 to 1. Kernel
+values \(K_{ij}\) can be negative or positive. Thus maximum norm \cite{max_norm}
+was also used to displace this range to [-1, 1], so that kernel effects are
+maintained.
 
-We use Signed Fixed Point representation\cite{fix_p} \(S(8,7)\) in order to use
-previos ranges.
+Signed fixed point representation\cite{fix_p} \textit{S(8,7)} for previous range
+mentioned above. 
 
-Convolution of image whit a kernel  $\mathbb{K}^{3{\times}3}$ results in 20-bits
-output \(S(20,14)\). Hence we make post-processing. It come result value to
-positive range and truncate value. We compare both output post-processing and
-20-bits so that find a minimum bits amount and do not lose important data. 
+Convolution between image and a $3\times3$ kernel results in 20 bits output
+\textit{S(20,14)}. Hence, post processing is made and the outcoming result value
+is shifted to positive range and truncated. Then, post-processing and 20 bits
+resolution outputs are compared ir order to find out the minimum bits amount
+without significative data loss. 
 
-We use SNR measure between ouput 20-bits \(S(20,14)\) and error that results from
-reduce bits number \(e_r=f(x)_{20b}-f(x)_{pos}\)\cite{srntesis}. Representation
-\(S(13,8)\) has a approximate SNR \(30 [dB]\) that show filter effect whit minimum
-data loss. It is acceptable becouse the objet in no show a perfect image.
+Signal to Noise Ratio (SNR) measure between \textit{S(20,14)} output and error
+produced by reducing bits number \(e_r=f(x)_{20b}-f(x)_{pos}\)\cite{srntesis} is
+analyzed. \textit{S(13,8)} representation leads to \textit{30 [dB]} SNR that
+shows filter effects with minimum data loss. This SNR value is acceptable
+because the objective is achieved despite not getting a perfect image.
 
-The values can come to a 8-bits representatio using dynamic range
-expansion\cite{dinamic_rango} but it se need to get  maximum and minimum
-number pixel value after convolution. So image should be in memory totally.
+8 bits representation for image values is also achieved by using dynamic range
+expansion, but maximun and minimun pixel value is needed after convolution. This
+implies that full image stored is needed. 
 
 \section{Architecture Design}
 
