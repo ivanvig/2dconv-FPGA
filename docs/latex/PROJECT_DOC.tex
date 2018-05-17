@@ -481,11 +481,11 @@ For simplicity, grey scale images were used, since only one channel is needed.
 
 \section{Previous Analysis}\label{preproc}
 The anlysis puropose is to work with a finite minimum representation for image
-pixels and kernel values. To do this, a study about number of bits used effects
-in image representation was made. 
+pixels and kernel values. 
+%To do this, a study about number of bits used effects in image representation was made. 
 
-Pixels values (\(I_{ij}\) range is 0 to 255. Dynamic range expansion
-\cite{dinamic_rango} was used in order to rearrange values from 0 to 1. Kernel
+Pixels values \(I_{ij}\) range is [0, 255]. Dynamic range expansion
+\cite{dinamic_rango} was used in order to rearrange values to [0, 1]. Kernel
 values \(K_{ij}\) can be negative or positive. Thus maximum norm \cite{max_norm}
 was also used to displace this range to [-1, 1], so that kernel effects are
 maintained.
@@ -493,11 +493,9 @@ maintained.
 Signed fixed point representation\cite{fix_p} \textit{S(8,7)} for previous range
 mentioned above. 
 
-Convolution between image and a $3\times3$ kernel results in 20 bits output
-\textit{S(20,14)}. Hence, post processing is made and the outcoming result value
-is shifted to positive range and truncated. Then, post-processing and 20 bits
-resolution outputs are compared ir order to find out the minimum bits amount
-without significative data loss. 
+Convolution between image and a $3\times3$ kernel results in \textit{S(20,14)}. 
+Hence, post processing is made and the outcoming result value
+is shifted to positive range and truncated. Then, doing post-processing. 
 
 Signal to Noise Ratio (SNR) measure between \textit{S(20,14)} output and error
 produced by reducing bits number \(e_r=f(x)_{20b}-f(x)_{pos}\)\cite{srntesis} is
@@ -505,9 +503,9 @@ analyzed. \textit{S(13,8)} representation leads to \textit{30 [dB]} SNR that
 shows filter effects with minimum data loss. This SNR value is acceptable
 because the objective is achieved despite not getting a perfect image.
 
-8 bits representation for image values is also achieved by using dynamic range
-expansion, but maximun and minimun pixel value is needed after convolution. This
-implies that full image stored is needed. 
+%8 bits representation for image values is also achieved by using dynamic range
+%expansion, but maximun and minimun pixel value is needed after convolution. This
+%implies that full image stored is needed. 
 
 \section{Architecture Design}
 
@@ -699,8 +697,17 @@ Figure \ref{algorithm} shows how the memories are written using this logic.
 \subfloat[filtration in Board.]{\includegraphics[width=1.5in]{pasted0}%
 \label{transmitted}}
 \caption{Comparison between different proccesing.}
-\label{comp}
+\label{images_py_bo}
 \end{figure*}
+
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{BRAM_c}
+\caption{Comparison between theoritical and syntesis.}
+\label{bram_n}
+\end{figure}
+
 
 The logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
@@ -727,16 +734,7 @@ for the processing of a $1600\times1024$ image and a $3\times3$ kernel.
 
 \section{Implementation and Results}
 
-Figure \ref{LUT} shows the LUT usage.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=2.5in]{grafico_LUT}
-\caption{LUT usage vs parallelism degree}
-\label{LUT}
-\end{figure}
-
-
+Figure \ref{bram_n} shows the BRAM usage.
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
