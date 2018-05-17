@@ -344,12 +344,14 @@
 % affiliations
 \author{\IEEEauthorblockN{Martin Casabella,
   Sergio Sulca,
-  Ivan Vignolles
+  Ivan Vignolles,
+  Ariel L. Pola
 }
 \IEEEauthorblockA{Escuela de Ingenier\'ia en Computaci\'on\\
   Facultad de Ciencias Exactas F\'isicas y Naturales\\
   Universidad Nacional de C\'ordoba\\
-  Email: martin.casabella@gmail.com, ser.0090@gmail.com, ivignolles@alumnos.unc.edu.ar}
+  Email: martin.casabella@gmail.com, ser.0090@gmail.com,
+  ivignolles@alumnos.unc.edu.ar, arielpola@gmail.com}
 }
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
@@ -417,26 +419,56 @@
 
 \section{Introduction}
 
-The 2D discrete convolution is an operation widely used in multiple engineering
-fields, in particular, it is one of the main operation in computer vision and
-image processing. Recently the convolutional neural networks
-(CNN)\cite{Lecun-et-al-1998} have dominated the field, hence a fast and
-efficient convolution implementation is important.
+% The 2D discrete convolution is an operation widely used in multiple engineering
+% fields, in particular, it is one of the main operation in computer vision and
+% image processing. Recently the convolutional neural networks
+% (CNN)\cite{Lecun-et-al-1998} have dominated the field, hence a fast and
+% efficient convolution implementation is important.
 
-There are different architectures to do a convolution in a FPGA, but most of them
-ignore the FPGA's memory limitation, the ones who take it into account like
-\cite{paper3} waste lots of resources to store the entire image. Another
-approach is to work with batches like \cite{paper2} and \cite{paper4} which is the
-approach we adopt.
+% There are different architectures to do a convolution in a FPGA, but most of them
+% ignore the FPGA's memory limitation, the ones who take it into account like
+% \cite{paper3} waste lots of resources to store the entire image. Another
+% approach is to work with batches like \cite{paper2} and \cite{paper4} which is the
+% approach we adopt.
 
-Other important aspect is the pixel processing rate, the architectures in \cite{paper2} and
-\cite{paper5} take 9 clock cycles to produce a processed pixel, \cite{paper1}
-achieves a speed up to 221MP/sec but has a fixed kernel and does not take into
-account the memory limitations.
+% Other important aspect is the pixel processing rate, the architectures in \cite{paper2} and
+% \cite{paper5} take 9 clock cycles to produce a processed pixel, \cite{paper1}
+% achieves a speed up to 221MP/sec but has a fixed kernel and does not take into
+% account the memory limitations.
 
-In this paper, we propose a high throughput, parallelizable, memory efficient
-hardware architecture with customizable kernel that can achieve up to 2.4GP/sec in pixel processing rate
-and 135MP/sec if the load and output stage are taken into account.
+% In this paper, we propose a high throughput, parallelizable, memory efficient
+% hardware architecture with customizable kernel that can achieve up to 2.4GP/sec in pixel processing rate
+% and 135MP/sec if the load and output stage are taken into account.
+
+
+The origin of digital image processing, due to the high level of processing they
+require, is directly related to the development and evolution of computers. Most
+filters for images that focus, blur, enhance edges and detect edges, among
+others, use convolution as a mathematical operation. Image processing is a very
+extensive research area with a large number of applications in multiple fields
+such as medicine, engineering, navigation, aeronautics, among others.
+Applications recently, use convolutional neural networks (CNN)
+\cite{Lecun-et-al-1998} where a fast and efficient convolution implementation is
+important.
+
+The implementation of high speed image processing systems in FPGA has been a
+very active field. This is mainly due to the ability to take advantage of bit
+level parallelism, pixel level, neighborhood level and task level to accelerate
+the calculation. In addition, FPGAs are reconfigurable, allowing the flexibility
+that is often desired in neural networks. This coupling of processing,
+parallelism and flexibility at very high speed is what makes FPGAs a platform of
+choice for the development of these areas \cite{papercnn}.
+
+Convolutional FPGA architectures can store the entire image \cite{paper3} and
+optimize the pixel processing speed \cite{paper1} and reduce complexity of
+implementation \cite{paper5}. Another approach is the filtering by blocks of
+image data, optimizing the parallelization of convolders \cite{paper2} and memory
+management \cite{paper4}. The difficulty presented by these schemes is the
+non-modularization of processing, making it difficult to increase the work rate
+by increasing parallelism.
+
+In this document, we propose a high-performance, parallelizable hardware
+architecture and dynamic memory reuse with a linear increase in BRAM resources.
 
 %Existen diferentes tipos de arquitecturas para realizar la convolucion 2D en una FPGA, pero 
 %muchas de ellas referencia no se no tiene en cuenta el uso de la memoria. 
