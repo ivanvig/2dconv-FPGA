@@ -542,7 +542,7 @@ because the objective is achieved despite not getting a perfect image.
 \section{Architecture Design}
 
 \subsection{Workflow}
-As shown in Fig. \ref{fig_workflow}, the workflow consists of three
+As shown in Fig. \ref{general}, the workflow consists of three
 %The workflow consists of three
 instances: first, in the PC a python script does the preprocessing 
 described in section \ref{preproc}, separates the image in batches and then sends the kernel's
@@ -553,12 +553,12 @@ the kernel inside the module. When the operation is finished a notification is
 sent to the microprocessor, which gives the order to retrieve the processed batch
 from the module and sends it to the PC and then waits for the next batch to arrive.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=3in]{workflow}
-\caption{System's workflow and languages used in every instance}
-\label{fig_workflow}
-\end{figure}
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=3in]{workflow}
+%\caption{System's workflow and languages used in every instance}
+%\label{fig_workflow}
+%\end{figure}
 
 \subsection{Convolution Module}
 A simplified architecture of the module is shown in Fig. \ref{general},
@@ -762,7 +762,7 @@ shared inputs with circular shift approaches is shown in Fig. \ref{comp}. Figure
 \ref{mem} shows the amount of memory required in function of the parallelism
 degree while Fig. \ref{transmitted} shows the amount of transferred bytes
 (considering that every byte transmitted is stored in only one memory register)
-for the processing of a $1600\times1024$ image and a $3\times3$ kernel.
+for processing a $1600\times1024$ image and a $3\times3$ kernel.
 
 \section{Implementation and Results}
 
@@ -866,7 +866,6 @@ Figure \ref{bram_n} shows the BRAM usage.
 
 
 \section{Conclusion}
-Being an engineer is pain
 
 
 
@@ -885,7 +884,6 @@ Being an engineer is pain
 \fi
 
 
-The authors would like to thank... mucha gracia' ariel
 
 
 
