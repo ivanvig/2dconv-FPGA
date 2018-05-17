@@ -676,7 +676,16 @@ $k+1$ different input columns are needed for all the units. For that reason, it 
 multiple convolution units in parallel will produce contiguous processed
 columns, sharing the common input columns. With this approach, for $N$
 convolution units the number of memory columns needed gets reduced from $N\cdot
-k$ to $N+k-1$.
+k$ to $N+k-1$. That means that adding a new convolution unit only adds one new
+memory columns as Fig. \ref{newconv} shows.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3in]{new_conv}
+\caption{Using shared inputs approach, only one new memory column is added for
+  every new instantiated convolution unit.}
+\label{newconv}
+\end{figure}
 
 The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
@@ -710,37 +719,6 @@ Figure \ref{algorithm} shows how the memories are written using this logic.
 \label{algorithm}
 \end{figure}
 
-\begin{figure*}[!t]
-\centering
-\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{mem_space}%
-\label{mem}}
-\hfil
-\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{data_sent}%
-\label{transmitted}}
-\caption{Comparison between different approaches.}
-\label{comp}
-\end{figure*}
-
-\begin{figure*}[!t]
-\centering
-\subfloat[filtration in Python.]{\includegraphics[width=1.5in]{lenapy}%
-\label{mem}}
-\hfil
-\subfloat[filtration in Board.]{\includegraphics[width=1.5in]{pasted0}%
-\label{transmitted}}
-\caption{Comparison between different proccesing.}
-\label{images_py_bo}
-\end{figure*}
-
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=2.5in]{BRAM_c}
-\caption{Comparison between theoritical and syntesis.}
-\label{bram_n}
-\end{figure}
-
-
 The logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
 parallelism degree and the iteration number.
@@ -756,17 +734,79 @@ To route the incoming and outgoing data, the MMU has a set of multiplexers whose
 select lines are managed by the finite state machine (Data multiplexer and FSM
 in Fig. \ref{general}).
 
-A comparison between the naive (which would be assign $k-1$ independent
+\begin{figure*}[!t]
+\centering
+\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{mem_space}%
+\label{mem}}
+\hfil
+\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{data_sent}%
+\label{transmitted}}
+\caption{Comparison between different approaches.}
+\label{comp}
+\end{figure*}
+
+A comparison between the naive (which would be assign $k$ independent
 memory columns to each convolution unit), the shared inputs and the
 shared inputs with circular shift approaches is shown in Fig. \ref{comp}. Figure
 \ref{mem} shows the amount of memory required in function of the parallelism
 degree while Fig. \ref{transmitted} shows the amount of transferred bytes
 (considering that every byte transmitted is stored in only one memory register)
-for processing a $1600\times1024$ image and a $3\times3$ kernel.
+for processing a $1600\times1024$ image and a $3\times3$ kernel. As shown in Fig.
+\ref{transmitted}, with the naive approach the transferred data is almost $3$
+times the image size (because a $3\times3$ kernel) and it does not get affected
+by the parallelism degree. The shared inputs approach tends to diminish the
+redundant data transferred as $N$ increases, that is because the redundant data
+in a $N+k-1$ batch is $k-1$ and $\frac{k-1}{N+k-1}$ tends to zero as N
+increases. The shared inputs with circular shift approach is the best case
+scenario where no redundant data is transferred at all.
+
 
 \section{Implementation and Results}
 
-Figure \ref{bram_n} shows the BRAM usage.
+To ensure the proper functioning of the architecture a negative filter was
+coded in python and applied to an image, then the same filter was applied using
+the FPGA module. The results are showed in Fig. \ref{images_py_bo}.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3in]{comparation}
+\caption{On the left, an image processed in a PC using python. On the right the
+  same image processed with the FPGA module.}
+\label{images_py_bo}
+\end{figure}
+
+The design was implemented in an Arty 7 FPGA from Xilinx.
+The architecture was synthesized for different number of convolution units. The
+results obtained for BRAM utilization from the synthesis are compared with the estimated results in
+Fig. \ref{bram_n}. As expected, the increase has a linear behaviour.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.5in]{BRAM_c}
+\caption{Normalized curve for BRAM resources utilization.}
+\label{bram_n}
+\end{figure}
+
+%\begin{table}[!t]
+%% increase table row spacing, adjust to taste
+%\renewcommand{\arraystretch}{1.3}
+%% if using array.sty, it might be a good idea to tweak the value of
+%% \extrarowheight as needed to properly center the text within the cells
+%\caption{Resource utilization table.}
+%\label{res_table}
+%\centering
+%% Some packages, such as MDW tools, offer better commands for making tables
+%% than the plain LaTeX2e tabular which is used here.
+%\begin{tabular}{|c||c||c||c|}
+%\hline
+ %Parallelism & LUT & BRAM & DSP\\
+%\hline
+  %4 & 2022 & 11 & 40\\
+%\hline
+  %8 & 2448 & 13 & 80\\
+%\hline
+%\end{tabular}
+%\end{table}
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
