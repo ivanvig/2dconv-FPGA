@@ -734,6 +734,17 @@ To route the incoming and outgoing data, the MMU has a set of multiplexers whose
 select lines are managed by the finite state machine (Data multiplexer and FSM
 in Fig. \ref{general}).
 
+\begin{figure*}[!t]
+\centering
+\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{mem_space}%
+\label{mem}}
+\hfil
+\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{data_sent}%
+\label{transmitted}}
+\caption{Comparison between different approaches.}
+\label{comp}
+\end{figure*}
+
 A comparison between the naive (which would be assign $k$ independent
 memory columns to each convolution unit), the shared inputs and the
 shared inputs with circular shift approaches is shown in Fig. \ref{comp}. Figure
@@ -749,39 +760,53 @@ in a $N+k-1$ batch is $k-1$ and $\frac{k-1}{N+k-1}$ tends to zero as N
 increases. The shared inputs with circular shift approach is the best case
 scenario where no redundant data is transferred at all.
 
-\begin{figure*}[!t]
-\centering
-\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{mem_space}%
-\label{mem}}
-\hfil
-\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{data_sent}%
-\label{transmitted}}
-\caption{Comparison between different approaches.}
-\label{comp}
-\end{figure*}
 
 \section{Implementation and Results}
 
-The design was implemented in an Arty 7 FPGA from Xilinx.
-
-Figure \ref{bram_n} shows a normalized curve of the estimated BRAM resources use
-versus the results obtained from synthesis. As expected, it has a linear
-behaviour.
+To ensure the proper functioning of the architecture a negative filter was
+coded in python and applied to an image, then the same filter was applied using
+the FPGA module. The results are showed in Fig. \ref{images_py_bo}.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=3in]{comparation}
-\caption{Comparison between theoritical and syntesis.}
+\caption{On the left, an image processed in a PC using python. On the right the
+  same image processed with the FPGA module.}
 \label{images_py_bo}
 \end{figure}
 
+The design was implemented in an Arty 7 FPGA from Xilinx.
+The architecture was synthesized for different number of convolution units. The
+results obtained for BRAM utilization from the synthesis are compared with the estimated results in
+Fig. \ref{bram_n}. As expected, the increase has a linear behaviour.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=2.5in]{BRAM_c}
-\caption{Comparison between theoritical and syntesis.}
+\caption{Normalized curve for BRAM resources utilization.}
 \label{bram_n}
 \end{figure}
+
+%\begin{table}[!t]
+%% increase table row spacing, adjust to taste
+%\renewcommand{\arraystretch}{1.3}
+%% if using array.sty, it might be a good idea to tweak the value of
+%% \extrarowheight as needed to properly center the text within the cells
+%\caption{Resource utilization table.}
+%\label{res_table}
+%\centering
+%% Some packages, such as MDW tools, offer better commands for making tables
+%% than the plain LaTeX2e tabular which is used here.
+%\begin{tabular}{|c||c||c||c|}
+%\hline
+ %Parallelism & LUT & BRAM & DSP\\
+%\hline
+  %4 & 2022 & 11 & 40\\
+%\hline
+  %8 & 2448 & 13 & 80\\
+%\hline
+%\end{tabular}
+%\end{table}
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
