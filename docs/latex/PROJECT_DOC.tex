@@ -581,7 +581,11 @@ post-processing. The pre-processing consists of capturing the image and applying
 the detailed transformation in Section \ref{preproc} using a Python script. In
 addition, the script divides the image into batch and is sent by the UART port
 to the FPGA. In the FPGA a microprocessor receives the information and
-communicates it to the convolution module using a 32 bits GPIO port. 
+communicates it to the convolution module using a 32 bits GPIO port. This port
+writes the BRAMs that store the data that will be filtered. Due to the
+limitations of the size of the FPGA, no other interface was used, such as
+Ethernet or DMA to read the image directly from a storage device. However, the
+proposed architecture is indifferent to these methods. 
 
 
 
