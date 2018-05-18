@@ -522,6 +522,11 @@ values $K_{x,y}$ can be negative or positive. Thus maximum norm \cite{max_norm}
 was also used to displace this range to $[-1, 1]$, so that kernel effects are
 maintained.
 
+Como la finalidad del trabajo desarrollado es ser aplicado Deep Learning es habitual 
+modificar rango dinamico a uno que se encuentra distubidos de sobre cero con valores positivos y negativos.
+Para ello se aplican metodos para modifcar el rango a uno apto parael trabajo. Es por ello que se aplica 
+la tecnica anterior.
+
 % Due to the data and convolution operation nature, a parallel approach it is much
 % more efficient than a sequential one in terms of speed. FPGAs were used for
 % system implementation, owing to the fact that these devices not only solve
