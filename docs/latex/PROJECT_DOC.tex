@@ -488,52 +488,85 @@ architecture and dynamic memory reuse with a linear increase in BRAM resources.
 %Nosotros proponemos una arquitectura que permita la configuracion del kernel, 
 %haga un uso eficiente de memoria, tenga un high throughput , sea paralelizable y escalable.
 
-\section{Convolution Operation}
+\section{Image Processing Algorithms}\label{preproc}
 
-Due to the data and convolution operation nature, a parallel approach it is much
-more efficient than a sequential one in terms of speed. FPGAs were used for
-system implementation, owing to the fact that these devices not only solve
-parallelism requirement but also allow different hardware prototypes testing.
+Filtering is widely used in many applications, such as aeronautics, navigation,
+CNN, etc. They are applied as preprocessing to eliminate useless details and
+noise. One of the preferred devices for the development of these techniques is
+the FPGA, since it presents an excellent relationship between speed of
+development and flexibility in the implementation. It allows the parallelization
+of the process and the reconfiguration of the design in a very short time. We
+will focus on the efficient use of FPGA resources by applying the 2D convolution
+technique and reducing the dynamic range of the pixels in the image.
 
-2D discrete convolution is defined by the following equation:
+\subsection{Convolution Operation}
+
+The convolution process consists of filtering an image $I(x,y)$ of size $h
+\times w$ with a set of coefficients called Kernel $K(x,y)$ as described in
+\eqref{conv-org}. The mask we use in the 2D convolution is of $3 \times 3$ which
+generates as output a pixel. When the filtering is done at the edges of the
+image, the external pixels are completed with zeros. The process is detailed in
+Fig. X.
 
 \begin{equation}\label{conv-org}
-S(x,y) = \sum_{i} \sum_{j}I(x-i,y-j)K(i, j)
+  S(x,y) = \sum_{i=0}^{h-1} \sum_{j=0}^{w-1}K(i,j)I(x-i,y-j)
 \end{equation}
-Following nowadays deep learning community tendency of no filter flipping, since
-filter must be learnt anyway \cite{Goodfellow-et-al-2016}, cross correlation function is obtained:
 
-\begin{equation}\label{conv}
-S(x,y) = \sum_{i} \sum_{j}I(x+i,y+j)K(i, j)
-\end{equation}
-which will be implemented, so in the following sections every time convolution
-operation is mentioned indicates a reference to eq. \ref{conv}
+\subsection{Normalization}
 
-For simplicity, grey scale images were used, since only one channel is needed.
-
-\section{Previous Analysis}\label{preproc}
-The anlysis puropose is to work with a finite minimum representation for image
-pixels and kernel values. 
-%To do this, a study about number of bits used effects in image representation was made. 
-
-Pixels values \(I_{ij}\) range is [0, 255]. Dynamic range expansion
-\cite{dinamic_rango} was used in order to rearrange values to [0, 1]. Kernel
-values \(K_{ij}\) can be negative or positive. Thus maximum norm \cite{max_norm}
-was also used to displace this range to [-1, 1], so that kernel effects are
+We will focus on grayscale images because of their simplicity of implementation,
+but the design can be extrapolated to any other type of image. The pixels of the
+grayscale images have a dynamic range $I_{x,y} [0,255]$. Dynamic range expansion
+\cite{dinamic_rango} was used in order to rearrange values to $[0,1]$. Kernel
+values $K_{x,y}$ can be negative or positive. Thus maximum norm \cite{max_norm}
+was also used to displace this range to $[-1, 1]$, so that kernel effects are
 maintained.
 
-Signed fixed point representation\cite{fix_p} \textit{S(8,7)} for previous range
-mentioned above. 
+% Due to the data and convolution operation nature, a parallel approach it is much
+% more efficient than a sequential one in terms of speed. FPGAs were used for
+% system implementation, owing to the fact that these devices not only solve
+% parallelism requirement but also allow different hardware prototypes testing.
 
-Convolution between image and a $3\times3$ kernel results in \textit{S(20,14)}. 
-Hence, post processing is made and the outcoming result value
-is shifted to positive range and truncated. Then, doing post-processing. 
+% 2D discrete convolution is defined by the following equation:
 
-Signal to Noise Ratio (SNR) measure between \textit{S(20,14)} output and error
-produced by reducing bits number \(e_r=f(x)_{20b}-f(x)_{pos}\)\cite{srntesis} is
-analyzed. \textit{S(13,8)} representation leads to \textit{30 [dB]} SNR that
-shows filter effects with minimum data loss. This SNR value is acceptable
-because the objective is achieved despite not getting a perfect image.
+% \begin{equation}\label{conv-org}
+% S(x,y) = \sum_{i} \sum_{j}I(x-i,y-j)K(i, j)
+% \end{equation}
+% Following nowadays deep learning community tendency of no filter flipping, since
+% filter must be learnt anyway \cite{Goodfellow-et-al-2016}, cross correlation function is obtained:
+
+% \begin{equation}\label{conv}
+% S(x,y) = \sum_{i} \sum_{j}I(x+i,y+j)K(i, j)
+% \end{equation}
+% which will be implemented, so in the following sections every time convolution
+% operation is mentioned indicates a reference to eq. \ref{conv}
+
+% For simplicity, grey scale images were used, since only one channel is needed.
+
+% \section{Previous Analysis}\label{preproc}
+% The anlysis puropose is to work with a finite minimum representation for image
+% pixels and kernel values. 
+% To do this, a study about number of bits used effects in image representation was made. 
+
+% Pixels values \(I_{ij}\) range is [0, 255]. Dynamic range expansion
+% \cite{dinamic_rango} was used in order to rearrange values to [0, 1]. Kernel
+% values \(K_{ij}\) can be negative or positive. Thus maximum norm \cite{max_norm}
+% was also used to displace this range to [-1, 1], so that kernel effects are
+% maintained.
+
+%%% 
+% Signed fixed point representation\cite{fix_p} \textit{S(8,7)} for previous range
+% mentioned above. 
+
+% Convolution between image and a $3\times3$ kernel results in \textit{S(20,14)}. 
+% Hence, post processing is made and the outcoming result value
+% is shifted to positive range and truncated. Then, doing post-processing. 
+
+% Signal to Noise Ratio (SNR) measure between \textit{S(20,14)} output and error
+% produced by reducing bits number \(e_r=f(x)_{20b}-f(x)_{pos}\)\cite{srntesis} is
+% analyzed. \textit{S(13,8)} representation leads to \textit{30 [dB]} SNR that
+% shows filter effects with minimum data loss. This SNR value is acceptable
+% because the objective is achieved despite not getting a perfect image.
 
 %8 bits representation for image values is also achieved by using dynamic range
 %expansion, but maximun and minimun pixel value is needed after convolution. This
@@ -542,16 +575,27 @@ because the objective is achieved despite not getting a perfect image.
 \section{Architecture Design}
 
 \subsection{Workflow}
-As shown in Fig. \ref{general}, the workflow consists of three
-%The workflow consists of three
-instances: first, in the PC a python script does the preprocessing 
-described in section \ref{preproc}, separates the image in batches and then sends the kernel's
-coefficients and the first batch through an UART connection to the FPGA. In the
-FPGA a microprocessor receives the information and communicates it to the
-convolution module using a 32 bits GPIO port. The batch is then convolved with
-the kernel inside the module. When the operation is finished a notification is
-sent to the microprocessor, which gives the order to retrieve the processed batch
-from the module and sends it to the PC and then waits for the next batch to arrive.
+In this section, the design of the architecture is described in detail. The
+entire process is divided into three stages, pre-processing, processing and
+post-processing. The pre-processing consists of capturing the image and applying
+the detailed transformation in Section \ref{preproc} using a Python script. In
+addition, the script divides the image into batch and is sent by the UART port
+to the FPGA. In the FPGA a microprocessor receives the information and
+communicates it to the convolution module using a 32 bits GPIO port. 
+
+
+
+% As shown in Fig. \ref{general}, the workflow consists of three
+% %The workflow consists of three
+% instances: first, in the PC a python script does the preprocessing described in
+% section \ref{preproc}, separates the image in batches and then sends the
+% kernel's coefficients and the first batch through an UART connection to the
+% FPGA. In the FPGA a microprocessor receives the information and communicates it
+% to the convolution module using a 32 bits GPIO port. The batch is then convolved
+% with the kernel inside the module. When the operation is finished a notification
+% is sent to the microprocessor, which gives the order to retrieve the processed
+% batch from the module and sends it to the PC and then waits for the next batch
+% to arrive.
 
 %\begin{figure}[!t]
 %\centering
