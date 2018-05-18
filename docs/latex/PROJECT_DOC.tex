@@ -521,8 +521,15 @@ Learning project where it is usual to operate with a dynamic range centered on
 zero. Therefore, we apply dynamic range expansion \cite{dinamic_rango} and
 maximum norm \cite{max_norm} to rearrange $\mathcal{T}[I(x,y)]=I^\prime(x,y)$
 between $[0,1]$ and $\mathcal{T}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$,
-respetively.
+respetively. Therefore, replacing in \eqref{conv-org}
 
+\begin{equation}\label{conv-org1}
+  G^\prime(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j).
+\end{equation}
+
+Finally, we apply the change of dynamic range on the output
+$\mathcal{T}[G^\prime(x,y)]=G(x,y)$ again and obtain range between $[0,255]$.
+The complete process is detailed in Fig. X.
 
 % Due to the data and convolution operation nature, a parallel approach it is much
 % more efficient than a sequential one in terms of speed. FPGAs were used for
