@@ -501,31 +501,28 @@ technique and reducing the dynamic range of the pixels in the image.
 
 \subsection{Convolution Operation}
 
-The convolution process consists of filtering an image $I(x,y)$ of size $h
-\times w$ with a set of coefficients called Kernel $K(x,y)$ as described in
-\eqref{conv-org}. The mask we use in the 2D convolution is of $3 \times 3$ which
-generates as output a pixel. When the filtering is done at the edges of the
-image, the external pixels are completed with zeros. The process is detailed in
-Fig. X.
+Bidimensional convolution is defined mathematically as
 
 \begin{equation}\label{conv-org}
-  S(x,y) = \sum_{i=0}^{h-1} \sum_{j=0}^{w-1}K(i,j)I(x-i,y-j)
+  S(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K(i,j)I(x-i,y-j)
 \end{equation}
+where $I(x,y)$ is an image of size $(m \times n)$ pixels, $K(i,j)$ is a set of
+coefficients called Kernel of size $(h \times h)$ and $S(x,y)$ is convolution
+result of size $(m-2 \times n-2)$ pixels because we are considered valid
+convolution \cite{validconv}. 
 
-\subsection{Normalization}
+\subsection{Change of Dinamic Range}
 
 We will focus on grayscale images because of their simplicity of implementation,
 but the design can be extrapolated to any other type of image. The pixels of the
-grayscale images have a dynamic range $I_{x,y} [0,255]$. Dynamic range expansion
-\cite{dinamic_rango} was used in order to rearrange values to $[0,1]$. Kernel
-values $K_{x,y}$ can be negative or positive. Thus maximum norm \cite{max_norm}
-was also used to displace this range to $[-1, 1]$, so that kernel effects are
-maintained.
+grayscale images $I(x,y)$ have a dynamic range between $[0,255]$ and Kernel
+values $K(x,y)$ can be negative or positive. This work is part of a Deep
+Learning project where it is usual to operate with a dynamic range centered on
+zero. Therefore, we apply dynamic range expansion \cite{dinamic_rango} and
+maximum norm \cite{max_norm} to rearrange $\mathcal{T}[I(x,y)]=I^\prime(x,y)$
+between $[0,1]$ and $\mathcal{T}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$,
+respetively.
 
-Como la finalidad del trabajo desarrollado es ser aplicado Deep Learning es habitual 
-modificar rango dinamico a uno que se encuentra distubidos de sobre cero con valores positivos y negativos.
-Para ello se aplican metodos para modifcar el rango a uno apto parael trabajo. Es por ello que se aplica 
-la tecnica anterior.
 
 % Due to the data and convolution operation nature, a parallel approach it is much
 % more efficient than a sequential one in terms of speed. FPGAs were used for
