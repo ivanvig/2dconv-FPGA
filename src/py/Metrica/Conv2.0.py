@@ -21,7 +21,7 @@ def pos(matrix):
 # para RGB retorna MxNx3, RGBA  retorna MxNx4
 
 # CAMBIARRRR PATH
-img_path = "D:/Documents/Tarpuy/Procesamiento-R/2dconv-verilog/src/py/Metrica/img/da_bossGS.jpg"
+img_path = "./img/ironmancito.jpg"
 input_img = img.imread(img_path)
 
 # Filtro para la convolucion
@@ -44,6 +44,7 @@ kernel = np.array(
 
 # convolucon de la senal original
 Conv_original = fun.cross_corr(input_img, kernel)
+"""
 # normailzar el kernel
 ker_iv = np.asarray(ivn.ker_norm(kernel))
 
@@ -70,16 +71,16 @@ Conv_fix2 = pos(Conv_fix2)
 # noise = fun.potencia(np.subtract(Conv_original, Conv_fix))
 
 # print 'SNR = %d [dB]' % (np.log10(signal / noise) * 10), signal, noise
-
-fig = plt.figure()
-ax = fig.add_subplot(2, 2, 1)
+"""
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(1, 1, 1)
 ax.imshow(Conv_original, cmap="gray")
 ax.set_title("Conv Original")
 
-ax2 = fig.add_subplot(2, 2, 2)
-ax2.imshow(Conv_1, cmap="gray")
-ax2.set_title("Conv con S(19,14) con modf rango")
-
+#ax2 = fig.add_subplot(1, 1, 1)
+#ax2.imshow(Conv_1, cmap="gray")
+#ax2.set_title("Convolution Python")
+"""
 ax3 = fig.add_subplot(2, 2, 3)
 ax3.imshow(Conv_fix2, cmap="gray")
 ax3.set_title("Conv con ki")
@@ -88,4 +89,5 @@ ax4 = fig.add_subplot(2, 2, 4)
 
 ax4.imshow(Conv_fix, cmap="gray", vmin=np.amin(Conv_fix), vmax = np.amax(Conv_fix))
 ax4.set_title("redondeo saturacion y mas ")
+"""
 plt.show()
