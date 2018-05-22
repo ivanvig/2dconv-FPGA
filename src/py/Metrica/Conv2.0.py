@@ -21,15 +21,15 @@ def pos(matrix):
 # para RGB retorna MxNx3, RGBA  retorna MxNx4
 
 # CAMBIARRRR PATH
-img_path = "./img/ironmancito.jpg"
+img_path = "./img/Lenna.jpg"
 input_img = img.imread(img_path)
 
 # Filtro para la convolucion
 kernel = np.array(
     [
-        [0, 1, 0],
-        [1, -4, 1],
-        [0, 1, 0]
+        [0, -1, 0],
+        [-1, 4, -1],
+        [0, -1, 0]
     ])
 """
 # filtro gussiano
@@ -90,4 +90,5 @@ ax4 = fig.add_subplot(2, 2, 4)
 ax4.imshow(Conv_fix, cmap="gray", vmin=np.amin(Conv_fix), vmax = np.amax(Conv_fix))
 ax4.set_title("redondeo saturacion y mas ")
 """
+plt.axis('off')
 plt.show()
