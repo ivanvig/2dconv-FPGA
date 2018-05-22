@@ -511,7 +511,7 @@ coefficients called Kernel of size $(h \times h)$ and $S(x,y)$ is convolution
 result of size $(m-2 \times n-2)$ pixels because we are considered valid
 convolution \cite{validconv}. 
 
-\subsection{Change of Dinamic Range}
+\subsection{Change of Dynamic Range}
 
 We will focus on grayscale images because of their simplicity of implementation,
 but the design can be extrapolated to any other type of image. The pixels of the
@@ -521,7 +521,7 @@ Learning project where it is usual to operate with a dynamic range centered on
 zero. Therefore, we apply dynamic range expansion \cite{dinamic_rango} and
 maximum norm \cite{max_norm} to rearrange $\mathcal{T}[I(x,y)]=I^\prime(x,y)$
 between $[0,1]$ and $\mathcal{T}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$,
-respetively. Therefore, replacing in \eqref{conv-org}
+respectively. Therefore, replacing in \eqref{conv-org}
 
 \begin{equation}\label{conv-org1}
   G^\prime(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j).
@@ -529,7 +529,14 @@ respetively. Therefore, replacing in \eqref{conv-org}
 
 Finally, we apply the change of dynamic range on the output
 $\mathcal{T}[G^\prime(x,y)]=G(x,y)$ again and obtain range between $[0,255]$.
-The complete process is detailed in Fig. X.
+The complete process is detailed in Fig. \ref{transformation}.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3in]{filter}
+\caption{Transformation steps during processing.}
+\label{transformation}
+\end{figure}
 
 % Due to the data and convolution operation nature, a parallel approach it is much
 % more efficient than a sequential one in terms of speed. FPGAs were used for
