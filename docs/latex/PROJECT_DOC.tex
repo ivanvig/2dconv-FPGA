@@ -606,8 +606,12 @@ communicates it to the convolution module using a 32 bits GPIO port. This port
 writes the BRAMs that store the data that will be filtered. Due to the
 limitations of the size of the FPGA, no other interface was used, such as
 Ethernet or DMA to read the image directly from a storage device. However, the
-proposed architecture is indifferent to these methods. 
-
+proposed architecture is indifferent to these methods. The second stage is the
+processing. The batch is convolved with the kernel inside the module, which the
+user establishes through the GPIO. When the operation ends, a notification is
+sent to the microprocessor, which gives the order to recover the processed batch
+of the module and sends it to the PC. Finally, the post-processor stage joins
+the batches on the PC using a Python script.
 
 
 % As shown in Fig. \ref{general}, the workflow consists of three
