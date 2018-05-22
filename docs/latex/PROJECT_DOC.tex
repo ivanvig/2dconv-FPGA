@@ -852,11 +852,26 @@ the results are shown in Fig. \ref{images_py_bo}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=3in]{comparation}
+\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{identity_c}%
+\label{mem}}
+\hfil
+\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{shaped_c}%
+\label{transmitted}}
+\hfil
+\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{emboss_c}%
+\label{transmitted}}
 \caption{On the left, an image processed in a PC using python. On the right the
-  same image processed with the FPGA module.}
-\label{images_py_bo}
+  same image processed with the FPGA module}
+\label{images_py_po}
 \end{figure}
+
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=3in]{comparation}
+%\caption{On the left, an image processed in a PC using python. On the right the
+  %same image processed with the FPGA module.}
+%\label{images_py_bo}
+%\end{figure}
 
 
 The architecture was synthesized for different degrees of parallelism, Table
