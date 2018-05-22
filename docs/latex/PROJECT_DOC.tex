@@ -516,7 +516,7 @@ coefficients called Kernel of size $(h \times h)$ and $S(x,y)$ is convolution
 result of size $(m-2 \times n-2)$ pixels because we are considered valid
 convolution \cite{validconv}. 
 
-\subsection{Change of Dinamic Range}
+\subsection{Change of Dynamic Range}
 
 We will focus on grayscale images because of their simplicity of implementation,
 but the design can be extrapolated to any other type of image. The pixels of the
@@ -526,7 +526,7 @@ Learning project where it is usual to operate with a dynamic range centered on
 zero. Therefore, we apply dynamic range expansion \cite{dinamic_rango} and
 maximum norm \cite{max_norm} to rearrange $\mathcal{T}[I(x,y)]=I^\prime(x,y)$
 between $[0,1]$ and $\mathcal{T}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$,
-respetively. Therefore, replacing in \eqref{conv-org}
+respectively. Therefore, replacing in \eqref{conv-org}
 
 \begin{equation}\label{conv-org1}
   G^\prime(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j).
@@ -534,7 +534,14 @@ respetively. Therefore, replacing in \eqref{conv-org}
 
 Finally, we apply the change of dynamic range on the output
 $\mathcal{T}[G^\prime(x,y)]=G(x,y)$ again and obtain range between $[0,255]$.
-The complete process is detailed in Fig. X.
+The complete process is detailed in Fig. \ref{transformation}.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3in]{filter}
+\caption{Transformation steps during processing.}
+\label{transformation}
+\end{figure}
 
 % Due to the data and convolution operation nature, a parallel approach it is much
 % more efficient than a sequential one in terms of speed. FPGAs were used for
@@ -704,7 +711,6 @@ bit length and the result is saved into the first position of the memory.
 Once a pixel is processed, it is saved into the memory while the convolution unit
 shifts its image register, discarding the oldest $k$ pixels and loading new $k$
 pixels, i.e. one from each input column, like a FIFO structure.
-% As shown in Fig. \ref{proc_conv},
 This procedure is equivalent to shit the kernel vertically on the image. All this steps are synchronized in such a way that
 one processed pixel is generated in every clock cycle.
 
@@ -714,16 +720,6 @@ the clock cycle where the first processed pixel is written in memory. This laten
 equal to $k$ plus some more clock cycles needed to latch values during the
 convolution, and the difference between the read address and the write address
 must be equal to it.
-
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=2.5in]{proc_conv.pdf}
-%\caption{En gris se observan los datos que han sido cargados a los registros del
-%bloque de convoluci\'on, en el ciclo siguiente es posible ver como los valores
-%de cada columna que ingresaron primero han sido decartados, y nuevos valores han
-%sido cargados, produciendo un efecto de desplazamiento hacia abajo.}
-%\label{proc_conv}
-%\end{figure}
 
 Until this point the analysis was over a single convolution unit, now the
 approach to work with multiple convolution units working in parallel is
@@ -739,15 +735,7 @@ multiple convolution units in parallel will produce contiguous processed
 columns, sharing the common input columns. With this approach, for $N$
 convolution units the number of memory columns needed gets reduced from $N\cdot
 k$ to $N+k-1$. That means that adding a new convolution unit only adds one new
-memory columns as Fig. \ref{newconv} shows.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=3in]{new_conv}
-\caption{Using shared inputs approach, only one new memory column is added for
-  every new instantiated convolution unit.}
-\label{newconv}
-\end{figure}
+memory columns.
 
 The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
@@ -794,18 +782,22 @@ positions named above. The number of states is given by eq. \ref{niter}.
 
 To route the incoming and outgoing data, the MMU has a set of multiplexers whose
 select lines are managed by the finite state machine (Data multiplexer and FSM
-in Fig. \ref{general}).
+in Fig. \ref{general}). The data multiplexer is conformed by a set of smaller
+blocks which are classified into two classes depending on their function: memory
+multiplexer blocks (MMB) and processing multiplexer blocks (PMB). The MMB routes
+the raw data and the data from the MACs to a memory while the PMB routes the
+data from the memories to a MAC. Fig. \ref{muxes} shows the information flow
+between
+memories$\rightarrow$MMU$\rightarrow$MACs$\rightarrow$MMU$\rightarrow$memories.
+Both the MMBs and PMBs have a number of inputs dependent on the number of states
+from the MMU's FSM and its represented by the letter $s$ in the figure.
 
-\begin{figure*}[!t]
+\begin{figure}[!t]
 \centering
-\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{mem_space2}%
-\label{mem}}
-\hfil
-\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{data_sent}%
-\label{transmitted}}
-\caption{Comparison between different approaches.}
-\label{comp}
-\end{figure*}
+\includegraphics[width=3in]{muxes}
+\caption{Data flow between the MACs and the storage.}
+\label{muxes}
+\end{figure}
 
 A comparison between the naive (which would be assign $k$ independent
 memory columns to each convolution unit), the shared inputs and the
@@ -822,12 +814,22 @@ in a $N+k-1$ batch is $k-1$ and $\frac{k-1}{N+k-1}$ tends to zero as N
 increases. The shared inputs with circular shift approach is the best case
 scenario where no redundant data is transferred at all.
 
+\begin{figure}[!t]
+\centering
+\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{mem_space2}%
+\label{mem}}
+\hfil
+\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{data_sent}%
+\label{transmitted}}
+\caption{Comparison between different approaches.}
+\label{comp}
+\end{figure}
 
 \section{Implementation and Results}
 
-To ensure the proper functioning of the architecture a negative filter was
-coded in python and applied to an image, then the same filter was applied using
-the FPGA module. The results are showed in Fig. \ref{images_py_bo}.
+To ensure the proper functioning of the architecture multiple kernels were
+coded in python and applied to an image, then the same kernels were applied using
+the FPGA module. The results are shown in Fig. \ref{images_py_bo}.
 
 \begin{figure}[!t]
 \centering
@@ -837,19 +839,74 @@ the FPGA module. The results are showed in Fig. \ref{images_py_bo}.
 \label{images_py_bo}
 \end{figure}
 
-\begin{figure}[!t]
+The design was implemented in an Arty A7 board from Digilent. Using Xilinx
+Vivado Design Suite 2017.4 to write and synthesize the verilog code and to write
+the microblaze's C code. The client where the pre and pos-processing occurs was
+written in Python 2.7.
+
+The architecture was synthesized for different degrees of parallelism, tables
+\ref{res_table_dsp} and \ref{res_table} show the resources consumed by the
+module and the microprocessor on the FPGA with and without DSP respectively.
+
+\begin{table}[!t]
+% increase table row spacing, adjust to taste
+\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+\caption{Resource utilization table with DSP.}
+\label{res_table_dsp}
 \centering
-\includegraphics[width=3in]{comparation2}
-\caption{On the left, an image processed in a PC using python. On the right the
-  same image processed with the FPGA module.}
-\label{images_py_bo2}
-\end{figure}
+% some packages, such as mdw tools, offer better commands for making tables
+% than the plain latex2e tabular which is used here.
+\begin{tabular}{|c||c||c||c|}
+\hline
+  Parallelism & DSP(\%) & LUT(\%) & BRAM(\%)\\
+\hline
+  2 & 22.22 & 8.87 & 20\\
+\hline
+  4 & 44.44 & 9.72 & 22\\
+\hline
+  6 & 66.67 & 10.46 & 24\\
+\hline
+  8 & 88.89 & 11.77 & 26\\
+\hline
+  10 & 100 & 14.8 & 28\\
+\hline
+\end{tabular}
+\end{table}
 
+\begin{table}[!t]
+% increase table row spacing, adjust to taste
+\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+\caption{Resource utilization table without DSP.}
+\label{res_table}
+\centering
+% some packages, such as mdw tools, offer better commands for making tables
+% than the plain latex2e tabular which is used here.
+\begin{tabular}{|c||c||c||c|}
+\hline
+  Parallelism & DSP(\%) & LUT(\%) & BRAM(\%)\\
+\hline
+  4 & ----- & 22.25 & 22\\
+\hline
+  8 & ----- & 37.29 & 26\\
+\hline
+  12 & ----- & 52.49 & 30\\
+\hline
+  16 & ----- & 66.83 & 34\\
+\hline
+  20 & ----- & 82.91 & 38\\
+\hline
+  24 & ----- & 97.16 & 42\\
+\hline
+\end{tabular}
+\end{table}
 
-The design was implemented in an Arty 7 FPGA from Xilinx.
-The architecture was synthesized for different number of convolution units. The
-results obtained for BRAM utilization from the synthesis are compared with the estimated results in
-Fig. \ref{bram_n}. As expected, the increase has a linear behaviour.
+A comparison between the estimated BRAM utilization and the results obtained
+from synthesis is shown in Fig. \ref{bram_n}. As expected, the increase has a
+linear behaviour. 
 
 \begin{figure}[!t]
 \centering
@@ -857,27 +914,6 @@ Fig. \ref{bram_n}. As expected, the increase has a linear behaviour.
 \caption{Normalized curve for BRAM resources utilization.}
 \label{bram_n}
 \end{figure}
-
-%\begin{table}[!t]
-%% increase table row spacing, adjust to taste
-%\renewcommand{\arraystretch}{1.3}
-%% if using array.sty, it might be a good idea to tweak the value of
-%% \extrarowheight as needed to properly center the text within the cells
-%\caption{Resource utilization table.}
-%\label{res_table}
-%\centering
-%% Some packages, such as MDW tools, offer better commands for making tables
-%% than the plain LaTeX2e tabular which is used here.
-%\begin{tabular}{|c||c||c||c|}
-%\hline
- %Parallelism & LUT & BRAM & DSP\\
-%\hline
-  %4 & 2022 & 11 & 40\\
-%\hline
-  %8 & 2448 & 13 & 80\\
-%\hline
-%\end{tabular}
-%\end{table}
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
