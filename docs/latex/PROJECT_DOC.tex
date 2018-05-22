@@ -459,11 +459,16 @@ that is often desired in neural networks. This coupling of processing,
 parallelism and flexibility at very high speed is what makes FPGAs a platform of
 choice for the development of these areas \cite{papercnn}.
 
-Convolutional FPGA architectures can store the entire image \cite{paper3} and
-optimize the pixel processing speed \cite{paper1} and reduce complexity of
-implementation \cite{paper5}. Another approach is the filtering by blocks of
-image data, optimizing the parallelization of convolders \cite{paper2} and memory
-management \cite{paper4}. The difficulty presented by these schemes is the
+There are many examples in the literature of 2D convolution implementations,
+where most of the work focuses on high performance, resource reduction and the
+FPGA area. As shown in \cite{paper3}, BRAM memory blocks are one of the most
+used elements and consume more power. Therefore, the architectures seek to
+reduce the use of BRAMs by dividing them into two groups that consider the total
+or partial storage of the image. The first of them increases processing by
+applying parallelization as well as reusing resources to reduce complexity
+\cite{paper1,paper5}. On the other hand, architectures with partial storage
+partition the image into as many parts as convolders are used
+\cite{paper2,paper4}. The difficulty presented by these schemes is the
 non-modularization of processing, making it difficult to increase the work rate
 by increasing parallelism.
 
@@ -843,9 +848,32 @@ The architecture was synthesized for different degrees of parallelism, tables
 \ref{res_table_dsp} and \ref{res_table} show the resources consumed by the
 module and the microprocessor on the FPGA with and without DSP respectively.
 
-A comparison between the estimated BRAM utilization and the results obtained
-from synthesis is shown in Fig. \ref{bram_n}. As expected, the increase has a
-linear behaviour. 
+\begin{table}[!t]
+% increase table row spacing, adjust to taste
+\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+\caption{Resource utilization table with DSP.}
+\label{res_table_dsp}
+\centering
+% some packages, such as mdw tools, offer better commands for making tables
+% than the plain latex2e tabular which is used here.
+\begin{tabular}{|c||c||c||c|}
+\hline
+  Parallelism & DSP(\%) & LUT(\%) & BRAM(\%)\\
+\hline
+  2 & 22.22 & 8.87 & 20\\
+\hline
+  4 & 44.44 & 9.72 & 22\\
+\hline
+  6 & 66.67 & 10.46 & 24\\
+\hline
+  8 & 88.89 & 11.77 & 26\\
+\hline
+  10 & 100 & 14.8 & 28\\
+\hline
+\end{tabular}
+\end{table}
 
 \begin{table}[!t]
 % increase table row spacing, adjust to taste
@@ -876,32 +904,9 @@ linear behaviour.
 \end{tabular}
 \end{table}
 
-\begin{table}[!t]
-% increase table row spacing, adjust to taste
-\renewcommand{\arraystretch}{1.3}
-% if using array.sty, it might be a good idea to tweak the value of
-% \extrarowheight as needed to properly center the text within the cells
-\caption{Resource utilization table with DSP.}
-\label{res_table_dsp}
-\centering
-% some packages, such as mdw tools, offer better commands for making tables
-% than the plain latex2e tabular which is used here.
-\begin{tabular}{|c||c||c||c|}
-\hline
-  Parallelism & DSP(\%) & LUT(\%) & BRAM(\%)\\
-\hline
-  2 & 22.22 & 8.87 & 20\\
-\hline
-  4 & 44.44 & 9.72 & 22\\
-\hline
-  6 & 66.67 & 10.46 & 24\\
-\hline
-  8 & 88.89 & 11.77 & 26\\
-\hline
-  10 & 100 & 14.8 & 28\\
-\hline
-\end{tabular}
-\end{table}
+A comparison between the estimated BRAM utilization and the results obtained
+from synthesis is shown in Fig. \ref{bram_n}. As expected, the increase has a
+linear behaviour. 
 
 \begin{figure}[!t]
 \centering
@@ -909,8 +914,6 @@ linear behaviour.
 \caption{Normalized curve for BRAM resources utilization.}
 \label{bram_n}
 \end{figure}
-
-
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
