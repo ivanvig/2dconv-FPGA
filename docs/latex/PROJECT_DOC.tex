@@ -768,7 +768,7 @@ Figure \ref{algorithm} shows how the memories are written using this logic.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=3in]{algorithm}
+\includegraphics[scale=0.55]{algorithm}
 \caption{Memory writing process using circular shift for $N = 4$ and $k = 3$.}
 \label{algorithm}
 \end{figure}
@@ -820,12 +820,13 @@ scenario where no redundant data is transferred at all.
 
 \begin{figure}[!t]
 \centering
-\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{mem_space2}%
+\subfloat[]{\includegraphics[scale=0.4]{mem_space2}%
 \label{mem}}
-\hfil
-\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{data_sent}%
+\hfil \vspace{-0.5cm}
+\subfloat[]{\includegraphics[scale=0.4]{data_sent}%
 \label{transmitted}}
-\caption{Comparison between different approaches.}
+\caption{Comparison between different approaches. \protect\subref{mem} Amount of
+  memory required. \protect\subref{transmitted} Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.}
 \label{comp}
 \end{figure}
 
@@ -851,13 +852,18 @@ sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1, 0,
 
 \begin{figure}[!t]
 \centering
-\subfloat[Identity kernel.]{\includegraphics[width=2.5in]{identity_c}}
+\subfloat[]{\includegraphics[scale=1.1]{identity_c}
+  \label{fig:identity}}
 \hfil
-\subfloat[Sharpening kernel.]{\includegraphics[width=2.5in]{shaped_c}}
+\subfloat[]{\includegraphics[scale=1.1]{shaped_c}
+  \label{fig:share}}
 \hfil
-\subfloat[Embossing kernel.]{\includegraphics[width=2.5in]{emboss_c}}
+\subfloat[]{\includegraphics[scale=1.1]{emboss_c}
+\label{fig:embossing}}
 \caption{On the left, an image processed in a PC using python, on the right the
-  same image processed with the FPGA module.} 
+  same image processed with the FPGA module. \protect\subref{fig:identity}
+  Identity Kernel. \protect\subref{fig:share} Sharpening Kernel.
+  \protect\subref{fig:embossing} Embossing Kernel.}
 \label{images_py_po}
 \end{figure}
 
@@ -878,16 +884,16 @@ of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
 % some packages, such as mdw tools, offer better commands for making tables
 % than the plain latex2e tabular which is used here.
 \begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-   & \multicolumn{3}{c|}{With DSP{[}n{]}(\%)} & \multicolumn{3}{c|}{Without DSP{[}n{]}(\%)} \\ \hline
-P  & DSP            & LUT        & BRAM       & DSP         & LUT           & BRAM         \\ \hline
-2  & 20(22)         & 1845(9)    & 10(20)     & ---         & 3168(15)      & 10(20)         \\ \hline
-4  & 40(44)         & 2022(10)   & 11(22)     & ---         & 4627(22)      & 11(22)         \\ \hline
-6  & 60(67)         & 2175(10)   & 12(24)     & ---         & 6063(29)      & 12(24)         \\ \hline
-8  & 80(89)         & 2448(12)   & 13(26)     & ---         & 7756(37)      & 13(26)         \\ \hline
-10 & ---            & ---        & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
-12 & ---            & ---        & ---        & ---         & 10917(52)     & 15(30)         \\ \hline
-24 & ---            & ---        & ---        & ---         & 20209(97)     & 21(42)         \\ \hline
+  \hline
+  & \multicolumn{3}{c|}{\textbf{With DSP [N](\%)}} & \multicolumn{3}{c|}{\textbf{Without DSP [N](\%)}} \\ \hline
+  \textbf{P}  & \textbf{DSP}            & \textbf{LUT}        & \textbf{BRAM}       & \textbf{DSP}         & \textbf{LUT}           & \textbf{BRAM}         \\ \hline
+  2  & 20(22)         & 1845(9)    & 10(20)     & ---         & 3168(15)      & 10(20)         \\ \hline
+  4  & 40(44)         & 2022(10)   & 11(22)     & ---         & 4627(22)      & 11(22)         \\ \hline
+  6  & 60(67)         & 2175(10)   & 12(24)     & ---         & 6063(29)      & 12(24)         \\ \hline
+  8  & 80(89)         & 2448(12)   & 13(26)     & ---         & 7756(37)      & 13(26)         \\ \hline
+  10 & ---            & ---        & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
+  12 & ---            & ---        & ---        & ---         & 10917(52)     & 15(30)         \\ \hline
+  24 & ---            & ---        & ---        & ---         & 20209(97)     & 21(42)         \\ \hline
 \end{tabular}           
 \end{table}
   
@@ -897,7 +903,7 @@ linear behaviour.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=3in]{BRAM_c}
+\includegraphics[scale=0.4]{BRAM_c}
 \caption{Normalized curve for BRAM resources utilization.}
 \label{bram_n}
 \end{figure}
