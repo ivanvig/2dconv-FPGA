@@ -447,9 +447,9 @@ filters for images that focus, blur, enhance edges and detect edges, among
 others, use convolution as a mathematical operation. Image processing is a very
 extensive research area with a large number of applications in multiple fields
 such as medicine, engineering, navigation, aeronautics, among others.
-Applications recently, use convolutional neural networks (CNN)
-\cite{Lecun-et-al-1998} where a fast and efficient convolution implementation is
-important.
+Applications recently, use convolutional neural networks
+(CNN)~\cite{Lecun-et-al-1998} where a fast and efficient convolution
+implementation is important.
 
 The implementation of high speed image processing systems in FPGA has been a
 very active field. This is mainly due to the ability to take advantage of bit
@@ -457,18 +457,18 @@ level parallelism, pixel level, neighborhood level and task level to accelerate
 the calculation. In addition, FPGAs are reconfigurable, allowing the flexibility
 that is often desired in neural networks. This coupling of processing,
 parallelism and flexibility at very high speed is what makes FPGAs a platform of
-choice for the development of these areas \cite{papercnn}.
+choice for the development of these areas~\cite{papercnn}.
 
 There are many examples in the literature of 2D convolution implementations,
 where most of the work focuses on high performance, resource reduction and the
-FPGA area. As shown in \cite{paper3}, BRAM memory blocks are one of the most
+FPGA area. As shown in~\cite{paper3}, BRAM memory blocks are one of the most
 used elements and consume more power. Therefore, the architectures seek to
 reduce the use of BRAMs by dividing them into two groups that consider the total
 or partial storage of the image. The first of them increases processing by
-applying parallelization as well as reusing resources to reduce complexity
-\cite{paper1,paper5}. On the other hand, architectures with partial storage
-partition the image into as many parts as convolders are used
-\cite{paper2,paper4}. The difficulty presented by these schemes is the
+applying parallelization as well as reusing resources to reduce
+complexity~\cite{paper1,paper5}. On the other hand, architectures with partial
+storage partition the image into as many parts as convolders are
+used~\cite{paper2,paper4}. The difficulty presented by these schemes is the
 non-modularization of processing, making it difficult to increase the work rate
 by increasing parallelism.
 
@@ -514,7 +514,7 @@ Bidimensional convolution is defined mathematically as
 where $I(x,y)$ is an image of size $(m \times n)$ pixels, $K(i,j)$ is a set of
 coefficients called Kernel of size $(h \times h)$ and $S(x,y)$ is convolution
 result of size $(m-2 \times n-2)$ pixels because we are considered valid
-convolution \cite{validconv}. 
+convolution~\cite{validconv}. 
 
 \subsection{Change of Dynamic Range}
 
@@ -523,10 +523,10 @@ but the design can be extrapolated to any other type of image. The pixels of the
 grayscale images $I(x,y)$ have a dynamic range between $[0,255]$ and Kernel
 values $K(x,y)$ can be negative or positive. This work is part of a Deep
 Learning project where it is usual to operate with a dynamic range centered on
-zero. Therefore, we apply dynamic range expansion \cite{dinamic_rango} and
-maximum norm \cite{max_norm} to rearrange $\mathcal{T}[I(x,y)]=I^\prime(x,y)$
+zero. Therefore, we apply dynamic range expansion~\cite{dinamic_rango} and
+maximum norm~\cite{max_norm} to rearrange $\mathcal{T}[I(x,y)]=I^\prime(x,y)$
 between $[0,1]$ and $\mathcal{T}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$,
-respectively. Therefore, replacing in \eqref{conv-org}
+respectively. Therefore, replacing in~\eqref{conv-org}
 
 \begin{equation}\label{conv-org1}
   G^\prime(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j).
@@ -534,7 +534,7 @@ respectively. Therefore, replacing in \eqref{conv-org}
 
 Finally, we apply the change of dynamic range on the output
 $\mathcal{T}[G^\prime(x,y)]=G(x,y)$ again and obtain range between $[0,255]$.
-The complete process is detailed in Fig. \ref{transformation}.
+The complete process is detailed in Fig.~\ref{transformation}.
 
 \begin{figure}[!t]
 \centering
@@ -601,7 +601,7 @@ entire process is divided into three stages, pre-processing, processing and
 post-processing. The pre-processing consists of capturing the image and applying
 the detailed transformation in Section \ref{preproc} using a Python script. In
 addition, the script divides the image into batch and is sent by the UART port
-to the FPGA. In the FPGA a microprocessor receives the information and
+to the FPGA\@. In the FPGA a microprocessor receives the information and
 communicates it to the convolution module using a 32 bits GPIO port. This port
 writes the BRAMs that store the data that will be filtered. Due to the
 limitations of the size of the FPGA, no other interface was used, such as
@@ -805,17 +805,17 @@ from the MMU's FSM and its represented by the letter $s$ in the figure.
 
 A comparison between the naive (which would be assign $k$ independent
 memory columns to each convolution unit), the shared inputs and the
-shared inputs with circular shift approaches is shown in Fig. \ref{comp}. Figure
-\ref{mem} shows the amount of memory required in function of the parallelism
-degree while Fig. \ref{transmitted} shows the amount of transferred bytes
-(considering that every byte transmitted is stored in only one memory register)
-for processing a $1600\times1024$ image and a $3\times3$ kernel. As shown in Fig.
-\ref{transmitted}, with the naive approach the transferred data is almost $3$
-times the image size (because a $3\times3$ kernel) and it does not get affected
-by the parallelism degree. The shared inputs approach tends to diminish the
-redundant data transferred as $N$ increases, that is because the redundant data
-in a $N+k-1$ batch is $k-1$ and $\frac{k-1}{N+k-1}$ tends to zero as N
-increases. The shared inputs with circular shift approach is the best case
+shared inputs with circular shift approaches is shown in Fig.~\ref{comp}.
+Figure~\ref{mem} shows the amount of memory required in function of the
+parallelism degree while Fig.~\ref{transmitted} shows the amount of transferred
+bytes (considering that every byte transmitted is stored in only one memory
+register) for processing a $1600\times1024$ image and a $3\times3$ kernel. As
+shown in Fig.~\ref{transmitted}, with the naive approach the transferred data is
+almost $3$ times the image size (because a $3\times3$ kernel) and it does not
+get affected by the parallelism degree. The shared inputs approach tends to
+diminish the redundant data transferred as $N$ increases, that is because the
+redundant data in a $N+k-1$ batch is $k-1$ and $\frac{k-1}{N+k-1}$ tends to zero
+as N increases. The shared inputs with circular shift approach is the best case
 scenario where no redundant data is transferred at all.
 
 \begin{figure}[!t]
@@ -837,46 +837,35 @@ the microblaze's C code. The client where the pre and post-processing occurs was
 written in Python 2.7.
 
 In the first instance the desired kernel's coefficients are loaded followed by
-the corresponding image batch via UART. Although UART is slow with respect to
+the corresponding image batch via UART\@. Although UART is slow with respect to
 the processing time it is used because its simplicity and slow resource
 consumption compared with other transmission medias.
 As far as data representation is concerned fixed point arithmetic was used with
-a resolution of U(8,0) for input and output image and S(8,7) for kernel.
+a resolution of $U(8,0)$ for input and output image and $S(8,7)$ for kernel.
 
 To ensure the proper functioning of the architecture multiple kernels were
 coded in python and applied to an image, then the same kernels were applied using
-the FPGA module. The kernels used were sharpening $\begin{smallmatrix}0 & -1 &
-  0\\ -1 & 5 & -1\\ 0 & -1 & 0\end{smallmatrix}$,
-embossing $[-2\quad-1\quad0; -1\quad0\quad1; 012]$ and identity $[0\quad0\quad0; 0\quad1\quad0; 0\quad0\quad0]$ and
-the results are shown in Fig. \ref{images_py_bo}.
+the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0, 0]$
+sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1, 0,
+1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}.
 
 \begin{figure}[!t]
 \centering
-\subfloat[Amount of memory required.]{\includegraphics[width=2.5in]{identity_c}%
-\label{mem}}
+\subfloat[Identity kernel.]{\includegraphics[width=2.5in]{identity_c}}
 \hfil
-\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{shaped_c}%
-\label{transmitted}}
+\subfloat[Sharpening kernel.]{\includegraphics[width=2.5in]{shaped_c}}
 \hfil
-\subfloat[Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.]{\includegraphics[width=2.5in]{emboss_c}%
-\label{transmitted}}
-\caption{On the left, an image processed in a PC using python. On the right the
-  same image processed with the FPGA module}
+\subfloat[Embossing kernel.]{\includegraphics[width=2.5in]{emboss_c}}
+\caption{On the left, an image processed in a PC using python, on the right the
+  same image processed with the FPGA module.} 
 \label{images_py_po}
 \end{figure}
 
-%\begin{figure}[!t]
-%\centering
-%\includegraphics[width=3in]{comparation}
-%\caption{On the left, an image processed in a PC using python. On the right the
-  %same image processed with the FPGA module.}
-%\label{images_py_bo}
-%\end{figure}
-
-
 The architecture was synthesized for different degrees of parallelism, Table
 \ref{res_table} shows the resources consumed by the module and the
-microprocessor on the FPGA with and without DSP respectively. 
+microprocessor on the FPGA with and without DSP respectively. Due to limitations
+of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
+24 without DSP but with a more intensive use of LUT.
 
 \begin{table}[!t]
 % increase table row spacing, adjust to taste
@@ -888,25 +877,20 @@ microprocessor on the FPGA with and without DSP respectively.
 \centering
 % some packages, such as mdw tools, offer better commands for making tables
 % than the plain latex2e tabular which is used here.
-\begin{tabular}{|c||c||c||c||c||c||c|}
+\begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
-   & \multicolumn{3}{|c|}{With DSP(\%)} & \multicolumn{3}{|c|}{Without DSP(\%)}\\
-\hline
-  P & DSP & LUT & BRAM & DSP & LUT & BRAM\\
-\hline
-  2 & 22.22 & 8.87 & 20 & ----- & 22.25 & 22\\
-\hline
-  4 & 44.44 & 9.72 & 22 & ----- & 37.29 & 26\\
-\hline
-  6 & 66.67 & 10.46 & 24 & ----- & 52.49 & 30\\
-\hline
-  8 & 88.89 & 11.77 & 26 & ----- & 66.83 & 34\\
-\hline
-  10 & 100 & 14.8 & 28 & ----- &82.91 & 38\\
-\hline
+   & \multicolumn{3}{c|}{With DSP{[}n{]}(\%)} & \multicolumn{3}{c|}{Without DSP{[}n{]}(\%)} \\ \hline
+P  & DSP            & LUT        & BRAM       & DSP         & LUT           & BRAM         \\ \hline
+2  & 20(22)         & 1845(9)    & 10(20)     & ---         & 3168(15)      & 10(20)         \\ \hline
+4  & 40(44)         & 2022(10)   & 11(22)     & ---         & 4627(22)      & 11(22)         \\ \hline
+6  & 60(67)         & 2175(10)   & 12(24)     & ---         & 6063(29)      & 12(24)         \\ \hline
+8  & 80(89)         & 2448(12)   & 13(26)     & ---         & 7756(37)      & 13(26)         \\ \hline
+10 & ---            & ---        & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
+12 & ---            & ---        & ---        & ---         & 10917(52)     & 15(30)         \\ \hline
+24 & ---            & ---        & ---        & ---         & 20209(97)     & 21(42)         \\ \hline
 \end{tabular}           
 \end{table}
-
+  
 A comparison between the estimated BRAM utilization and the results obtained
 from synthesis is shown in Fig. \ref{bram_n}. As expected, the increase has a
 linear behaviour. 
