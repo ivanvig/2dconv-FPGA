@@ -653,28 +653,30 @@ set of columns of the FPGA's block RAM.
 \subsubsection{States}
 It is possible to see that during the work cycle, the convolution module goes
 through several states, as shown in Fig.\ref{state}.
+States transition are controlled by coded instructions embedded in the 32 bits input frame,
+and the module will remain in its current state until it receives a valid instruction.
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
 configured, to do so it must receive a reset signal.
 
-State transition are controlled by coded instructions embedded in the 32 bits input frame.
+
 %he most significant bit of the 32 bits input in the module
 %must be set to high. The Fig. \textbf{FIGURABITS} shows the 32 bits input
 %frame structure and the binary code for the instructions.
 
-The module will stay in the \textbf{reset} state until it receives the
-instruction to go to the \textbf{KernelLoad} state, in which state the kernel
-coefficients are loaded into the module. Then it goes to the \textbf{SizeLoad}
-state where the image's height is loaded, the need for this is explained in
+After receiving correspondent coded instruction, its will switch to the \textbf{KernelLoad} state,
+in which the kernel coefficients are loaded into the module. Then it goes to the \textbf{SizeLoad}
+state where the image's height is loaded, the argument for doing this is explained in
 section \ref{infstorage}. Once the module has gone through this setup states it
-will not come back to them until the entire image is processed. Now the
-processing loop start, first the module goes to the \textbf{ImageLoad} state and
-saves in the memory the batch, then is goes to the \textbf{Run} state where the
-processing occurs, while in processing the module can not be interrupted, i.e.
-it will ignore all instructions till the batch is processed, as soon as the
-processing is ended a notification will be emitted through Control Unit's
-\textit{EoP} pin and the module will wait the instruction to got to the
-\textbf{Out} state where the already processed batch is send back to the microprocessor.
+will not come back to them until the entire image is processed.
+
+To begin with the processing loop, first the module goes to the \textbf{ImageLoad} state and
+stores the batch in memory. Then is goes to the \textbf{Run} state where the
+processing occurs, and while processing is being made the module can not be interrupted, i.e.
+it will ignore all instructions till the batch is processed completely. As soon as 
+processing step is ended, a notification will be emitted through Control Unit's
+\textit{EoP} pin and the module will wait for \textbf{Out} state switch instruction, state where the 
+already processed batch is sent back to the microprocessor.
 
 All this states logic is managed by the control unit, which depending on the
 state will communicate the corresponding control signal to the other components
@@ -718,7 +720,7 @@ pixels, i.e. one from each input column, like a FIFO structure.
 This procedure is equivalent to shit the kernel vertically on the image. All this steps are synchronized in such a way that
 one processed pixel is generated in every clock cycle.
 
-The AGU manages the memory's read and write address, it takes into account the
+The AGU manages the memory's read and write addresses, and it takes into account the
 latency between the clock cycle where the first pixel in the memory is read and
 the clock cycle where the first processed pixel is written in memory. This latency is
 equal to $k$ plus some more clock cycles needed to latch values during the
@@ -726,24 +728,24 @@ convolution, and the difference between the read address and the write address
 must be equal to it.
 
 Until this point the analysis was over a single convolution unit, now the
-approach to work with multiple convolution units working in parallel is
+approach to work with multiple convolution units in parallel is
 described.
 
 As mentioned above, $k$ columns are needed as input to produce one processed
 column in a convolution unit, that means that $2k$ columns are needed for two
-convolution units, however given the nature of the convolution operation, to
+convolution units. However, given the nature of the convolution operation, to
 produce a contiguous column it is necessary to shift the input columns by one.
-Hence, there is an overlap between the two inputs and this produces that even that $k$ input columns are still needed per convolution unit, only
-$k+1$ different input columns are needed for all the units. For that reason, it was decided that
+Hence, there is an overlap between the two inputs and this produces that even $k$ input columns are still needed per convolution unit, only
+$k+1$ different input columns are needed for all the units. For this reason, it was decided that
 multiple convolution units in parallel will produce contiguous processed
 columns, sharing the common input columns. With this approach, for $N$
 convolution units the number of memory columns needed gets reduced from $N\cdot
-k$ to $N+k-1$. That means that adding a new convolution unit only adds one new
+k$ to $N+k-1$, concluding that adding a new convolution unit only adds one new
 memory columns.
 
 The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
-that already is in the memory, some data is reused between iterations. Given $N$ convolution
+that is already in memory, some data is reused between iterations. Given $N$ convolution
 units and a $k\times k$ kernel, a $N+k-1$ batch width is needed, but the
 processed batch has a width of $N$ columns, i.e. one for each convolution unit,
 therefore the last $k-1$ memory columns are not overwritten and maintain the
@@ -878,7 +880,7 @@ sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1, 0,
 \subfloat[]{\includegraphics[scale=1.1]{shaped_c}
   \label{fig:share}}
 \hfil
-\subfloat[]{\includegraphics[scale=1.1]{emboss_c}
+\subfloat[]{\includegraphics[scale=1.1]{emboss_c2}
 \label{fig:embossing}}
 \caption{On the left, an image processed in a PC using python, on the right the
   same image processed with the FPGA module. \protect\subref{fig:identity}
@@ -891,6 +893,7 @@ The architecture was synthesized for different degrees of parallelism, Table
 \ref{res_table} shows the resources consumed by the module and the
 microprocessor on the FPGA with and without DSP respectively. Due to limitations
 of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
+
 24 without DSP but with a more intensive use of LUT.
 
 \begin{table}[!t]
@@ -923,7 +926,7 @@ linear behaviour.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[scale=0.4]{BRAM_c}
+\includegraphics[scale=0.3]{BRAM_c}
 \caption{Normalized curve for BRAM resources utilization.}
 \label{bram_n}
 \end{figure}
