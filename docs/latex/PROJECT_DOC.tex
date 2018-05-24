@@ -781,6 +781,19 @@ must be an integer $m$ such that
 
 Figure \ref{algorithm} shows how the memories are written using this logic.
 
+\begin{figure}[!t]
+\centering
+\subfloat[]{\includegraphics[width=2.5in]{muxes}%
+\label{dflow}}
+\hfil \vspace{0.1cm}
+\centering
+\subfloat[]{\includegraphics[width=2.5in]{muxes_cont}%
+\label{int_struct}}
+\caption{\protect\subref{dflow} shows the data flow between the MACs and the
+  storage. \protect\subref{int_struct} shows the internal structure of MMB and PMB.}
+\label{muxes}
+\end{figure}
+
 The logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
 parallelism degree and the iteration number.
@@ -817,18 +830,6 @@ from the MMU's FSM and its represented by the letter $s$ in the figure.
 \label{comp}
 \end{figure}
 
-\begin{figure}[!t]
-\centering
-\subfloat[]{\includegraphics[width=2.5in]{muxes}%
-\label{dflow}}
-\hfil \vspace{0.1cm}
-\centering
-\subfloat[]{\includegraphics[width=2.5in]{muxes_cont}%
-\label{int_struct}}
-\caption{\protect\subref{dflow} shows the data flow between the MACs and the
-  storage. \protect\subref{int_struct} shows the internal structure of MMB and PMB.}
-\label{muxes}
-\end{figure}
 
 A comparison between the naive (which would be assign $k$ independent
 memory columns to each convolution unit), the shared inputs and the
