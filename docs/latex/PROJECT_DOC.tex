@@ -872,7 +872,7 @@ scenario where no redundant data is transferred at all.
 \section{Implementation and Results}\label{sec:implementation}
 
 The design was implemented in an Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using Xilinx
-Vivado Design Suite 2017.4 tools. A $100 MHz$ reference clock frequency was synthesized.
+Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock frequency was synthesized.
 The client where the pre and post-processing occurs was written in Python 2.7.
 
 In the first instance the desired kernel's coefficients are loaded followed by
@@ -939,11 +939,13 @@ of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
 \end{tabular}           
 \end{table}
   
+
 A comparison between the estimated BRAM utilization and the results obtained
-from synthesis is shown in Fig. \ref{bram_n}. As wanted, utilization increment linear behaviour was achieved. 
+from synthesis is shown in Fig. \ref{bram_n}. Normalization was made with respect to BRAM utilization percentage dividing by maximun utilization 
+percentage value, and considering that microblaze instance already occupies $18$ \% of BRAM resources. As wanted, utilization increment linear behaviour was achieved. 
 
 Considering convolution operation processing, one pixel per clock cycle is obtained, per instantiated MAC unit, i.e. if $16$ MAC unit were instantiated,
-with a reference clock at $100$ MHz, $1.6$ Gigapixels/second (Gp/s) throughput is achieved. In addition, regarding load and read stage, where one pixel every two
+with a reference clock at $100$ MHz , $1.6$ Gigapixels/second (Gp/s) throughput is achieved. In addition, regarding load and read stage, where one pixel every two
  clock cycles is load, $23.2$ Megapixels/second (Mp/s) throughput is obtained.
 
 \begin{figure}[!t]
@@ -1062,7 +1064,8 @@ presented, which allows our system work with different parallelism degrees.
 In addition, we optimized the use of  memory resources implementing an algorithm
 used not only for reading and writing operations but also interaction between implemented modules. 
 Performances and results show that resources utilization concerning BRAM resources, increase linearly, as desired.
- High throughput was achieved in what processing  is concerned. On the other hand, the limiting factor that impacted
+
+High throughput was achieved in what processing  is concerned. On the other hand, the limiting factor that impacted
  the implemented system the most was UART speed transmission. Another limiting factor was the DSP48A1 slices.
 Both factors mentioned above are easily solved by using an FPGA with more slices and resources.
 
