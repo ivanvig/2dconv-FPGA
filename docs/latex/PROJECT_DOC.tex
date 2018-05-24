@@ -845,18 +845,18 @@ redundant data in a $N+k-1$ batch is $k-1$ and $\frac{k-1}{N+k-1}$ tends to zero
 as N increases. The shared inputs with circular shift approach is the best case
 scenario where no redundant data is transferred at all.
 
-\begin{figure}[!t]
-\centering
-\subfloat[]{\includegraphics[scale=0.3]{mem_space2}%
-\label{mem}}
-\hfil \vspace{0.1cm}
-\centering
-\subfloat[]{\includegraphics[scale=0.3]{data_sent}%
-\label{transmitted}}
-\caption{Comparison between different approaches. \protect\subref{mem} Amount of
-  memory required. \protect\subref{transmitted} Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.}
-\label{comp}
-\end{figure}
+% \begin{figure}[!t]
+% \centering
+% \subfloat[]{\includegraphics[scale=0.3]{mem_space2}%
+% \label{mem}}
+% \hfil \vspace{0.1cm}
+% \centering
+% \subfloat[]{\includegraphics[scale=0.3]{data_sent}%
+% \label{transmitted}}
+% \caption{Comparison between different approaches. \protect\subref{mem} Amount of
+%   memory required. \protect\subref{transmitted} Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.}
+% \label{comp}
+% \end{figure}
 
 \section{Implementation and Results}\label{sec:implementation}
 
