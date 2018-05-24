@@ -653,28 +653,29 @@ set of columns of the FPGA's block RAM.
 \subsubsection{States}
 It is possible to see that during the work cycle, the convolution module goes
 through several states, as shown in Fig.\ref{state}.
+States transition are controlled by coded instructions embedded in the 32 bits input frame,
+and the module will remain in its current state until it receives a valid instruction.
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
 configured, to do so it must receive a reset signal.
 
-State transition are controlled by coded instructions embedded in the 32 bits input frame.
+
 %he most significant bit of the 32 bits input in the module
 %must be set to high. The Fig. \textbf{FIGURABITS} shows the 32 bits input
 %frame structure and the binary code for the instructions.
 
-The module will stay in the \textbf{reset} state until it receives the
-instruction to go to the \textbf{KernelLoad} state, in which state the kernel
-coefficients are loaded into the module. Then it goes to the \textbf{SizeLoad}
-state where the image's height is loaded, the need for this is explained in
+After receiving correspondent coded instruction, its will switch to the \textbf{KernelLoad} state,
+in which the kernel coefficients are loaded into the module. Then it goes to the \textbf{SizeLoad}
+state where the image's height is loaded, the argument for doing this is explained in
 section \ref{infstorage}. Once the module has gone through this setup states it
-will not come back to them until the entire image is processed. Now the
-processing loop start, first the module goes to the \textbf{ImageLoad} state and
-saves in the memory the batch, then is goes to the \textbf{Run} state where the
-processing occurs, while in processing the module can not be interrupted, i.e.
-it will ignore all instructions till the batch is processed, as soon as the
-processing is ended a notification will be emitted through Control Unit's
-\textit{EoP} pin and the module will wait the instruction to got to the
-\textbf{Out} state where the already processed batch is send back to the microprocessor.
+will not come back to them until the entire image is processed. To begin with the
+processing loop, first the module goes to the \textbf{ImageLoad} state and
+stores the batch in memory. Then is goes to the \textbf{Run} state where the
+processing occurs, and while processing is being made the module can not be interrupted, i.e.
+it will ignore all instructions till the batch is processed completely. As soon as 
+processing step is ended, a notification will be emitted through Control Unit's
+\textit{EoP} pin and the module will wait for \textbf{Out} state switch instruction, state where the 
+already processed batch is sent back to the microprocessor.
 
 All this states logic is managed by the control unit, which depending on the
 state will communicate the corresponding control signal to the other components
