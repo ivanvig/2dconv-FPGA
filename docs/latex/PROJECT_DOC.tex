@@ -906,15 +906,12 @@ image has good quality with all kernel filters tested.
 \label{images_py_po}
 \end{figure}
 
-
-
 The architecture was synthesized for different degrees of parallelism, Table
 \ref{res_table} shows the resources consumed by the module and the
 microprocessor on the FPGA with and without DSP respectively. As awaited, a linear consumption
 increase is shown according to parallelism degree. Due to limitations
 of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
 24 without DSP but with a more intensive use of LUT.
-
 
 
 \begin{table}[!t]
@@ -943,6 +940,10 @@ of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
   
 A comparison between the estimated BRAM utilization and the results obtained
 from synthesis is shown in Fig. \ref{bram_n}. As wanted, utilization increment linear behaviour was achieved. 
+
+Considering convolution operation processing, one pixel per clock cycle is obtained, per instantiated MAC unit, i.e. if $16$ MAC unit were instantiated,
+with a reference clock at $100$ MHz, $1.6$ Gigapixels/second (Gp/s) throughput is achieved. In addition, regarding load and read stage, where one pixel every two
+ clock cycles is load, $23.2$ Megapixels/second (Mp/s) throughput is obtained.
 
 \begin{figure}[!t]
 \centering
