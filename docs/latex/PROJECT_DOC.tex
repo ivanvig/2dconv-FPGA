@@ -600,7 +600,7 @@ In this section, the design of the architecture is described in detail. The
 entire process is divided into three stages, pre-processing, processing and
 post-processing. The pre-processing consists of capturing the image and applying
 the detailed transformation in Section \ref{preproc} using a Python script. In
-addition, the script divides the image into batch and is sent by the UART port
+addition, the script divides the image into batches and is sent by the UART port
 to the FPGA\@. In the FPGA a microprocessor receives the information and
 communicates it to the convolution module using a 32 bits GPIO port. This port
 writes the BRAMs that store the data that will be filtered. Due to the
@@ -610,7 +610,7 @@ proposed architecture is indifferent to these methods. The second stage is the
 processing. The batch is convolved with the kernel inside the module, which the
 user establishes through the GPIO. When the operation ends, a notification is
 sent to the microprocessor, which gives the order to recover the processed batch
-of the module and sends it to the PC. Finally, the post-processor stage joins
+of the module and sends it to the PC. Finally, the post-processing stage joins
 the batches on the PC using a Python script.
 
 
