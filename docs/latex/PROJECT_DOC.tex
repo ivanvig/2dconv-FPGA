@@ -876,16 +876,17 @@ written in Python 2.7.
 
 In the first instance the desired kernel's coefficients are loaded followed by
 the corresponding image batch via UART\@. Although UART is slow with respect to
-the processing time it is used because its simplicity and slow resource
+the processing time, it is used because of its simplicity and low resource
 consumption compared with other transmission medias.
-As far as data representation is concerned fixed point arithmetic was used with
+As far as data representation is concerned, fixed point arithmetic was used with
 a resolution of $U(8,0)$ for input and output image and $S(8,7)$ for kernel.
 
-To ensure the proper functioning of the architecture multiple kernels were
-coded in python and applied to an image, then the same kernels were applied using
+To ensure the proper functioning of the architecture, multiple kernels were
+coded in python and applied to an image, and then the same kernels were applied using
 the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0, 0]$
 sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1, 0,
 1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}.
+
 
 \begin{figure}[!t]
 \centering
@@ -904,12 +905,15 @@ sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1, 0,
 \label{images_py_po}
 \end{figure}
 
+
+
 The architecture was synthesized for different degrees of parallelism, Table
 \ref{res_table} shows the resources consumed by the module and the
 microprocessor on the FPGA with and without DSP respectively. Due to limitations
 of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
-
 24 without DSP but with a more intensive use of LUT.
+
+
 
 \begin{table}[!t]
 % increase table row spacing, adjust to taste
