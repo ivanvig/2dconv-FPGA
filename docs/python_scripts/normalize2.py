@@ -43,7 +43,7 @@ def all_mem_trasnmission():
         tick.label.set_fontsize(16)
 
     plt.ylabel('Memory space [bytes]', fontsize= 20,fontweight='bold')
-    plt.xlabel('Convolution units',fontsize= 20,fontweight='bold')
+    plt.xlabel('MAC Units',fontsize= 20,fontweight='bold')
     plt.xlim((1.8,10.2))
     plt.ylim((min(x2)-0.4,max(x1)+0.4))
     plt.grid(True)
@@ -98,7 +98,7 @@ def all_mem_trasnmission():
         tick.label.set_fontsize(16)
 
     plt.ylabel('Data sent [Kb]', fontsize= 20, fontweight='bold')
-    plt.xlabel('Convolution units',fontsize= 20, fontweight='bold')
+    plt.xlabel('MAC Units',fontsize= 20, fontweight='bold')
     plt.xlim((1.8,10.2))
     plt.ylim((1500,5000))
     plt.grid(True)
@@ -141,7 +141,7 @@ def coplexity():
         tick.label.set_fontsize(16)
 
     plt.ylabel('BRAM Utilization (Normalized)', fontsize= 20, fontweight='bold')
-    plt.xlabel('Convolution units',fontsize= 20, fontweight='bold')
+    plt.xlabel('MAC Units',fontsize= 20, fontweight='bold')
     plt.xlim((1.8,10.2))
     plt.ylim((0.70,1.02))
     plt.grid(True,linestyle='--')
@@ -154,5 +154,5 @@ def coplexity():
 
     plt.show()
 
-#all_mem_trasnmission()
+all_mem_trasnmission()
 coplexity()
