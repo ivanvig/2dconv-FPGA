@@ -869,9 +869,9 @@ scenario where no redundant data is transferred at all.
 
 \section{Implementation and Results}\label{sec:implementation}
 
-The design was implemented in an Arty A7 board from Digilent using Xilinx
-Vivado Design Suite 2017.4 to write and synthesize the verilog code and to write
-the microblaze's C code. The client where the pre and post-processing occurs was
+The design was implemented in an Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using Xilinx
+Vivado Design Suite 2017.4 tools to write and synthesize verilog and 
+microblaze's C code. The client where the pre and post-processing occurs was
 written in Python 2.7.
 
 In the first instance the desired kernel's coefficients are loaded followed by
@@ -885,7 +885,8 @@ To ensure the proper functioning of the architecture, multiple kernels were
 coded in python and applied to an image, and then the same kernels were applied using
 the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0, 0]$
 sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1, 0,
-1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}.
+1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}. As it can be seen, processed
+image has good quality with all kernel filters tested.
 
 
 \begin{figure}[!t]
