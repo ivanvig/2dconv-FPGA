@@ -691,9 +691,7 @@ of the module.
 \begin{figure}[!t]
   \centering
   \includegraphics[width=2.5in]{states.pdf}
-  \caption{Module's state diagram.
-    A - Kernel load, B - Size load, C - Image load, D - Proccesing, E - Output,
-    F - Reset}
+  \caption{Module's state diagram.}
   \label{state}
 \end{figure}
 
@@ -779,8 +777,6 @@ must be an integer $m$ such that
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
 
-Figure \ref{algorithm} shows how the memories are written using this logic.
-
 \begin{figure}[!t]
 \centering
 \subfloat[]{\includegraphics[width=2.5in]{muxes}%
@@ -796,7 +792,8 @@ Figure \ref{algorithm} shows how the memories are written using this logic.
 
 The logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
-parallelism degree and the iteration number.
+parallelism degree and the iteration number. Fig.~\ref{algorithm} shows how
+the memories are written using this logic. 
 
 The MMU keeps track of the memory
 positions where it must save the input batch, the information which must feed
@@ -806,7 +803,7 @@ To do so, it has a finite state machine where each state corresponds to a set of
 positions named above. The number of states is given by eq. \ref{niter}.
 
 To route the incoming and outgoing data, the MMU has a set of multiplexers whose
-select lines are managed by the finite state machine (Data multiplexer and FSM
+select lines are managed by the finite state machine (Data multiplexer and FSM respectively
 in Fig. \ref{general}). The data multiplexer is conformed by a set of smaller
 blocks which are classified into two classes depending on their function: memory
 multiplexer blocks (MMB) and processing multiplexer blocks (PMB). The MMB routes
@@ -900,7 +897,6 @@ The architecture was synthesized for different degrees of parallelism, Table
 \ref{res_table} shows the resources consumed by the module and the
 microprocessor on the FPGA with and without DSP respectively. Due to limitations
 of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
-
 24 without DSP but with a more intensive use of LUT.
 
 \begin{table}[!t]
