@@ -668,8 +668,9 @@ After receiving correspondent coded instruction, its will switch to the \textbf{
 in which the kernel coefficients are loaded into the module. Then it goes to the \textbf{SizeLoad}
 state where the image's height is loaded, the argument for doing this is explained in
 section \ref{infstorage}. Once the module has gone through this setup states it
-will not come back to them until the entire image is processed. To begin with the
-processing loop, first the module goes to the \textbf{ImageLoad} state and
+will not come back to them until the entire image is processed.
+
+To begin with the processing loop, first the module goes to the \textbf{ImageLoad} state and
 stores the batch in memory. Then is goes to the \textbf{Run} state where the
 processing occurs, and while processing is being made the module can not be interrupted, i.e.
 it will ignore all instructions till the batch is processed completely. As soon as 
