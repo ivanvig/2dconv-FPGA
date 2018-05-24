@@ -634,13 +634,13 @@ the batches on the PC using a Python script.
 %\end{figure}
 
 \subsection{Convolution Module}
-A simplified architecture of the module is shown in Fig. \ref{general},
-the \textbf{control unit} is the one in charge of handling the communication
-with the processor, in the \textbf{convolution unit} is where the sum of
-the products of the kernel's coefficients with the pixels happen, the
-\textbf{address generation unit (AGU)} manages the memory addresses, the
-\textbf{memory management unit (MMU)} manages how the values in memory must be
-read and written, and finally the \textbf{storage}, which is implemented with a
+A simplified architecture of the module is shown in Fig. \ref{general}.
+The \textbf{control unit} is the one in charge of handling the communication
+with the processor and the \textbf{convolution unit} is where the sum of
+the products of the kernel's coefficients with the pixels happens. The
+\textbf{address generation unit (AGU)} manages the memory addresses along with the
+\textbf{memory management unit (MMU)}, that manages how the values in memory must be
+read and written. The last module is the \textbf{storage} one, which is implemented with a
 set of columns of the FPGA's block RAM.
 
 \begin{figure}[!t]
