@@ -1052,6 +1052,19 @@ with a reference clock at $100$ MHz, $1.6$ Gigapixels/second (Gp/s) throughput i
 
 \section{Conclusion}\label{sec:conclusion}
 
+Using FPGA we are able to process the filtering at the same time of reading the current image batch. 
+In this paper, we have presented the implementation of two-dimensional
+convolution on a Xilinx Arty 7 FPGA platform based on resource efficiency and system parallelism.
+We implemented a whole image processing system taking into account load stage, processing
+stage, and output stage. Moreover, a relationship between instantiated BRAM blocks and MAC units was found in the architecture
+presented, which allows our system work with different parallelism degrees. 
+
+In addition, we optimized the use of  memory resources implementing an algorithm
+used not only for reading and writing operations but also interaction between implemented modules. 
+Performances and results show that resources utilization concerning BRAM resources, increase linearly, as desired.
+ High throughput was achieved in what processing  is concerned. On the other hand, the limiting factor that impacted
+ the implemented system the most was UART speed transmission. Another limiting factor was the DSP48A1 slices.
+Both factors mentioned above are easily solved by using an FPGA with more slices and resources.
 
 
 
