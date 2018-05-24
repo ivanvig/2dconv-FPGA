@@ -652,7 +652,7 @@ the batches on the PC using a Python script.
 \subsection{Convolution Module}
 A simplified architecture of the module is shown in Fig. \ref{general}.
 The \textbf{control unit} is the one in charge of handling the communication
-with the processor and the \textbf{convolution unit} is where the sum of
+with the processor and the \textbf{MAC unit} is where the sum of
 the products of the kernel's coefficients with the pixels happens. The
 \textbf{address generation unit (AGU)} manages the memory addresses along with the
 \textbf{memory management unit (MMU)}, that manages how the values in memory must be
@@ -706,7 +706,7 @@ of the module.
 \end{figure}
 
 \subsubsection{Data storage}\label{infstorage}
-The kernel coefficients are stored in registers inside each convolution unit. In
+The kernel coefficients are stored in registers inside each MAC unit. In
 order to store a batch, the proposed approach is to arrange the block RAM memory
 in columns, where each of them will store a image's pixel column. Therefore a
 batch size is given by the height of the image and the number of memory columns,
@@ -721,14 +721,14 @@ processed batch. In section \ref{dataproc} additional aspects of the design
 that reduces even more the memory use are explained.
 
 \subsubsection{Data processing}\label{dataproc}
-Given a $k\times k$ kernel, each convolution unit takes $k$ adjacent memory columns as
-input. To produce the first processed pixel, a convolution unit first needs to
+Given a $k\times k$ kernel, each MAC unit takes $k$ adjacent memory columns as
+input. To produce the first processed pixel, a MAC unit first needs to
 load $k$ pixels from each columns in such a way as to have $k\times
 k$ pixels loaded into it, then proceeds to multiply the pixels with the kernel's
 coefficients and sum everything. Finally, it truncates the result to reduce the
 bit length and the result is saved into the first position of the memory.
 
-Once a pixel is processed, it is saved into the memory while the convolution unit
+Once a pixel is processed, it is saved into the memory while the MAC unit
 shifts its image register, discarding the oldest $k$ pixels and loading new $k$
 pixels, i.e. one from each input column, like a FIFO structure.
 This procedure is equivalent to shit the kernel vertically on the image. All this steps are synchronized in such a way that
@@ -741,8 +741,8 @@ equal to $k$ plus some more clock cycles needed to latch values during the
 convolution, and the difference between the read address and the write address
 must be equal to it.
 
-Until this point the analysis was over a single convolution unit, now the
-approach to work with multiple convolution units in parallel is
+Until this point the analysis was over a single MAC unit, now the
+approach to work with multiple MAC units in parallel is
 described.
 
 \begin{figure}[!t]
@@ -753,22 +753,22 @@ described.
 \end{figure}
 
 As mentioned above, $k$ columns are needed as input to produce one processed
-column in a convolution unit, that means that $2k$ columns are needed for two
-convolution units. However, given the nature of the convolution operation, to
+column in a MAC unit, that means that $2k$ columns are needed for two
+MAC units. However, given the nature of the convolution operation, to
 produce a contiguous column it is necessary to shift the input columns by one.
-Hence, there is an overlap between the two inputs and this produces that even $k$ input columns are still needed per convolution unit, only
+Hence, there is an overlap between the two inputs and this produces that even $k$ input columns are still needed per MAC unit, only
 $k+1$ different input columns are needed for all the units. For this reason, it was decided that
-multiple convolution units in parallel will produce contiguous processed
+multiple MAC units in parallel will produce contiguous processed
 columns, sharing the common input columns. With this approach, for $N$
-convolution units the number of memory columns needed gets reduced from $N\cdot
-k$ to $N+k-1$, concluding that adding a new convolution unit only adds one new
+MAC units the number of memory columns needed gets reduced from $N\cdot
+k$ to $N+k-1$, concluding that adding a new MAC unit only adds one new
 memory columns.
 
 The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
 that is already in memory, some data is reused between iterations. Given $N$ convolution
 units and a $k\times k$ kernel, a $N+k-1$ batch width is needed, but the
-processed batch has a width of $N$ columns, i.e. one for each convolution unit. 
+processed batch has a width of $N$ columns, i.e. one for each MAC unit. 
 Therefore the last $k-1$ memory columns are not overwritten and maintain the
 input data. This $k-1$ columns will be reused as the first columns of the 
 next batch, thus the batch width is reduced to $N$, with the exception of
@@ -776,10 +776,10 @@ the first batch that will still have a $N+k-1$ width.
 
 A consequence of reusing the memory columns written by the previous batch is
 that in every iteration the position of memory columns associated with each
-convolution unit describes a circular shift by $N$ places. From the above it
+MAC unit describes a circular shift by $N$ places. From the above it
 follows that a periodicity in the relationship between the memory columns and the
-convolution unit's inputs must exist, where the period $It$ is the number of
-iterations necessary to get to the original memory columns - convolution units
+MAC unit's inputs must exist, where the period $It$ is the number of
+iterations necessary to get to the original memory columns - MAC units
 inputs relationship, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
 must be an integer $m$ such that 
 
@@ -807,7 +807,7 @@ the memories are written using this logic.
 
 The MMU keeps track of the memory
 positions where it must save the input batch, the information which must be fed
-to every convolution unit, the memory position where the processed data must be
+to every MAC unit, the memory position where the processed data must be
 stored and the order in which the processed data must be returned, for each iteration.
 To do so, it has a finite state machine where each state corresponds to a set of
 positions named above. The number of states is given by eq. \ref{niter}.
@@ -839,7 +839,7 @@ from the MMU's FSM and its represented by the letter $s$ in the figure.
 
 
 A comparison between the naive (which would be assign $k$ independent
-memory columns to each convolution unit), the shared inputs and the
+memory columns to each MAC unit), the shared inputs and the
 shared inputs with circular shift approaches is shown in Fig.~\ref{comp}.
 Figure~\ref{mem} shows the amount of memory required in function of the
 parallelism degree while Fig.~\ref{transmitted} shows the amount of transferred
