@@ -529,11 +529,11 @@ between $[0,1]$ and $\mathcal{T}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$,
 respectively. Therefore, replacing in~\eqref{conv-org}
 
 \begin{equation}\label{conv-org1}
-  G^\prime(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j).
+  G(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j).
 \end{equation}
 
-Finally, we apply the change of dynamic range on the output
-$\mathcal{T}[G^\prime(x,y)]=G(x,y)$ again and obtain range between $[0,255]$.
+Finally, processed image reconstruction is only needed since $G(x,y)$ values are already
+rearranged in FPGA.
 The complete process is detailed in Fig.~\ref{transformation}.
 
 \begin{figure}[!t]
