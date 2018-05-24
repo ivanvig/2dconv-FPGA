@@ -461,26 +461,27 @@ Applications recently, use convolutional neural networks
 (CNN)~\cite{Lecun-et-al-1998} where a fast and efficient convolution
 implementation is important.
 
-The implementation of high speed image processing systems in FPGA has been a
-very active field. This is mainly due to the ability to take advantage of bit
-level parallelism, pixel level, neighborhood level and task level to accelerate
-the calculation. In addition, FPGAs are reconfigurable, allowing the flexibility
-that is often desired in neural networks. This coupling of processing,
-parallelism and flexibility at very high speed is what makes FPGAs a platform of
-choice for the development of these areas~\cite{papercnn}.
+The implementation of high speed image processing systems in field programmable
+gate array (FPGA) has been a very active field. This is mainly due to the
+ability to take advantage of bit level parallelism, pixel level, neighborhood
+level and task level to accelerate the calculation. In addition, FPGAs are
+reconfigurable, allowing the flexibility that is often desired in neural
+networks. This coupling of processing, parallelism and flexibility at very high
+speed is what makes FPGAs a platform of choice for the development of these
+areas~\cite{papercnn}.
 
-There are many examples in the literature of 2D convolution implementations,
-where most of the work focuses on high performance, resource reduction and the
-FPGA area. As shown in~\cite{paper3}, BRAM memory blocks are one of the most
-used elements and consume more power. Therefore, the architectures seek to
-reduce the use of BRAMs by dividing them into two groups that consider the total
-or partial storage of the image. The first of them increases processing by
-applying parallelization as well as reusing resources to reduce
-complexity~\cite{paper1,paper5}. On the other hand, architectures with partial
-storage partition the image into as many parts as convolders are
-used~\cite{paper2,paper4}. The difficulty presented by these schemes is the
-non-modularization of processing, making it difficult to increase the work rate
-by increasing parallelism.
+There are many examples in the literature of two-dimensional (2D) convolution
+implementations, where most of the work focuses on high performance, resource
+reduction and the FPGA area. As shown in~\cite{paper3}, block random access
+memory (BRAM) is one of the most used elements and consume more power.
+Therefore, the architectures seek to reduce the use of BRAMs by dividing them
+into two groups that consider the total or partial storage of the image. The
+first of them increases processing by applying parallelization as well as
+reusing resources to reduce complexity~\cite{paper1,paper5}. On the other hand,
+architectures with partial storage partition the image into as many parts as
+convolders are used~\cite{paper2,paper4}. The difficulty presented by these
+schemes is the non-modularization of processing, making it difficult to increase
+the work rate by increasing parallelism.
 
 In this document, we propose a high-performance, parallelizable hardware
 architecture and dynamic memory reuse with a linear increase in BRAM resources.
