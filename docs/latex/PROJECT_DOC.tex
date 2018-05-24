@@ -391,13 +391,23 @@
 
 % As a general rule, do not put math, special symbols or citations
 % in the abstract
+
+%abstract spanish
+%\begin{abstract}
+ %En este art\'iculo se presenta una arquitectura de hardware para realizar una
+ %convoluci\'on 2D en una FPGA cuando no se puede instanciar suficiente memoria
+ %RAM para poder alojar la imagen completa. Se prioriz\'o la velocidad de
+ %procesamiento, el uso eficiente de los recursos y un dise\~no escalable donde
+ %se pudieran agregar tantas operaciones de convoluci\'on en paralelo como se
+ %desee sin deber hacer grandes modificaciones en el dise\~no.
+%\end{abstract}
+
+
 \begin{abstract}
-  In this article we present a hardware architecture to perform a 2D convolution
-  in an FPGA when you can not instantiate enough RAM to be able to host the
-  complete image. Priority is given to the processing speed, the efficient use
-  of resources and a scalable design where you could add as many convolution
-  operations in parallel as you wish without having to make major changes in the
-  design.
+  In this article, a hardware architecture for 2D convolution implementation on FPGA when
+  there is not enough RAM memory for instantiate and store a complete image, is presented.
+  Not only processing speed is prioritized, but also efficient resource utilization and scalability in design, 
+  so as to add as many convolution operations in parallel as needed without requiring any major changes.
 \end{abstract}
 
 % no keywords
@@ -691,9 +701,7 @@ of the module.
 \begin{figure}[!t]
   \centering
   \includegraphics[width=2.5in]{states.pdf}
-  \caption{Module's state diagram.
-    A - Kernel load, B - Size load, C - Image load, D - Proccesing, E - Output,
-    F - Reset}
+  \caption{Module's state diagram.}
   \label{state}
 \end{figure}
 
@@ -760,32 +768,30 @@ The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
 that is already in memory, some data is reused between iterations. Given $N$ convolution
 units and a $k\times k$ kernel, a $N+k-1$ batch width is needed, but the
-processed batch has a width of $N$ columns, i.e. one for each convolution unit,
-therefore the last $k-1$ memory columns are not overwritten and maintain the
+processed batch has a width of $N$ columns, i.e. one for each convolution unit. 
+Therefore the last $k-1$ memory columns are not overwritten and maintain the
 input data. This $k-1$ columns will be reused as the first columns of the 
 next batch, thus the batch width is reduced to $N$, with the exception of
 the first batch that will still have a $N+k-1$ width.
 
 A consequence of reusing the memory columns written by the previous batch is
-that in every iteration the position of the memory columns associated with each
+that in every iteration the position of memory columns associated with each
 convolution unit describes a circular shift by $N$ places. From the above it
-follows that a periodicity in the relation between the memory columns and the
-convolution units' inputs must exist, where the period $It$ is the number of
+follows that a periodicity in the relationship between the memory columns and the
+convolution unit's inputs must exist, where the period $It$ is the number of
 iterations necessary to get to the original memory columns - convolution units
-inputs relation, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
+inputs relationship, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
 must be an integer $m$ such that 
 
 \begin{equation}\label{niter}
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
 
-Figure \ref{algorithm} shows how the memories are written using this logic.
-
 \begin{figure}[!t]
 \centering
 \subfloat[]{\includegraphics[width=2.5in]{muxes}%
 \label{dflow}}
-\hfil \vspace{0.1cm}
+\hfil
 \centering
 \subfloat[]{\includegraphics[width=2.5in]{muxes_cont}%
 \label{int_struct}}
@@ -796,21 +802,22 @@ Figure \ref{algorithm} shows how the memories are written using this logic.
 
 The logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
-parallelism degree and the iteration number.
+parallelism degree and the iteration number. Fig.~\ref{algorithm} shows how
+the memories are written using this logic. 
 
 The MMU keeps track of the memory
-positions where it must save the input batch, the information which must feed
+positions where it must save the input batch, the information which must be fed
 to every convolution unit, the memory position where the processed data must be
 stored and the order in which the processed data must be returned, for each iteration.
 To do so, it has a finite state machine where each state corresponds to a set of
 positions named above. The number of states is given by eq. \ref{niter}.
 
 To route the incoming and outgoing data, the MMU has a set of multiplexers whose
-select lines are managed by the finite state machine (Data multiplexer and FSM
+select lines are managed by the finite state machine (Data multiplexer and FSM respectively
 in Fig. \ref{general}). The data multiplexer is conformed by a set of smaller
 blocks which are classified into two classes depending on their function: memory
 multiplexer blocks (MMB) and processing multiplexer blocks (PMB). The MMB routes
-the raw data and the data from the MACs to a memory while the PMB routes the
+the raw data and the data from the MACs to a memory, while the PMB routes the
 data from the memories to a MAC. Fig. \ref{muxes} shows the information flow
 between
 memories$\rightarrow$MMU$\rightarrow$MACs$\rightarrow$MMU$\rightarrow$memories.
@@ -837,8 +844,9 @@ shared inputs with circular shift approaches is shown in Fig.~\ref{comp}.
 Figure~\ref{mem} shows the amount of memory required in function of the
 parallelism degree while Fig.~\ref{transmitted} shows the amount of transferred
 bytes (considering that every byte transmitted is stored in only one memory
-register) for processing a $1600\times1024$ image and a $3\times3$ kernel. As
-shown in Fig.~\ref{transmitted}, with the naive approach the transferred data is
+register) for processing a $1600\times1024$ image and a $3\times3$ kernel.
+
+As shown in Fig.~\ref{transmitted}, with the naive approach the transferred data is
 almost $3$ times the image size (because a $3\times3$ kernel) and it does not
 get affected by the parallelism degree. The shared inputs approach tends to
 diminish the redundant data transferred as $N$ increases, that is because the
@@ -868,16 +876,17 @@ written in Python 2.7.
 
 In the first instance the desired kernel's coefficients are loaded followed by
 the corresponding image batch via UART\@. Although UART is slow with respect to
-the processing time it is used because its simplicity and slow resource
+the processing time, it is used because of its simplicity and low resource
 consumption compared with other transmission medias.
-As far as data representation is concerned fixed point arithmetic was used with
+As far as data representation is concerned, fixed point arithmetic was used with
 a resolution of $U(8,0)$ for input and output image and $S(8,7)$ for kernel.
 
-To ensure the proper functioning of the architecture multiple kernels were
-coded in python and applied to an image, then the same kernels were applied using
+To ensure the proper functioning of the architecture, multiple kernels were
+coded in python and applied to an image, and then the same kernels were applied using
 the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0, 0]$
 sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1, 0,
 1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}.
+
 
 \begin{figure}[!t]
 \centering
@@ -896,12 +905,15 @@ sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1, 0,
 \label{images_py_po}
 \end{figure}
 
+
+
 The architecture was synthesized for different degrees of parallelism, Table
 \ref{res_table} shows the resources consumed by the module and the
 microprocessor on the FPGA with and without DSP respectively. Due to limitations
 of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
-
 24 without DSP but with a more intensive use of LUT.
+
+
 
 \begin{table}[!t]
 % increase table row spacing, adjust to taste
