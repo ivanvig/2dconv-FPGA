@@ -870,9 +870,8 @@ scenario where no redundant data is transferred at all.
 \section{Implementation and Results}\label{sec:implementation}
 
 The design was implemented in an Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using Xilinx
-Vivado Design Suite 2017.4 tools to write and synthesize verilog and 
-microblaze's C code. The client where the pre and post-processing occurs was
-written in Python 2.7.
+Vivado Design Suite 2017.4 tools. A $100 MHz$ reference clock frequency was synthesized.
+The client where the pre and post-processing occurs was written in Python 2.7.
 
 In the first instance the desired kernel's coefficients are loaded followed by
 the corresponding image batch via UART\@. Although UART is slow with respect to
