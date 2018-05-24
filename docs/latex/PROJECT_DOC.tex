@@ -474,6 +474,12 @@ by increasing parallelism.
 
 In this document, we propose a high-performance, parallelizable hardware
 architecture and dynamic memory reuse with a linear increase in BRAM resources.
+In addition, theoretical estimates of complexity are compared with synthesis
+results in FPGA. The remainder of this paper is as follows. Section
+\ref{sec:preproc} introduces the image processing algorithm. The archicterure
+design of image filtering is presented in section \ref{sec:architecture}. In
+section \ref{sec:implementation}, hardware implementation and experimental
+results are shown. Finally, a conclusion will be done in section \ref{sec:conclusion}.
 
 %Existen diferentes tipos de arquitecturas para realizar la convolucion 2D en una FPGA, pero 
 %muchas de ellas referencia no se no tiene en cuenta el uso de la memoria. 
@@ -493,7 +499,7 @@ architecture and dynamic memory reuse with a linear increase in BRAM resources.
 %Nosotros proponemos una arquitectura que permita la configuracion del kernel, 
 %haga un uso eficiente de memoria, tenga un high throughput , sea paralelizable y escalable.
 
-\section{Image Processing Algorithms}\label{preproc}
+\section{Image Processing Algorithms}\label{sec:preproc}
 
 Filtering is widely used in many applications, such as aeronautics, navigation,
 CNN, etc. They are applied as preprocessing to eliminate useless details and
@@ -593,13 +599,13 @@ The complete process is detailed in Fig.~\ref{transformation}.
 %expansion, but maximun and minimun pixel value is needed after convolution. This
 %implies that full image stored is needed. 
 
-\section{Architecture Design}
+\section{Architecture Design}\label{sec:architecture}
 
 \subsection{Workflow}
 In this section, the design of the architecture is described in detail. The
 entire process is divided into three stages, pre-processing, processing and
 post-processing. The pre-processing consists of capturing the image and applying
-the detailed transformation in Section \ref{preproc} using a Python script. In
+the detailed transformation in Section \ref{sec:preproc} using a Python script. In
 addition, the script divides the image into batches and is sent by the UART port
 to the FPGA\@. In the FPGA a microprocessor receives the information and
 communicates it to the convolution module using a 32 bits GPIO port. This port
@@ -731,6 +737,13 @@ Until this point the analysis was over a single convolution unit, now the
 approach to work with multiple convolution units working in parallel is
 described.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[scale=0.55]{algorithm}
+\caption{Memory writing process using circular shift for $N = 4$ and $k = 3$.}
+\label{algorithm}
+\end{figure}
+
 As mentioned above, $k$ columns are needed as input to produce one processed
 column in a convolution unit, that means that $2k$ columns are needed for two
 convolution units, however given the nature of the convolution operation, to
@@ -767,13 +780,6 @@ must be an integer $m$ such that
 \end{equation}
 
 Figure \ref{algorithm} shows how the memories are written using this logic.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[scale=0.55]{algorithm}
-\caption{Memory writing process using circular shift for $N = 4$ and $k = 3$.}
-\label{algorithm}
-\end{figure}
 
 The logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
@@ -833,7 +839,7 @@ scenario where no redundant data is transferred at all.
 \label{comp}
 \end{figure}
 
-\section{Implementation and Results}
+\section{Implementation and Results}\label{sec:implementation}
 
 The design was implemented in an Arty A7 board from Digilent using Xilinx
 Vivado Design Suite 2017.4 to write and synthesize the verilog code and to write
@@ -1008,7 +1014,7 @@ linear behaviour.
 
 
 
-\section{Conclusion}
+\section{Conclusion}\label{sec:conclusion}
 
 
 
