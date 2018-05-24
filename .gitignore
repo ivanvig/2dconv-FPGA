@@ -66,3 +66,4 @@ auto
 *.fls
 *shell*
 *.bk
+*.synctex.gz
