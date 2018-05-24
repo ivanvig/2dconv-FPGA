@@ -806,8 +806,27 @@ from the MMU's FSM and its represented by the letter $s$ in the figure.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=3in]{muxes}
-\caption{Data flow between the MACs and the storage.}
+\subfloat[]{\includegraphics[scale=0.3]{mem_space2}%
+\label{mem}}
+\hfil \vspace{0.1cm}
+\centering
+\subfloat[]{\includegraphics[scale=0.3]{data_sent}%
+\label{transmitted}}
+\caption{Comparison between different approaches. \protect\subref{mem} Amount of
+  memory required. \protect\subref{transmitted} Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.}
+\label{comp}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\subfloat[]{\includegraphics[width=2.5in]{muxes}%
+\label{dflow}}
+\hfil \vspace{0.1cm}
+\centering
+\subfloat[]{\includegraphics[width=2.5in]{muxes_cont}%
+\label{int_struct}}
+\caption{\protect\subref{dflow} shows the data flow between the MACs and the
+  storage. \protect\subref{int_struct} shows the internal structure of MMB and PMB.}
 \label{muxes}
 \end{figure}
 
