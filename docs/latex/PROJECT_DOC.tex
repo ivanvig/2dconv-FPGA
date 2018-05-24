@@ -726,7 +726,7 @@ pixels, i.e. one from each input column, like a FIFO structure.
 This procedure is equivalent to shit the kernel vertically on the image. All this steps are synchronized in such a way that
 one processed pixel is generated in every clock cycle.
 
-The AGU manages the memory's read and write address, it takes into account the
+The AGU manages the memory's read and write addresses, and it takes into account the
 latency between the clock cycle where the first pixel in the memory is read and
 the clock cycle where the first processed pixel is written in memory. This latency is
 equal to $k$ plus some more clock cycles needed to latch values during the
@@ -734,7 +734,7 @@ convolution, and the difference between the read address and the write address
 must be equal to it.
 
 Until this point the analysis was over a single convolution unit, now the
-approach to work with multiple convolution units working in parallel is
+approach to work with multiple convolution units in parallel is
 described.
 
 \begin{figure}[!t]
@@ -746,19 +746,19 @@ described.
 
 As mentioned above, $k$ columns are needed as input to produce one processed
 column in a convolution unit, that means that $2k$ columns are needed for two
-convolution units, however given the nature of the convolution operation, to
+convolution units. However, given the nature of the convolution operation, to
 produce a contiguous column it is necessary to shift the input columns by one.
-Hence, there is an overlap between the two inputs and this produces that even that $k$ input columns are still needed per convolution unit, only
-$k+1$ different input columns are needed for all the units. For that reason, it was decided that
+Hence, there is an overlap between the two inputs and this produces that even $k$ input columns are still needed per convolution unit, only
+$k+1$ different input columns are needed for all the units. For this reason, it was decided that
 multiple convolution units in parallel will produce contiguous processed
 columns, sharing the common input columns. With this approach, for $N$
 convolution units the number of memory columns needed gets reduced from $N\cdot
-k$ to $N+k-1$. That means that adding a new convolution unit only adds one new
+k$ to $N+k-1$, concluding that adding a new convolution unit only adds one new
 memory columns.
 
 The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
-that already is in the memory, some data is reused between iterations. Given $N$ convolution
+that is already in memory, some data is reused between iterations. Given $N$ convolution
 units and a $k\times k$ kernel, a $N+k-1$ batch width is needed, but the
 processed batch has a width of $N$ columns, i.e. one for each convolution unit,
 therefore the last $k-1$ memory columns are not overwritten and maintain the
