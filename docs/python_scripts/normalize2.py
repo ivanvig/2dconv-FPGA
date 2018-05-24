@@ -114,12 +114,12 @@ def coplexity():
 
     naive = []
 
-    norm2 = 42.0  # valor maximo en % BRAM utilizados
+    norm2 = 28.0  # valor maximo en % BRAM utilizados
 
     real = [20.0/norm2, 22.0/norm2, 24.0/norm2, 26.0/norm2, 28.0/norm2]
 
     vec1 = np.arange(2,12,2)
-    vec2 = np.arange(2,16,2)
+    vec2 = np.arange(2,12,2)
 
     for i in vec2:
        naive.append((i+18.0)/norm2)
@@ -142,9 +142,9 @@ def coplexity():
 
     plt.ylabel('BRAM Utilization (Normalized)', fontsize= 20, fontweight='bold')
     plt.xlabel('Convolution units',fontsize= 20, fontweight='bold')
-    plt.xlim((1.8,14))
-    plt.ylim((0.45,0.78))
-    plt.grid(True)
+    plt.xlim((1.8,10.2))
+    plt.ylim((0.70,1.02))
+    plt.grid(True,linestyle='--')
     plt.legend(fontsize=16,loc=2)
 
     plt.savefig('./BRAM_c.eps',bbox_inches = 'tight')
