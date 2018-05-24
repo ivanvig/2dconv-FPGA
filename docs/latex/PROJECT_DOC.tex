@@ -760,26 +760,30 @@ The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
 that is already in memory, some data is reused between iterations. Given $N$ convolution
 units and a $k\times k$ kernel, a $N+k-1$ batch width is needed, but the
-processed batch has a width of $N$ columns, i.e. one for each convolution unit,
-therefore the last $k-1$ memory columns are not overwritten and maintain the
+processed batch has a width of $N$ columns, i.e. one for each convolution unit. 
+Therefore the last $k-1$ memory columns are not overwritten and maintain the
 input data. This $k-1$ columns will be reused as the first columns of the 
 next batch, thus the batch width is reduced to $N$, with the exception of
 the first batch that will still have a $N+k-1$ width.
 
 A consequence of reusing the memory columns written by the previous batch is
-that in every iteration the position of the memory columns associated with each
+that in every iteration the position of memory columns associated with each
 convolution unit describes a circular shift by $N$ places. From the above it
-follows that a periodicity in the relation between the memory columns and the
-convolution units' inputs must exist, where the period $It$ is the number of
+follows that a periodicity in the relationship between the memory columns and the
+convolution unit's inputs must exist, where the period $It$ is the number of
 iterations necessary to get to the original memory columns - convolution units
-inputs relation, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
+inputs relationship, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
 must be an integer $m$ such that 
 
 \begin{equation}\label{niter}
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
 
+
 Figure \ref{algorithm} shows how the memories are written using this logic.
+
+
+
 
 \begin{figure}[!t]
 \centering
@@ -793,6 +797,9 @@ Figure \ref{algorithm} shows how the memories are written using this logic.
   storage. \protect\subref{int_struct} shows the internal structure of MMB and PMB.}
 \label{muxes}
 \end{figure}
+
+
+
 
 The logic is implemented in the MMU, which serves as an interface between
 the memories and the rest of the components, keeping them independent from the
