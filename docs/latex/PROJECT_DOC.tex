@@ -616,19 +616,20 @@ The complete process is detailed in Fig.~\ref{transformation}.
 In this section, the design of the architecture is described in detail. The
 entire process is divided into three stages, pre-processing, processing and
 post-processing. The pre-processing consists of capturing the image and applying
-the detailed transformation in Section \ref{sec:preproc} using a Python script. In
-addition, the script divides the image into batches and is sent by the UART port
-to the FPGA\@. In the FPGA a microprocessor receives the information and
-communicates it to the convolution module using a 32 bits GPIO port. This port
-writes the BRAMs that store the data that will be filtered. Due to the
-limitations of the size of the FPGA, no other interface was used, such as
-Ethernet or DMA to read the image directly from a storage device. However, the
-proposed architecture is indifferent to these methods. The second stage is the
-processing. The batch is convolved with the kernel inside the module, which the
-user establishes through the GPIO. When the operation ends, a notification is
-sent to the microprocessor, which gives the order to recover the processed batch
-of the module and sends it to the PC. Finally, the post-processing stage joins
-the batches on the PC using a Python script.
+the detailed transformation in Section \ref{sec:preproc} using a Python script.
+In addition, the script divides the image into batches and is sent by the UART
+port to the FPGA. In the FPGA a microprocessor receives the information and
+communicates it to the convolution module using a 32 bits general purpose
+input-output (GPIO) port. This port writes the BRAMs that store the data that
+will be filtered. Due to the limitations of the size of the FPGA, no other
+interface was used, such as Ethernet or direct memory access (DMA) to read the
+image directly from a storage device. However, the proposed architecture is
+indifferent to these methods. The second stage is the processing. The batch is
+convolved with the kernel inside the module, which the user establishes through
+the GPIO. When the operation ends, a notification is sent to the microprocessor,
+which gives the order to recover the processed batch of the module and sends it
+to the central processing unit (CPU). Finally, the post-processing stage joins
+the batches on the CPU using a Python script.
 
 
 % As shown in Fig. \ref{general}, the workflow consists of three
@@ -653,7 +654,7 @@ the batches on the PC using a Python script.
 \subsection{Convolution Module}
 A simplified architecture of the module is shown in Fig. \ref{general}.
 The \textbf{control unit} is the one in charge of handling the communication
-with the processor and the \textbf{MAC unit} is where the sum of
+with the processor and the \textbf{multiple accumulator (MAC) unit} is where the sum of
 the products of the kernel's coefficients with the pixels happens. The
 \textbf{address generation unit (AGU)} manages the memory addresses along with the
 \textbf{memory management unit (MMU)}, that manages how the values in memory must be
@@ -899,7 +900,7 @@ image has good quality with all kernel filters tested.
 \hfil
 \subfloat[]{\includegraphics[scale=1.1]{emboss_c2}
 \label{fig:embossing}}
-\caption{On the left, an image processed in a PC using python, on the right the
+\caption{On the left, an image processed in a CPU using python, on the right the
   same image processed with the FPGA module. \protect\subref{fig:identity}
   Identity Kernel. \protect\subref{fig:share} Sharpening Kernel.
   \protect\subref{fig:embossing} Embossing Kernel.}
