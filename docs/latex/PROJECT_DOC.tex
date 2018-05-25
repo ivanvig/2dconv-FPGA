@@ -655,8 +655,8 @@ the batches on the CPU using a Python script.
 \subsection{Convolution Module}
 A simplified architecture of the module is shown in Fig. \ref{general}. The
 \textbf{control unit} is the one in charge of handling the communication with
-the processor and the \textbf{multiple accumulator (MAC) unit}i executes the sum
-of the products of the kernel's coefficients with the pixels happens. The
+the processor and the \textbf{multiple accumulator (MAC) unit} executes the sum
+of the products of the kernel's coefficients with the pixels. The
 \textbf{address generation unit (AGU)} manages the memory addresses along with
 the \textbf{memory management unit (MMU)}, that manages how the values in memory
 must be read and written. The last module is the \textbf{storage} one, which is
@@ -693,7 +693,7 @@ will not come back to them until the entire image is processed.
 To begin with the processing loop, first the module goes to the \textbf{ImageLoad} state and
 stores the batch in memory. Then is goes to the \textbf{Run} state where the
 processing occurs, and while processing is being made the module can not be interrupted, i.e.
-it will ignore all instructions till the batch is processed completely. As soon as 
+it will ignore all instructions until the batch is processed completely. As soon as 
 processing step is ended, a notification will be emitted through Control Unit's
 \textit{EoP} pin and the module will wait for \textbf{Out} state switch instruction, state where the 
 already processed batch is sent back to the microprocessor.
