@@ -485,7 +485,7 @@ improve the work rate by increasing parallelism.
 In this work, we explain the concept of dynamic reuse of BRAM in 2D convolution
 and its implementation complexity for parallel architectures. Moreover, we
 propose a modular acquitecture, where it is easy to appreciate that when the
-number of parallelism increases, the complexity of BRAM increases linearly.
+parallelism level increases, the complexity of BRAM increases linearly.
 
 This paper is organized as follows. Section \ref{sec:preproc} introduces the
 image processing algorithm. The archicterure design of image filtering is
@@ -655,8 +655,8 @@ the batches on the CPU using a Python script.
 \subsection{Convolution Module}
 A simplified architecture of the module is shown in Fig. \ref{general}. The
 \textbf{control unit} is the one in charge of handling the communication with
-the processor and the \textbf{multiple accumulator (MAC) unit}i executes the sum
-of the products of the kernel's coefficients with the pixels happens. The
+the processor and the \textbf{multiple accumulator (MAC) unit} executes the sum
+of the products of the kernel's coefficients with the pixels. The
 \textbf{address generation unit (AGU)} manages the memory addresses along with
 the \textbf{memory management unit (MMU)}, that manages how the values in memory
 must be read and written. The last module is the \textbf{storage} one, which is
@@ -689,7 +689,7 @@ image is processed.
 To begin with the processing loop, first the module goes to the \textbf{ImageLoad} state and
 stores the batch in memory. Then is goes to the \textbf{Run} state where the
 processing occurs, and while processing is being made the module can not be interrupted, i.e.
-it will ignore all instructions till the batch is processed completely. As soon as 
+it will ignore all instructions until the batch is processed completely. As soon as 
 processing step is ended, a notification will be emitted through Control Unit's
 \textit{EoP} pin and the module will wait for \textbf{Out} state switch instruction, state where the 
 already processed batch is sent back to the microprocessor.
@@ -1065,7 +1065,7 @@ Performances and results show that resources utilization concerning BRAM resourc
 
 High throughput was achieved in what processing  is concerned. On the other hand, the limiting factor that impacted
  the implemented system the most was UART speed transmission. Another limiting factor was the DSP48A1 slices.
-Both factors mentioned above are easily solved by using an FPGA with more slices and resources.
+Factor mentioned above is easily solved by using an FPGA with more slices and resources.
 
 
 
