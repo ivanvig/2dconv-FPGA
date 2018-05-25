@@ -347,9 +347,9 @@
   Ivan Vignolles,
   Ariel L. Pola
 }
-\IEEEauthorblockA{Escuela de Ingenier\'ia en Computaci\'on\\
-  Facultad de Ciencias Exactas F\'isicas y Naturales\\
-  Universidad Nacional de C\'ordoba\\
+\IEEEauthorblockA{Department of Research and Development\\
+  Fundacion Fulgor \\
+  Ernesto Romagosa 518, C\'ordoba X5016GQN, Argentina\\
   Email: martin.casabella@gmail.com, ser.0090@gmail.com,
   ivanmvig@gmail.com, arielpola@gmail.com}
 }
@@ -450,21 +450,20 @@
 % hardware architecture with customizable kernel that can achieve up to 2.4GP/sec in pixel processing rate
 % and 135MP/sec if the load and output stage are taken into account.
 
-
 The origin of digital image processing, due to the high level of processing they
 require, is directly related to the development and evolution of computers. Most
 filters for images that focus, blur, enhance edges and detect edges, among
 others, use convolution as a mathematical operation. Image processing is a very
 extensive research area with a large number of applications in multiple fields
 such as medicine, engineering, navigation, aeronautics, among others.
-Applications recently, use convolutional neural networks
-(CNN)~\cite{Lecun-et-al-1998} where a fast and efficient convolution
-implementation is important.
+Convolutional neural networks (CNN)~\cite{Lecun-et-al-1998} have received
+increasing attention in recent years. This technique uses a fast and efficient
+convolution implementation.
 
-The implementation of high speed image processing systems in field programmable
+The implementation of high-speed image processing systems in field programmable
 gate array (FPGA) has been a very active field. This is mainly due to the
 ability to take advantage of bit level parallelism, pixel level, neighborhood
-level and task level to accelerate the calculation. In addition, FPGAs are
+level and task level to speed up the calculation. In addition, FPGAs are
 reconfigurable, allowing the flexibility that is often desired in neural
 networks. This coupling of processing, parallelism and flexibility at very high
 speed is what makes FPGAs a platform of choice for the development of these
@@ -473,24 +472,26 @@ areas~\cite{papercnn}.
 There are many examples in the literature of two-dimensional (2D) convolution
 implementations, where most of the work focuses on high performance, resource
 reduction and the FPGA area. As shown in~\cite{paper3}, block random access
-memory (BRAM) is one of the most used elements and consume more power.
-Therefore, the architectures seek to reduce the use of BRAMs by dividing them
-into two groups that consider the total or partial storage of the image. The
-first of them increases processing by applying parallelization as well as
-reusing resources to reduce complexity~\cite{paper1,paper5}. On the other hand,
-architectures with partial storage partition the image into as many parts as
-convolders are used~\cite{paper2,paper4}. The difficulty presented by these
-schemes is the non-modularization of processing, making it difficult to increase
-the work rate by increasing parallelism.
+memory (BRAM) is one of the most used elements with the highest energy
+consumption. Therefore, the architectures seek to reduce the use of BRAMs by
+dividing them into two groups that consider the total or partial storage of the
+image. The first of them increases processing by applying parallelization as
+well as reusing resources to reduce complexity~\cite{paper1,paper5}. On the
+other hand, architectures with partial storage partition the image into as many
+parts as convolders are used~\cite{paper2,paper4}. The difficulty presented by
+these schemes is the non-modularization of processing, making it difficult to
+improve the work rate by increasing parallelism.
 
-In this document, we propose a high-performance, parallelizable hardware
-architecture and dynamic memory reuse with a linear increase in BRAM resources.
-In addition, theoretical estimates of complexity are compared with synthesis
-results in FPGA. The remainder of this paper is as follows. Section
-\ref{sec:preproc} introduces the image processing algorithm. The archicterure
-design of image filtering is presented in section \ref{sec:architecture}. In
-section \ref{sec:implementation}, hardware implementation and experimental
-results are shown. Finally, a conclusion will be done in section \ref{sec:conclusion}.
+In this work, we explain the concept of dynamic reuse of BRAM in 2D convolution
+and its implementation complexity for parallel architectures. Moreover, we
+propose a modular acquitecture, where it is easy to appreciate that when the
+number of parallelism increases, the complexity of BRAM increases linearly.
+
+This paper is organized as follows. Section \ref{sec:preproc} introduces the
+image processing algorithm. The archicterure design of image filtering is
+presented in section \ref{sec:architecture}. In section
+\ref{sec:implementation}, hardware implementation and experimental results are
+shown. Finally, a conclusion will be done in section \ref{sec:conclusion}.
 
 %Existen diferentes tipos de arquitecturas para realizar la convolucion 2D en una FPGA, pero 
 %muchas de ellas referencia no se no tiene en cuenta el uso de la memoria. 
@@ -513,23 +514,24 @@ results are shown. Finally, a conclusion will be done in section \ref{sec:conclu
 \section{Image Processing Algorithms}\label{sec:preproc}
 
 Filtering is widely used in many applications, such as aeronautics, navigation,
-CNN, etc. They are applied as preprocessing to eliminate useless details and
+CNN, etc. It is applied as pre-processing to eliminate useless details and
 noise. One of the preferred devices for the development of these techniques is
-the FPGA, since it presents an excellent relationship between speed of
-development and flexibility in the implementation. It allows the parallelization
-of the process and the reconfiguration of the design in a very short time. We
-will focus on the efficient use of FPGA resources by applying the 2D convolution
-technique and reducing the dynamic range of the pixels in the image.
+the FPGA, since it presents an excellent relationship between the speed of
+development and the flexibility in the implementation. It allows the
+parallelization of the process and the reconfiguration of the design in a very
+short time. We will focus on the efficient use of FPGA resources by applying the
+2D convolution technique and reducing the dynamic range of the pixels in the
+image.
 
 \subsection{Convolution Operation}
 
 Bidimensional convolution is defined mathematically as
 
 \begin{equation}\label{conv-org}
-  S(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K(i,j)I(x-i,y-j)
+  G(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K(i,j)I(x-i,y-j)
 \end{equation}
 where $I(x,y)$ is an image of size $(m \times n)$ pixels, $K(i,j)$ is a set of
-coefficients called Kernel of size $(h \times h)$ and $S(x,y)$ is convolution
+coefficients called Kernel of size $(h \times h)$ and $G(x,y)$ is convolution
 result of size $(m-2 \times n-2)$ pixels because we are considered valid
 convolution~\cite{validconv}. 
 
@@ -540,18 +542,18 @@ but the design can be extrapolated to any other type of image. The pixels of the
 grayscale images $I(x,y)$ have a dynamic range between $[0,255]$ and Kernel
 values $K(x,y)$ can be negative or positive. This work is part of a Deep
 Learning project where it is usual to operate with a dynamic range centered on
-zero. Therefore, we apply dynamic range expansion~\cite{dinamic_rango} and
-maximum norm~\cite{max_norm} to rearrange $\mathcal{T}[I(x,y)]=I^\prime(x,y)$
-between $[0,1]$ and $\mathcal{T}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$,
+zero. Therefore, we apply dynamic range expansion $(\mathcal{D}[.])$~\cite{dinamic_rango} and
+maximum norm $(\mathcal{M}[.])$~\cite{max_norm} to rearrange $\mathcal{D}[I(x,y)]=I^\prime(x,y)$
+between $[0,1]$ and $\mathcal{M}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$,
 respectively. Therefore, replacing in~\eqref{conv-org}
 
 \begin{equation}\label{conv-org1}
-  G(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j).
+  G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],
 \end{equation}
+where $\mathcal{D}^{-1}[.]$ is the dynamic range change between $[0,255]$ in the
+FPGA. Finally, all the processed blocks are reordered from the software side. In
+Fig.~\ref{transformation} the complete processing is described.
 
-Finally, processed image reconstruction is only needed since $G(x,y)$ values are already
-rearranged in FPGA.
-The complete process is detailed in Fig.~\ref{transformation}.
 
 \begin{figure}[!t]
 \centering
