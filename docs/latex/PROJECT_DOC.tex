@@ -551,14 +551,14 @@ respectively. Therefore, replacing in~\eqref{conv-org}
   G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],
 \end{equation}
 where $\mathcal{D}^{-1}[.]$ is the dynamic range change between $[0,255]$ in the
-FPGA. Finally, all the processed blocks are reordered from the software side. In
-Fig.~\ref{transformation} the complete processing is described.
+FPGA. Finally, all the processed blocks are reordered from the software side.
+The complete processing is described in Fig.~\ref{transformation}.
 
 
 \begin{figure}[!t]
 \centering
 \includegraphics[scale=0.47]{wflow3}
-\caption{Transformation steps during processing.}
+\caption{Transformations of the dynamic range during the processing of the image.}
 \label{transformation}
 \end{figure}
 
@@ -618,10 +618,10 @@ Fig.~\ref{transformation} the complete processing is described.
 In this section, the design of the architecture is described in detail. The
 entire process is divided into three stages, pre-processing, processing and
 post-processing. The pre-processing consists of capturing the image and applying
-the detailed transformation in Section \ref{sec:preproc} using a Python script.
-In addition, the script divides the image into batches and is sent by the UART
-port to the FPGA. In the FPGA a microprocessor receives the information and
-communicates it to the convolution module using a 32 bits general purpose
+the detailed transformation in Section~\ref{sec:preproc} using a Python script.
+In addition, the script divides the image into batches and sends them through
+the UART port to the FPGA. In the FPGA a microprocessor receives the information
+and communicates it to the convolution module using a 32 bits general purpose
 input-output (GPIO) port. This port writes the BRAMs that store the data that
 will be filtered. Due to the limitations of the size of the FPGA, no other
 interface was used, such as Ethernet or direct memory access (DMA) to read the
@@ -632,7 +632,6 @@ the GPIO. When the operation ends, a notification is sent to the microprocessor,
 which gives the order to recover the processed batch of the module and sends it
 to the central processing unit (CPU). Finally, the post-processing stage joins
 the batches on the CPU using a Python script.
-
 
 % As shown in Fig. \ref{general}, the workflow consists of three
 % %The workflow consists of three
@@ -654,31 +653,32 @@ the batches on the CPU using a Python script.
 %\end{figure}
 
 \subsection{Convolution Module}
-A simplified architecture of the module is shown in Fig. \ref{general}.
-The \textbf{control unit} is the one in charge of handling the communication
-with the processor and the \textbf{multiple accumulator (MAC) unit} is where the sum of
-the products of the kernel's coefficients with the pixels happens. The
-\textbf{address generation unit (AGU)} manages the memory addresses along with the
-\textbf{memory management unit (MMU)}, that manages how the values in memory must be
-read and written. The last module is the \textbf{storage} one, which is implemented with a
-set of columns of the FPGA's block RAM.
+A simplified architecture of the module is shown in Fig. \ref{general}. The
+\textbf{control unit} is the one in charge of handling the communication with
+the processor and the \textbf{multiple accumulator (MAC) unit}i executes the sum
+of the products of the kernel's coefficients with the pixels happens. The
+\textbf{address generation unit (AGU)} manages the memory addresses along with
+the \textbf{memory management unit (MMU)}, that manages how the values in memory
+must be read and written. The last module is the \textbf{storage} one, which is
+implemented with a set of columns of the FPGA's block RAM. The units of the
+convolution module are described below.
+
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=3in]{general.pdf}
-\caption{Simplified block diagram of the convolution module.}
+\caption{Simplified block diagram of the convolution module implemented in FPGA.}
 \label{general}
 \end{figure}
 
 \subsubsection{States}
 It is possible to see that during the work cycle, the convolution module goes
-through several states, as shown in Fig.\ref{state}.
-States transition are controlled by coded instructions embedded in the 32 bits input frame,
-and the module will remain in its current state until it receives a valid instruction.
+through several states, as shown in Fig.\ref{state}. States transition are
+controlled by coded instructions embedded in the 32 bits input frame, and the
+module will remain in its current state until it receives a valid instruction.
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
 configured, to do so it must receive a reset signal.
-
 
 %he most significant bit of the 32 bits input in the module
 %must be set to high. The Fig. \textbf{FIGURABITS} shows the 32 bits input
