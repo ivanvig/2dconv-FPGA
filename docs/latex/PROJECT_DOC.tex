@@ -830,7 +830,7 @@ data from the MACs to a memory, while the PMB routes the data from the memories
 to a MAC. The information flow between memories
 $\rightarrow$MMU$\rightarrow$MACs$\rightarrow$MMU$\rightarrow$memories is shown
 in Fig.~\ref{muxes}. Both, the MMBs and PMBs have a number of inputs dependent
-on the number of states from the MMU's FSM and and multiplexer connections are defined as
+on the number of states from the MMU's FSM and multiplexer connections are defined as
 
 \begin{equation}%\label{niter}
   O_j^i = O_{[(k-1)i+j]\%N}
@@ -883,9 +883,10 @@ scenario where no redundant data is transferred at all.
 % \end{figure}
 
 \section{Implementation and Results}\label{sec:implementation}
-The design was implemented in an Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using Xilinx
-Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock frequency was synthesized.
-The client where the pre and post-processing occurs was written in Python 2.7.
+The design was implemented in an Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using
+Xilinx Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock frequency
+was synthesized. The script for pre and post-processing was written in Python
+2.7.
 
 In the first instance the desired kernel's coefficients are loaded followed by
 the corresponding image batch via UART\@. Although UART is slow with respect to
@@ -895,11 +896,11 @@ As far as data representation is concerned, fixed point arithmetic was used with
 a resolution of $U(8,0)$ for input and output image and $S(8,7)$ for kernel.
 
 To ensure the proper functioning of the architecture, multiple kernels were
-coded in python and applied to an image, and then the same kernels were applied using
-the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0, 0]$
-sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1, 0,
-1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}. As it can be seen, processed
-image has good quality with all kernel filters tested.
+coded in python and applied to an image, and then the same kernels were applied
+using the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0,
+0]$ sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1,
+0, 1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}. As it can be
+seen, processed image has good quality with all kernel filters tested.
 
 
 \begin{figure}[!t]
@@ -912,20 +913,18 @@ image has good quality with all kernel filters tested.
 \hfil
 \subfloat[]{\includegraphics[scale=1.1]{emboss_c2}
 \label{fig:embossing}}
-\caption{On the left, an image processed in a CPU using python, on the right the
-  same image processed with the FPGA module. \protect\subref{fig:identity}
-  Identity Kernel. \protect\subref{fig:share} Sharpening Kernel.
-  \protect\subref{fig:embossing} Embossing Kernel.}
+\caption{On the left, an image processed in a CPU using python and on the right the
+  same image processed with the FPGA module. The filters used are \protect\subref{fig:identity}
+  Identity Kernel, \protect\subref{fig:share} Sharpening Kernel and \protect\subref{fig:embossing} Embossing Kernel.}
 \label{images_py_po}
 \end{figure}
 
-The architecture was synthesized for different degrees of parallelism, Table
-\ref{res_table} shows the resources consumed by the module and the
-microprocessor on the FPGA with and without DSP respectively. As awaited, a linear consumption
-increase is shown according to parallelism degree. Due to limitations
-of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
-24 without DSP but with a more intensive use of LUT.
-
+The architecture was synthesized for different degrees of parallelism.
+Table~\ref{res_table} shows the cmplexity by the module and the microprocessor
+on the FPGA with and without DSP respectively. As a result, a linear increase is
+shown according to parallelism. Due to limitations of the FPGA used a
+parallelism up to 8 was achieved using DSP and up to 24 without DSP but with a
+more intensive use of LUT.
 
 \begin{table}[!t]
 % increase table row spacing, adjust to taste
@@ -950,15 +949,20 @@ of the FPGA used a parallelism degree up to 8 was achieved using DSP and up to
   24 & ---            & ---        & ---        & ---         & 20209(97)     & 21(42)         \\ \hline
 \end{tabular}           
 \end{table}
-  
 
 A comparison between the estimated BRAM utilization and the results obtained
-from synthesis is shown in Fig. \ref{bram_n}. Normalization was made with respect to BRAM utilization percentage dividing by maximun utilization 
-percentage value, and considering that microblaze instance already occupies $18$ \% of BRAM resources. As wanted, utilization increment linear behaviour was achieved. 
+from synthesis is shown in Fig.~\ref{bram_n}. Normalization was made with
+respect to BRAM utilization percentage dividing by maximun utilization
+percentage value, and considering that microblaze instance already occupies $18\%$
+of BRAM resources. As a result, utilization increment linear behaviour was
+achieved.
 
-Considering convolution operation processing, one pixel per clock cycle is obtained, per instantiated MAC unit, i.e. if $16$ MAC unit were instantiated,
-with a reference clock at $100$ MHz , $1.6$ Gigapixels/second (Gp/s) throughput is achieved. In addition, regarding load and read stage, where one pixel every two
- clock cycles is loaded, $23.2$ Megapixels/second (Mp/s) throughput is obtained.
+Considering convolution operation processing, one pixel per clock cycle is
+obtained, per instantiated MAC unit, i.e. if $16$ MAC unit were instantiated,
+with a reference clock at $100$ MHz , $1.6$ Gigapixels/second (Gp/s) throughput
+is achieved. In addition, regarding load and read stage, where one pixel every
+two clock cycles is loaded, $23.2$ Megapixels/second (Mp/s) throughput is
+obtained.
 
 \begin{figure}[!t]
 \centering
@@ -1065,7 +1069,6 @@ with a reference clock at $100$ MHz , $1.6$ Gigapixels/second (Gp/s) throughput 
 
 
 \section{Conclusion}\label{sec:conclusion}
-
 Using FPGA we are able to process the filtering at the same time of reading the current image batch. 
 In this paper, we have presented the implementation of two-dimensional
 convolution on a Xilinx Arty 7 FPGA platform based on resource efficiency and system parallelism.
