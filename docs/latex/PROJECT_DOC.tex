@@ -768,7 +768,7 @@ memory columns.
 
 The same overlap explained above produces also that repeated data will be needed
 between one batch and the next one. In order to eliminate the need to send data
-that is already in memory, some data is reused between iterations. Given $N$ convolution
+that is already in memory, some data is reused between iterations. Given $N$ MAC
 units and a $k\times k$ kernel, a $N+k-1$ batch width is needed, but the
 processed batch has a width of $N$ columns, i.e. one for each MAC unit. 
 Therefore the last $k-1$ memory columns are not overwritten and maintain the
