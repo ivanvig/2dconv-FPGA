@@ -733,7 +733,7 @@ bit length and the result is saved into the first position of the memory.
 Once a pixel is processed, it is saved into the memory while the MAC unit
 shifts its image register, discarding the oldest $k$ pixels and loading new $k$
 pixels, i.e. one from each input column, like a FIFO structure.
-This procedure is equivalent to shit the kernel vertically on the image. All this steps are synchronized in such a way that
+This procedure is equivalent to shifting the kernel vertically on the image. All this steps are synchronized in such a way that
 one processed pixel is generated in every clock cycle.
 
 The AGU manages the memory's read and write addresses, and it takes into account the
