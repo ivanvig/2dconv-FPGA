@@ -673,22 +673,18 @@ convolution module are described below.
 
 \subsubsection{States}
 It is possible to see that during the work cycle, the convolution module goes
-through several states, as shown in Fig.\ref{state}. States transition are
+through several states, as shown in Fig.~\ref{state}. States transition are
 controlled by coded instructions embedded in the 32 bits input frame, and the
 module will remain in its current state until it receives a valid instruction.
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
-configured, to do so it must receive a reset signal.
-
-%he most significant bit of the 32 bits input in the module
-%must be set to high. The Fig. \textbf{FIGURABITS} shows the 32 bits input
-%frame structure and the binary code for the instructions.
-
-After receiving correspondent coded instruction, its will switch to the \textbf{KernelLoad} state,
-in which the kernel coefficients are loaded into the module. Then it goes to the \textbf{SizeLoad}
-state where the image's height is loaded, the argument for doing this is explained in
-section \ref{infstorage}. Once the module has gone through this setup states it
-will not come back to them until the entire image is processed.
+configured, to do so it must receive a reset signal. After receiving
+correspondent coded instruction, its will switch to the \textbf{KernelLoad}
+state, in which the kernel coefficients are loaded into the module. Then it goes
+to the \textbf{SizeLoad} state where the image's height is loaded, the argument
+for doing this is explained in section \ref{infstorage}. Once the module has
+gone through this setup states it will not come back to them until the entire
+image is processed.
 
 To begin with the processing loop, first the module goes to the \textbf{ImageLoad} state and
 stores the batch in memory. Then is goes to the \textbf{Run} state where the
