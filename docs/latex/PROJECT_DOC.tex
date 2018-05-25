@@ -409,7 +409,9 @@
   enough RAM memory for instantiate and store a complete image. Not only
   processing speed is prioritized, but also efficient resource utilization and
   scalability in design, so as to add as many convolution operations in parallel
-  as needed without requiring any major changes.
+  as needed without requiring any major changes. With the proposed structure,
+ dynamic memory reuse is accomplished, with a linear increase in memory complexity
+ with respect to parallelism level.
 
   % In this article, a hardware architecture for 2D convolution implementation on FPGA when
   % there is not enough RAM memory for instantiate and store a complete image, is presented.
@@ -1107,11 +1109,6 @@ resources.
 \ifCLASSOPTIONcompsoc
   % The Computer Society usually uses the plural form
   \section*{Acknowledgments}
-The authors would like to thank Dr. Mario R. Hueda and Dr. Damian Morero for supporting their
-design through Fuglor fundation research program.
-
-
-
 
 
 
@@ -1122,6 +1119,10 @@ design through Fuglor fundation research program.
 \fi
 
 
+%%%% Para cuando vaya a incluirse: esto es acknowledgment
+%%
+%%The authors would like to thank PhD. Mario R. Hueda and PhD. Damian Morero for supporting their
+%%design through Fulgor fundation research program.
 
 
 
