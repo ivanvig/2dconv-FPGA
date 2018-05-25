@@ -487,11 +487,12 @@ and its implementation complexity for parallel architectures. Moreover, we
 propose a modular acquitecture, where it is easy to appreciate that when the
 parallelism level increases, the complexity of BRAM increases linearly.
 
-This paper is organized as follows. Section \ref{sec:preproc} introduces the
+This paper is organized as follows. Section~\ref{sec:preproc} introduces the
 image processing algorithm. The archicterure design of image filtering is
-presented in section \ref{sec:architecture}. In section
-\ref{sec:implementation}, hardware implementation and experimental results are
-shown. Finally, a conclusion will be done in section \ref{sec:conclusion}.
+presented in section~\ref{sec:architecture}. In
+section~\ref{sec:implementation}, hardware implementation and experimental
+results are shown. Finally, conclusions are drawn in
+section~\ref{sec:conclusion}.
 
 %Existen diferentes tipos de arquitecturas para realizar la convolucion 2D en una FPGA, pero 
 %muchas de ellas referencia no se no tiene en cuenta el uso de la memoria. 
@@ -519,7 +520,7 @@ noise. One of the preferred devices for the development of these techniques is
 the FPGA, since it presents an excellent relationship between the speed of
 development and the flexibility in the implementation. It allows the
 parallelization of the process and the reconfiguration of the design in a very
-short time. We will focus on the efficient use of FPGA resources by applying the
+short time. We focus on the efficient use of FPGA resources by applying the
 2D convolution technique and reducing the dynamic range of the pixels in the
 image.
 
@@ -531,21 +532,23 @@ Bidimensional convolution is defined mathematically as
   G(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K(i,j)I(x-i,y-j)
 \end{equation}
 where $I(x,y)$ is an image of size $(m \times n)$ pixels, $K(i,j)$ is a set of
-coefficients called Kernel of size $(h \times h)$ and $G(x,y)$ is convolution
+coefficients called Kernel of size $(k \times k)$ and $G(x,y)$ is convolution
 result of size $(m-2 \times n-2)$ pixels because we are considered valid
 convolution~\cite{validconv}. 
 
 \subsection{Change of Dynamic Range}
 
-We will focus on grayscale images because of their simplicity of implementation,
-but the design can be extrapolated to any other type of image. The pixels of the
-grayscale images $I(x,y)$ have a dynamic range between $[0,255]$ and Kernel
-values $K(x,y)$ can be negative or positive. This work is part of a Deep
-Learning project where it is usual to operate with a dynamic range centered on
-zero. Therefore, we apply dynamic range expansion $(\mathcal{D}[.])$~\cite{dinamic_rango} and
-maximum norm $(\mathcal{M}[.])$~\cite{max_norm} to rearrange $\mathcal{D}[I(x,y)]=I^\prime(x,y)$
-between $[0,1]$ and $\mathcal{M}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$,
-respectively. Therefore, replacing in~\eqref{conv-org}
+The images used for processing are grayscale due to its simplicity of
+implementation, but the design can be extrapolated to any other type of image.
+The pixels of the grayscale images $I(x,y)$ have a dynamic range between
+$[0,255]$ and Kernel values $K(x,y)$ can be negative or positive. This work is
+part of a Deep Learning project where it is usual to operate with a dynamic
+range centered on zero. Therefore, we apply dynamic range expansion
+$(\mathcal{D}[.])$~\cite{dinamic_rango} and maximum norm
+$(\mathcal{M}[.])$~\cite{max_norm} to rearrange
+$\mathcal{D}[I(x,y)]=I^\prime(x,y)$ between $[0,1]$ and
+$\mathcal{M}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$, respectively. Therefore,
+replacing in~\eqref{conv-org}
 
 \begin{equation}\label{conv-org1}
   G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],
@@ -623,7 +626,7 @@ In addition, the script divides the image into batches and sends them through
 the UART port to the FPGA. In the FPGA a microprocessor receives the information
 and communicates it to the convolution module using a 32 bits general purpose
 input-output (GPIO) port. This port writes the BRAMs that store the data that
-will be filtered. Due to the limitations of the size of the FPGA, no other
+is filtered. Due to the limitations of the size of the FPGA, no other
 interface was used, such as Ethernet or direct memory access (DMA) to read the
 image directly from a storage device. However, the proposed architecture is
 indifferent to these methods. The second stage is the processing. The batch is
@@ -672,67 +675,70 @@ convolution module are described below.
 \end{figure}
 
 \subsubsection{States}
-It is possible to see that during the work cycle, the convolution module goes
-through several states, as shown in Fig.~\ref{state}. States transition are
-controlled by coded instructions embedded in the 32 bits input frame, and the
-module will remain in its current state until it receives a valid instruction.
+The convolution module goes through several states during the work cycle, as
+shown in Fig.~\ref{state}. States transition are controlled by coded
+instructions embedded in the 32 bits input frame, and the module is remained in
+its current state until it receives a valid instruction.
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
-configured, to do so it must receive a reset signal. After receiving
-correspondent coded instruction, its will switch to the \textbf{KernelLoad}
-state, in which the kernel coefficients are loaded into the module. Then it goes
-to the \textbf{SizeLoad} state where the image's height is loaded, the argument
-for doing this is explained in section \ref{infstorage}. Once the module has
-gone through this setup states it will not come back to them until the entire
-image is processed.
+configured, so it must receive a reset signal. After receiving coded
+instruction, its is switched to the \textbf{KernelLoad} state, in which the
+kernel coefficients are loaded into the module. The next state is
+\textbf{SizeLoad} state where the image's height o number of rows of BRAM is
+loaded. The convolution method is explained in the section~\ref{infstorage}. The
+three previous states are executed once throughout the work cycle. The process
+is repeated for each new image.
 
-To begin with the processing loop, first the module goes to the \textbf{ImageLoad} state and
-stores the batch in memory. Then is goes to the \textbf{Run} state where the
-processing occurs, and while processing is being made the module can not be interrupted, i.e.
-it will ignore all instructions until the batch is processed completely. As soon as 
-processing step is ended, a notification will be emitted through Control Unit's
-\textit{EoP} pin and the module will wait for \textbf{Out} state switch instruction, state where the 
+The following states define the processing cycle. First, the module goes to the
+\textbf{ImageLoad} state and stores the batch in memory BRAM in FPGA. Next state
+is the \textbf{Run} state where the processing occurs, and while processing is
+being made the module can not be interrupted. As a consequence, all instructions
+are ignored until the batch is processed completely. As soon as processing step
+is ended, a notification is emitted through Control Unit's \textit{EoP} pin and
+the module waits for \textbf{Out} state switch instruction state where the
 already processed batch is sent back to the microprocessor.
 
 All this states logic is managed by the control unit, which depending on the
-state will communicate the corresponding control signal to the other components
+state communicated the corresponding control signal to the other components
 of the module.
 
 \begin{figure}[!t]
   \centering
   \includegraphics[scale=0.55]{states.pdf}
-  \caption{Module's state diagram.}
+  \caption{State diagram that describes the transitions of events for the
+    processing of the image.}
   \label{state}
 \end{figure}
 
 \subsubsection{Data storage}\label{infstorage}
-The kernel coefficients are stored in registers inside each MAC unit. In
-order to store a batch, the proposed approach is to arrange the block RAM memory
-in columns, where each of them will store a image's pixel column. Therefore a
-batch size is given by the height of the image and the number of memory columns,
-also the maximum height of the image will be restricted by the number of entries
-that each memory columns has.
+The kernel coefficients are stored in registers within each MAC unit. To store a
+batch, the proposed approach is to organize the block of RAM in columns. A batch
+of pixels of an image is stored in each column. Therefore, a batch size is given
+by the height of the image and the number of memory columns, and the maximum
+height of the image is restricted by the number of entries in each memory
+column.
 
 During a batch processing, every pixel is read only once, so in order to do a
 more efficient use of the memory, the pixels that were already used are
 overwritten with processed pixels. This approach reduces drastically the amount
 of memory needed because it reuses the same memory to store the input batch and the
-processed batch. In section \ref{dataproc} additional aspects of the design
+processed batch. In section~\ref{dataproc} additional aspects of the design
 that reduces even more the memory use are explained.
 
 \subsubsection{Data processing}\label{dataproc}
-Given a $k\times k$ kernel, each MAC unit takes $k$ adjacent memory columns as
-input. To produce the first processed pixel, a MAC unit first needs to
-load $k$ pixels from each columns in such a way as to have $k\times
-k$ pixels loaded into it, then proceeds to multiply the pixels with the kernel's
-coefficients and sum everything. Finally, it truncates the result to reduce the
-bit length and the result is saved into the first position of the memory.
+For a $k\times k$ kernel, each MAC unit takes $k$ adjacent memory columns as
+input. The MAC unit first needs to load $k$ pixels from each columns in such a
+way as to have $k\times k$ pixels loaded into it to produce the first processed
+pixel. Then proceeds to multiply the pixels with the kernel's coefficients and
+sum everything. Finally, it truncates the result to reduce the bit length and
+the result is saved into the first position of the memory.
 
-Once a pixel is processed, it is saved into the memory while the MAC unit
-shifts its image register, discarding the oldest $k$ pixels and loading new $k$
-pixels, i.e. one from each input column, like a FIFO structure.
-This procedure is equivalent to shifting the kernel vertically on the image. All this steps are synchronized in such a way that
-one processed pixel is generated in every clock cycle.
+Once a pixel is processed, it is saved into the memory while the MAC unit shifts
+its image register, discarding the oldest $k$ pixels and loading new $k$ pixels,
+i.e. one from each input column, like firt input firt output (FIFO) structure.
+This procedure is equivalent to shifting the kernel vertically on the image. All
+this steps are synchronized in such a way that one processed pixel is generated
+in every clock cycle.
 
 The AGU manages the memory's read and write addresses, and it takes into account the
 latency between the clock cycle where the first pixel in the memory is read and
@@ -753,26 +759,24 @@ described.
 \end{figure}
 
 As mentioned above, $k$ columns are needed as input to produce one processed
-column in a MAC unit, that means that $2k$ columns are needed for two
-MAC units. However, given the nature of the convolution operation, to
-produce a contiguous column it is necessary to shift the input columns by one.
-Hence, there is an overlap between the two inputs and this produces that even $k$ input columns are still needed per MAC unit, only
-$k+1$ different input columns are needed for all the units. For this reason, it was decided that
-multiple MAC units in parallel will produce contiguous processed
-columns, sharing the common input columns. With this approach, for $N$
-MAC units the number of memory columns needed gets reduced from $N\cdot
-k$ to $N+k-1$, concluding that adding a new MAC unit only adds one new
-memory columns.
+column in a MAC unit, that means that $2k$ columns are needed for two MAC units.
+However, given the nature of the convolution operation, to produce a contiguous
+column it is necessary to shift the input columns by one. Hence, there is an
+overlap between the two inputs and this produces that even $k$ input columns are
+still needed per MAC unit, only $k+1$ different input columns are needed for all
+the units. For this reason, MAC units in parallel produces contiguous processed
+columns, sharing the common input columns. Therefore, $N$ MAC units the number
+of memory columns needed gets reduced from $N\cdot k$ to $N+k-1$ and concluding
+that adding a new MAC unit only adds one new memory columns.
 
-The same overlap explained above produces also that repeated data will be needed
-between one batch and the next one. In order to eliminate the need to send data
-that is already in memory, some data is reused between iterations. Given $N$ MAC
-units and a $k\times k$ kernel, a $N+k-1$ batch width is needed, but the
-processed batch has a width of $N$ columns, i.e. one for each MAC unit. 
-Therefore the last $k-1$ memory columns are not overwritten and maintain the
-input data. This $k-1$ columns will be reused as the first columns of the 
-next batch, thus the batch width is reduced to $N$, with the exception of
-the first batch that will still have a $N+k-1$ width.
+The same overlap explained above also results in repeated data being used
+between one batch and the next. Therefore, batches that are not in memory are
+sent between iterations. Given $N$ MAC units and a $k\times k$ kernel, a $N+k-1$
+batch width is needed, but the processed batch has a width of $N$ columns, i.e.
+one for each MAC unit. So, the last $k-1$ memory columns are not overwritten and
+maintain the input data. This $k-1$ columns are reused as the first columns
+of the next batch, thus the batch width is reduced to $N$, with the exception of
+the first batch that has a width of $N+k-1$.
 
 A consequence of reusing the memory columns written by the previous batch is
 that in every iteration the position of memory columns associated with each
@@ -1065,7 +1069,7 @@ Performances and results show that resources utilization concerning BRAM resourc
 
 High throughput was achieved in what processing  is concerned. On the other hand, the limiting factor that impacted
  the implemented system the most was UART speed transmission. Another limiting factor was the DSP48A1 slices.
-Factor mentioned above is easily solved by using an FPGA with more slices and resources.
+Both factors mentioned above is easily solved by using an FPGA with more slices and resources.
 
 
 
