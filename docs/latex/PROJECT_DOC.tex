@@ -827,10 +827,11 @@ data multiplexer is conformed by a set of smaller blocks which are classified
 into two classes depending on their function: memory multiplexer blocks (MMB)
 and processing multiplexer blocks (PMB). The MMB routes the raw data and the
 data from the MACs to a memory, while the PMB routes the data from the memories
-to a MAC. The information flow between memories$\rightarrow$MMU$\rightarrow$MACs$\rightarrow$MMU$\rightarrow$memories is shown
-in Fig.~\ref{muxes}. Both, the MMBs and PMBs have a number of inputs proportional to
-the number of states from the MMU's FSM and their multiplexers' inputs are defined
-respectively as
+to a MAC. The information flow between
+memories$\rightarrow$MMU$\rightarrow$MACs$\rightarrow$MMU$\rightarrow$memories
+is shown in Fig.~\ref{muxes}. Both, the MMBs and PMBs have a number of inputs
+proportional to the number of states from the MMU's FSM and their multiplexers'
+inputs are defined respectively as
 
 \begin{equation}%\label{niter}
   O_j^i = O_{[(k-1)i+j]\%N}
