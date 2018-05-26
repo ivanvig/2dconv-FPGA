@@ -342,17 +342,31 @@
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Martin Casabella,
-  Sergio Sulca,
-  Ivan Vignolles,
-  Ariel L. Pola
+\author{\IEEEauthorblockN{
+    xxxxxx xxxxxxxxx,
+    xxxxxx xxxxx,
+    xxxx xxxxxxxxx,
+    xxxxx xx xxxx
+  }
+  \IEEEauthorblockA{
+    xxxxxxxxxx xx xxxxxxxx xxx xxxxxxxxxxx\\
+    xxxxxxxxx xxxxxx \\
+    xxxxxxx xxxxxxxx xxx, xxxxxxx xxxxxxxx, xxxxxxxxx\\
+    xxxxx: xxxxxx.xxxxxxxxx@xxxxx.xxx, xxx.xxxx@xxxxx.xxx,
+    xxxxxxxx@xxxxx.xxx, xxxxxxxxx@xxxxx.xxx}
 }
-\IEEEauthorblockA{Department of Research and Development\\
-  Fundacion Fulgor \\
-  Ernesto Romagosa 518, C\'ordoba X5016GQN, Argentina\\
-  Email: martin.casabella@gmail.com, ser.0090@gmail.com,
-  ivanmvig@gmail.com, arielpola@gmail.com}
-}
+%\author{\IEEEauthorblockN{
+    %Martin Casabella,
+    %Sergio Sulca,
+    %Ivan Vignolles,
+    %Ariel L. Pola
+  %}
+  %\IEEEauthorblockA{Department of Research and Development\\
+    %Fundacion Fulgor \\
+    %Ernesto Romagosa 518, C\'ordoba X5016GQN, Argentina\\
+    %Email: martin.casabella@gmail.com, ser.0090@gmail.com,
+    %ivanmvig@gmail.com, arielpola@gmail.com}
+%}
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
 % the acknowledgment of grants, issue a \IEEEoverridecommandlockouts
@@ -828,6 +842,19 @@ be returned, for each iteration. To do so, it has a finite state machine where
 each state corresponds to a set of positions named above. The number of states
 is given by the iteration number in eq.~\ref{niter}.
 
+\begin{figure}[!t]
+\centering
+\subfloat[]{\includegraphics[scale=0.3]{mem_space2}%
+\label{mem}}
+\hfil %\vspace{0.1cm}
+\centering
+\subfloat[]{\includegraphics[scale=0.3]{data_sent}%
+\label{transmitted}}
+\caption{Comparison between different approaches. \protect\subref{mem} Amount of
+  memory required. \protect\subref{transmitted} Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.}
+\label{comp}
+\end{figure}
+
 The MMU has a set of multiplexers whose select lines are managed by the finite
 state machine (Fig.~\ref{general}) to route the incoming and outgoing data. The
 data multiplexer is conformed by a set of smaller blocks which are classified
@@ -847,19 +874,6 @@ inputs are defined respectively as
   M_j^i = M_{(iN+j)\%(N+k-1)}
 \end{equation}
 where the symbol $\%$ represents the module operation and $i$ goes from $0$ to $It-1$.
-
-\begin{figure}[!t]
-\centering
-\subfloat[]{\includegraphics[scale=0.3]{mem_space2}%
-\label{mem}}
-\hfil %\vspace{0.1cm}
-\centering
-\subfloat[]{\includegraphics[scale=0.3]{data_sent}%
-\label{transmitted}}
-\caption{Comparison between different approaches. \protect\subref{mem} Amount of
-  memory required. \protect\subref{transmitted} Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.}
-\label{comp}
-\end{figure}
 
 A comparison between the naive (which would be assign $k$ independent
 memory columns to each MAC unit), the shared inputs and the
@@ -1107,8 +1121,10 @@ resources.
 \ifCLASSOPTIONcompsoc
   % The Computer Society usually uses the plural form
   \section*{Acknowledgments}
-The authors would like to thank Dr. Mario R. Hueda and Dr. Damian Morero for supporting their
-design through Fuglor fundation research program.
+xxx xxxxxxx xxxxx xxxx xx xxxxx xxxx xxxxx xx xxxxx xxx xxxx xxxxxx xxxxxx xxx
+xxxxxxxxxx xxxxxxxxxxxx xxxxxxx xxxxxx xxxxxxxxx xxxxxxxx xxxxxxxxx.
+%The authors would like to thank PhD. Mario R. Hueda and PhD. Damian Morero for supporting their
+%design through Fuglor fundation research program.
 
 
 
