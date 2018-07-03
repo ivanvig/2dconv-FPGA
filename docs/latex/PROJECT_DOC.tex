@@ -561,7 +561,7 @@ convolution~\cite{validconv}.
 
 \subsection{Change of Dynamic Range}
 
-The images used for processing are grayscale due to its implementation simplicity, but the design can be extrapolated to any other type of image.
+The images used for processing are grayscale because of its implementation simplicity, but the design can be extrapolated to any other type of image.
 The pixels of the grayscale images $I(x,y)$ have a dynamic range between
 $[0,255]$ and Kernel values $K(x,y)$ can be negative or positive. This work is
 part of a Deep Learning project where it is usual to operate with a dynamic
@@ -576,7 +576,7 @@ replacing in~\eqref{conv-org}
   G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],
 \end{equation}
 where $\mathcal{D}^{-1}[.]$ is the dynamic range change between $[0,255]$ in the
-FPGA. Finally, all the processed blocks are reordered from the software side.
+FPGA. Finally, all the processed blocks are reordered by software.
 The complete processing is described in Fig.~\ref{transformation}.
 
 
@@ -643,16 +643,16 @@ The complete processing is described in Fig.~\ref{transformation}.
 In this section, the design of the architecture is described in detail. The
 entire process is divided into three stages, pre-processing, processing and
 post-processing. The pre-processing consists of capturing the image and applying
-the detailed transformation in Section~\ref{sec:preproc} using a Python script.
+the described transformation in Section~\ref{sec:preproc} using a Python script.
 In addition, the script divides the image into batches and sends them through
 the UART port to the FPGA. In the FPGA a microprocessor receives the information
-and communicates it to the convolution module using a 32 bits general purpose
-input-output (GPIO) port. This port writes the BRAMs that store the data that
-is filtered. Due to the limitations of the size of the FPGA, no other
-interface was used, such as Ethernet or direct memory access (DMA) to read the
+and transfers it to the convolution module using a 32 bits general purpose
+input-output (GPIO) port. This port writes the BRAMs that store filtered data.
+Due to FPGA size limitations, no other
+interface was used, such as Ethernet or direct memory access, to read the
 image directly from a storage device. However, the proposed architecture is
 indifferent to these methods. The second stage is the processing. The batch is
-convolved with the kernel inside the module, which the user establishes through
+convolved with the kernel inside the module, which is established by the user through
 the GPIO. When the operation ends, a notification is sent to the microprocessor,
 which gives the order to recover the processed batch of the module and sends it
 to the central processing unit (CPU). Finally, the post-processing stage joins
