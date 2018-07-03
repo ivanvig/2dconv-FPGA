@@ -798,10 +798,10 @@ the first batch that has a width of $N+k-1$.
 A consequence of reusing the memory columns written by the previous batch is
 that in every iteration the position of memory columns associated with each
 MAC unit describes a circular shift by $N$ places. From the above it
-follows that a periodicity in the relationship between the memory columns and the
+follows that a periodicity in the ratio between the memory columns and the
 MAC unit's inputs must exist, where the period $It$ is the number of
 iterations necessary to get to the original memory columns - MAC units
-inputs relationship, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
+inputs ratio, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
 must be an integer $m$ such that 
 
 \begin{equation}\label{niter}
@@ -825,17 +825,18 @@ The logic is implemented in the MMU, which serves as an interface between the
 memories and the rest of the components, keeping them independent from the
 parallelism degree and the iteration number. An example of implementation of the
 memories is shown in Fig.~\ref{algorithm}. We consider $N=4$ MAC units, a kernel
-$k=3$ and 6 memory columns. In the first iteration, the memories 1-6 are
-loaded with the new batch, and the result is stored in memories 1-4. In the next
-iteration, a new batch is loaded without overwriting memories 5-6. After
-processing, the data is stored in memories 5-8. 
+$k=3$ and 6 memory columns. In the first iteration, the memories 1 to 6 are
+loaded with the new batch, and the result is stored in memories 1 to 4. In the next
+iteration, a new batch is loaded without overwriting memories 5 and 6. After
+processing, the data is stored in memories 5 to 8. 
 
-The MMU keeps track of the memory positions where it must save the input batch,
-the information which must be fed to every MAC unit, the memory position where
+The MMU keeps track of the memory positions where the input batch must be stored,
+the information that must be fed to every MAC unit, the memory position where
 the processed data must be stored and the order in which the processed data must
 be returned, for each iteration. To do so, it has a finite state machine where
-each state corresponds to a set of positions named above. The number of states
-is given by the iteration number in eq.~\ref{niter}.
+each state corresponds to a set of the aforementioned positions. The number of states
+is given by the iteration number in eq.~\eqref{niter}.
+
 
 \begin{figure}[!t]
 \centering
@@ -853,13 +854,13 @@ is given by the iteration number in eq.~\ref{niter}.
 The MMU has a set of multiplexers whose select lines are managed by the finite
 state machine (Fig.~\ref{general}) to route the incoming and outgoing data. The
 data multiplexer is conformed by a set of smaller blocks which are classified
-into two classes depending on their function: memory multiplexer blocks (MMB)
+into two classes according to their function: memory multiplexer blocks (MMB)
 and processing multiplexer blocks (PMB). The MMB routes the raw data and the
-data from the MACs to a memory, while the PMB routes the data from the memories
+data from the MACs to a memory, whereas the PMB routes the data from the memories
 to a MAC. The information flow between
 memories$\rightarrow$MMU$\rightarrow$MACs$\rightarrow$MMU$\rightarrow$memories
-is shown in Fig.~\ref{muxes}. Both, the MMBs and PMBs have a number of inputs
-proportional to the number of states from the MMU's FSM and their multiplexers'
+is shown in Fig.~\ref{muxes}. Both the MMBs and PMBs have a number of inputs
+proportional to the number of states from the MMU FSM and their multiplexers
 inputs are defined respectively as
 
 \begin{equation}%\label{niter}
