@@ -488,8 +488,8 @@ gate array (FPGA) has been a very active field. This is mainly due to the
 ability to take advantage of bit level parallelism, pixel level, neighborhood
 level and task level to increase computing performance and speed. In addition, FPGAs are
 reconfigurable, allowing the flexibility that is often desired in neural
-networks. This coupling of processing, parallelism and flexibility at very high
-speed is what makes FPGAs a platform of choice for the development of these
+networks. This combination of parallel processing and flexibility at very high
+speed, is what makes FPGAs a platform of choice for the development of these
 areas~\cite{papercnn}.
 
 There are many examples in the literature of two-dimensional (2D) convolution
@@ -501,7 +501,7 @@ dividing them into two groups that consider either total storage or partial stor
 image. The first of them increases processing by applying parallelization as
 well as reusing resources to reduce complexity~\cite{paper1,paper5}. On the
 other hand, architectures with partial storage partition the image into as many
-parts as convolders are used~\cite{paper2,paper4}. The difficulty presented by
+parts as convolders are used~\cite{paper2,paper4}. The drawback presented by
 these schemes is the non-modularization of processing, making it difficult to
 improve the work rate by increasing parallelism.
 
@@ -511,7 +511,7 @@ propose a modular architecture, where it is easy to appreciate that when the
 parallelism level increases, the complexity of BRAM increases linearly.
 
 This paper is organized as follows. Section~\ref{sec:preproc} introduces the
-image processing algorithm. The archicterure design of image filtering is
+image processing algorithm. The archicterure design is
 presented in section~\ref{sec:architecture}. In
 section~\ref{sec:implementation}, hardware implementation and experimental
 results are shown. Finally, conclusions are drawn in
@@ -561,8 +561,7 @@ convolution~\cite{validconv}.
 
 \subsection{Change of Dynamic Range}
 
-The images used for processing are grayscale due to its simplicity of
-implementation, but the design can be extrapolated to any other type of image.
+The images used for processing are grayscale due to its implementation simplicity, but the design can be extrapolated to any other type of image.
 The pixels of the grayscale images $I(x,y)$ have a dynamic range between
 $[0,255]$ and Kernel values $K(x,y)$ can be negative or positive. This work is
 part of a Deep Learning project where it is usual to operate with a dynamic
