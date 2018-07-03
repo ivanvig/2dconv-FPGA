@@ -1,0 +1,122 @@
+
+--------------------------------------------------------------------
+Reviews:
+
+----------------------- REVIEW 1 ---------------------
+
+- Revisar gramatica, segun el hay muchos errores gramaticales (................................. 5mentarios)
+
+- Marco que no debemos usar expresiones coloquiales con la estructura de Espanol (eso puede llegar a haber ocurrido, por naturalidad de hablar espanol)
+
+- Remarco que por esto, la ESCRITURA (no contenido), esta MUY LEJOS de un paper IEEEXplore. 
+
+
+In section 3 the authors states "... and the multiple accumulator (MAC) unit
+...", while it should be "... and the multiplier-accumulator (MAC) unit ..."
+
+
+-MAC ENTONCES:   multiplier-accumulator unit (tiene razon)
+
+
+In the same section the authors states "... and the module is remainded ...",
+while it should be "... and the module remain ..."
+
+- Error gramatical, a alguno se le paso.
+
+Correct: "... SiseLoad state where the image's height o number of rows ..."
+
+-Otro error gramatical, SizeLoad.
+
+It is not clear what the authors express here: "All this states logic is managed
+by the control unit, which depending on the state communicated the correspond-
+ing control signal to the other components of the module."
+
+
+Correct: "As a result, utilization increment linear behaviour was achieved."
+
+
+- Reexpresar lo de arriba, no queda claro segun el.
+
+The reference 9 must be corrected.
+
+- Esto no se manejar bien yo las referencias, pero hay que corregir la 9
+
+----------------------- REVIEW 2 ---------------------
+
+(EN ESPANOL).
+
+Nose porque, a este le llego asi.. sin el anonimato.
+
+- No se respetaron las normas de entrega del trabajo ya que la copia que está en mi poder tiene tanto los nombres de los autores 
+como las afiliaciones e incluso las direcciones de email.
+
+- El contenido del trabajo es completo y correcto.
+
+- La redacción debería revisarse de manera exhaustiva ya que contiene varios errores de escritura que en algunos párrafos.
+
+- A mi entender debería haberse incluido una comparación en consumo/throughput con sistemas comerciales existentes como GPU debajo consumo a modo de justificar el uso de un FPGA.
+
+SUGIERE QUE BUSQUEMOS ALGUN SISTEMA GPU... habria que ver.
+
+
+----------------------- REVIEW 3 ---------------------
+
+El trabajo presenta una solución ingenieril a un problema y su implementación. En lineas generales el trabajo está bien presentado y las ideas son exhibidas con claridad.
+
+(EN ESPANOL).
+
+Observaciones: No resepeta el double blinded de autores/institución y agradecimientos.
+               No incluye keywords.
+
+Introducción: Hay algunos errores de ortografia y redacción pero está bien presentada.
+
+
+
+Image Processing Algorithms: Argumentar un poco mejor la elección de la FPGA frente a otros dispositivos. 
+Dice que hacen foco en el uso eficiente de los recursos de la FPGA mediante la aplicación de convolución 2D y la reducción del rango dinámico? 
+En todo caso no digan que hacen un uso eficiente de la FPGA debido a eso sino nombrenlos, al estilo "Hacemos foco en el uso eficiente de los recursos de la FPGA al realizar la convolución 2D reduciendo el rango dinámico, etc, etc.." 
+
+Cuando dicen que utilizan imagenes en escala de grises pero que el diseño puede ser extrapolado a cualquier otro tipo de imagen faltaría alguna referencia que lo respalde. 
+
+Acá dicen que hacen una expansión del rango dinámico? No habian dicho antes que  hacian una reducción del rango dinámico como uno de los métodos para utilizar de forma eficiente los recursos de hardware? 
+
+Architecture Design: 
+*Workflow: Introducir el concepto de "batches", a que se refiere y cómo se realiza el particionado.
+Queda clara la idea de como es el procesamiento y flujo de la información.
+
+*Convolution Module: No hace falta que indique que mas adelante se va a explicar el método de convolución. "memory BRAM" puede ser reemplazado por "block RAM".
+
+*Data Storage: Cuando habla de las restricciones, tal vez convenga introducirlas en algún punto previo y argumentarlas un poco más.
+
+*Data Processing: Cuando explica la latencia dá muchas vueltas, explicar de manera mas concisa y determinante con datos reales.
+Al hablar de la correspondencia entre la cantidad de columnas y las unidades MAC confunde un poco, redactar con un poco mas de claridad.
+ntenten que las imágenes a las cuales hacen referencia esten en la misma página que en donde se las llama.
+
+Implementation and Results: Nunca utilizar información vaga del estilo "good quality", utilizar siempre algún tipo de métrica.
+Al gráfico entre el uso de la BRAM teórica vs el uso real, para que lo usan? Argumentar el por qué de ese gráfico.
+Explicar un poco mejor lo del throughput.
+Faltaría comparar contra algún otro trabajo en el que se realice la conv2D con otro método y presentar los resultados comparativos como para poder evaluar su trabajo.
+
+----------------------- REVIEW 4 ---------------------
+
+- Sugiere que agergemos comparaciones con otros trabajos del rubro. Dice que incluyamos una nueva tabla con comparacion de recursos.
+
+- Seccion 2, parrafo 1: dice que esa introduccion deberia ser respecto a algoritmos de procesamiento de imagenes, pero es una replica de motivacion al uso de FPGA para
+implementar la convolucion
+
+- La Fig.2 no tiene relacion con la unidad de convolucion descrita. TIENE RAZON, es el SISTEMA COMPLETO, donde solo un bloquecito dice MAC UNIT, y el epigrafe
+dice "SIMPLIFIED BLOCK DIAGRAM OF THE CONVOLUTION MODULE IMPLEMENTED IN FPGA", confuso.
+
+- Escribir la palabra: pre-processing and post-processing  COMPLETA (??????????????????????????
+
+
+- ortografia: Typos: page 1 paragraph 5  acquitecture= architecture
+page 5 paragraph 2, cmplexity-complexity
+
+
+-------------------------  METAREVIEW  ------------------------
+
+El trabajo es adecuado para la categoría "Technical Forum".
+Problemas en la redacción y la falta de comparación con el estado del arte impiden su presentación como "Regular paper"
+
+------------------------------------------------------

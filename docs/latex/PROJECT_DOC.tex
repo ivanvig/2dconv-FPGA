@@ -432,8 +432,9 @@
   % Not only processing speed is prioritized, but also efficient resource utilization and scalability in design, 
   % so as to add as many convolution operations in parallel as needed without requiring any major changes.
 \end{abstract}
-
-% no keywords
+ 
+\noindent
+Keywords: FPGA, hardware architecture, convolution, kernel filter, multiplier-accumulator unit, image filtering
 
 
 
@@ -507,7 +508,7 @@ improve the work rate by increasing parallelism.
 
 In this work, we explain the concept of dynamic reuse of BRAM in 2D convolution
 and its implementation complexity for parallel architectures. Moreover, we
-propose a modular acquitecture, where it is easy to appreciate that when the
+propose a modular architecture, where it is easy to appreciate that when the
 parallelism level increases, the complexity of BRAM increases linearly.
 
 This paper is organized as follows. Section~\ref{sec:preproc} introduces the
@@ -681,13 +682,12 @@ the batches on the CPU using a Python script.
 \subsection{Convolution Module}
 A simplified architecture of the module is shown in Fig. \ref{general}. The
 \textbf{control unit} is the one in charge of handling the communication with
-the processor and the \textbf{multiple accumulator (MAC) unit} executes the sum
+the processor and the \textbf{multiplier-accumulator (MAC) unit} executes the sum
 of the products of the kernel's coefficients with the pixels. The
 \textbf{address generation unit (AGU)} manages the memory addresses along with
 the \textbf{memory management unit (MMU)}, that manages how the values in memory
 must be read and written. The last module is the \textbf{storage} one, which is
-implemented with a set of columns of the FPGA's block RAM. The units of the
-convolution module are described below.
+implemented with a set of columns of the FPGA's block RAM. 
 
 
 \begin{figure}[!t]
@@ -700,7 +700,7 @@ convolution module are described below.
 \subsubsection{States}
 The convolution module goes through several states during the work cycle, as
 shown in Fig.~\ref{state}. States transition are controlled by coded
-instructions embedded in the 32 bits input frame, and the module is remained in
+instructions embedded in the 32 bits input frame, and the module remain in
 its current state until it receives a valid instruction.
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
@@ -713,7 +713,7 @@ three previous states are executed once throughout the work cycle. The process
 is repeated for each new image.
 
 The following states define the processing cycle. First, the module goes to the
-\textbf{ImageLoad} state and stores the batch in memory BRAM in FPGA. Next state
+\textbf{ImageLoad} state and stores the batch in FPGA's block RAM. Next state
 is the \textbf{Run} state where the processing occurs, and while processing is
 being made the module can not be interrupted. As a consequence, all instructions
 are ignored until the batch is processed completely. As soon as processing step
@@ -721,9 +721,6 @@ is ended, a notification is emitted through Control Unit's \textit{EoP} pin and
 the module waits for \textbf{Out} state switch instruction state where the
 already processed batch is sent back to the microprocessor.
 
-All this states logic is managed by the control unit, which depending on the
-state communicated the corresponding control signal to the other components
-of the module.
 
 \begin{figure}[!t]
   \centering
@@ -923,8 +920,7 @@ To ensure the proper functioning of the architecture, multiple kernels were
 coded in python and applied to an image, and then the same kernels were applied
 using the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0,
 0]$ sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1,
-0, 1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}. As it can be
-seen, processed image has good quality with all kernel filters tested.
+0, 1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}. 
 
 
 \begin{figure}[!t]
@@ -944,7 +940,7 @@ seen, processed image has good quality with all kernel filters tested.
 \end{figure}
 
 The architecture was synthesized for different degrees of parallelism.
-Table~\ref{res_table} shows the cmplexity by the module and the microprocessor
+Table~\ref{res_table} shows the complexity by the module and the microprocessor
 on the FPGA with and without DSP respectively. As a result, a linear increase is
 shown according to parallelism. Due to limitations of the FPGA used a
 parallelism up to 8 was achieved using DSP and up to 24 without DSP but with a
