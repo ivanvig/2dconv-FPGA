@@ -420,7 +420,7 @@
 \begin{abstract}
   This paper presents a hardware architecture for two-dimensional (2D)
   convolution implementation on a Xilinx Arty 7 FPGA platform when there is not
-  enough RAM memory for instantiate and store a complete image. Not only
+  enough RAM memory to instantiate and store a complete image. Not only
   processing speed is prioritized, but also efficient resource utilization and
   scalability in design, so as to add as many convolution operations in parallel
   as needed without requiring any major changes. With the proposed structure,
@@ -474,8 +474,7 @@ Keywords: FPGA, hardware architecture, convolution, kernel filter, multiplier-ac
 % hardware architecture with customizable kernel that can achieve up to 2.4GP/sec in pixel processing rate
 % and 135MP/sec if the load and output stage are taken into account.
 
-The origin of digital image processing, due to the high level of processing they
-require, is directly related to the development and evolution of computers. Most
+The origin of digital image processing is directly related to the development and evolution of computers. Most
 filters for images that focus, blur, enhance edges and detect edges, among
 others, use convolution as a mathematical operation. Image processing is a very
 extensive research area with a large number of applications in multiple fields
@@ -538,13 +537,13 @@ section~\ref{sec:conclusion}.
 
 \section{Image Processing Algorithms}\label{sec:preproc}
 
-Filtering is widely used in many applications, such as aeronautics, navigation,
-CNN, etc. It is applied as pre-processing to eliminate useless details and
+Filtering process is widely used in many applications, such as aeronautics, navigation,
+CNN, etc. It is applied as pre-processing to remove useless details and
 noise. One of the preferred devices for the development of these techniques is
 the FPGA, since it presents an excellent relationship between the speed of
 development and the flexibility in the implementation. It allows the
 parallelization of the process and the reconfiguration of the design in a very
-short time. We focus on the efficient use of FPGA resources by applying the
+short time. We focus our study on the efficient use of FPGA resources by applying the
 2D convolution technique and reducing the dynamic range of the pixels in the
 image.
 
