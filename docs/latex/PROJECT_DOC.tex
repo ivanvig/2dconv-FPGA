@@ -654,8 +654,8 @@ image directly from a storage device. However, the proposed architecture is
 indifferent to these methods. The second stage is the processing. The batch is
 convolved with the kernel inside the module, which is established by the user through
 the GPIO. When the operation ends, a notification is sent to the microprocessor,
-which gives the order to recover the processed batch of the module and sends it
-to the central processing unit (CPU). Finally, the post-processing stage joins
+which gives the order to recover the processed batch from the module and sends it
+to the central processing unit (CPU). Finally, the post-processing stage combines
 the batches on the CPU using a Python script.
 
 % As shown in Fig. \ref{general}, the workflow consists of three
@@ -683,8 +683,8 @@ A simplified architecture of the module is shown in Fig. \ref{general}. The
 the processor and the \textbf{multiplier-accumulator (MAC) unit} executes the sum
 of the products of the kernel's coefficients with the pixels. The
 \textbf{address generation unit (AGU)} manages the memory addresses along with
-the \textbf{memory management unit (MMU)}, that manages how the values in memory
-must be read and written. The last module is the \textbf{storage} one, which is
+the \textbf{memory management unit (MMU)}, that decides how the values in memory
+are read and written. The last module is the \textbf{storage} one, which is
 implemented with a set of columns of the FPGA's block RAM. 
 
 
@@ -697,8 +697,8 @@ implemented with a set of columns of the FPGA's block RAM.
 
 \subsubsection{States}
 The convolution module goes through several states during the work cycle, as
-shown in Fig.~\ref{state}. States transition are controlled by coded
-instructions embedded in the 32 bits input frame, and the module remain in
+shown in Fig.~\ref{state}. States transitions are controlled by coded
+instructions embedded in the 32-bits input frame, and the module remain in
 its current state until it receives a valid instruction.
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
