@@ -704,8 +704,8 @@ its current state until it receives a valid instruction.
 At the beginning the module must be in a \textbf{reset} state, waiting to be
 configured, so it must receive a reset signal. After receiving coded
 instruction, its is switched to the \textbf{KernelLoad} state, in which the
-kernel coefficients are loaded into the module. The next state is
-\textbf{SizeLoad} state where the image's height o number of rows of BRAM is
+kernel coefficients are loaded to the module. The next state is
+\textbf{SizeLoad} state where the image's height, i.e  number of rows of BRAM, is
 loaded. The convolution method is explained in the section~\ref{infstorage}. The
 three previous states are executed once throughout the work cycle. The process
 is repeated for each new image.
@@ -714,10 +714,9 @@ The following states define the processing cycle. First, the module goes to the
 \textbf{ImageLoad} state and stores the batch in FPGA's block RAM. Next state
 is the \textbf{Run} state where the processing occurs, and while processing is
 being made the module can not be interrupted. As a consequence, all instructions
-are ignored until the batch is processed completely. As soon as processing step
-is ended, a notification is emitted through Control Unit's \textit{EoP} pin and
-the module waits for \textbf{Out} state switch instruction state where the
-already processed batch is sent back to the microprocessor.
+are ignored until the batch is completely processed. As soon as processing step
+ends, a notification is emitted through Control Unit's \textit{EoP} pin and
+the module waits for \textbf{Out} state switch instruction. After this transition, processed batch is sent back to the microprocessor.
 
 
 \begin{figure}[!t]
