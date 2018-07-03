@@ -729,32 +729,31 @@ the module waits for \textbf{Out} state switch instruction. After this transitio
 
 \subsubsection{Data storage}\label{infstorage}
 The kernel coefficients are stored in registers within each MAC unit. To store a
-batch, the proposed approach is to organize the block of RAM in columns. A batch
-of pixels of an image is stored in each column. Therefore, a batch size is given
+batch, the proposed approach is to organize the block of RAM in columns. An image batch
+of pixels is stored in each column. Therefore, the batch size is given
 by the height of the image and the number of memory columns, and the maximum
 height of the image is restricted by the number of entries in each memory
 column.
 
-During a batch processing, every pixel is read only once, so in order to do a
+During batch processing, every pixel is read only once, so in order to do a
 more efficient use of the memory, the pixels that were already used are
-overwritten with processed pixels. This approach reduces drastically the amount
-of memory needed because it reuses the same memory to store the input batch and the
+overwritten with processed pixels. This approach drastically reduces the amount
+of required memory because it reuses the same memory to store the input batch and the
 processed batch. In section~\ref{dataproc} additional aspects of the design
 that reduces even more the memory use are explained.
 
 \subsubsection{Data processing}\label{dataproc}
 For a $k\times k$ kernel, each MAC unit takes $k$ adjacent memory columns as
-input. The MAC unit first needs to load $k$ pixels from each columns in such a
-way as to have $k\times k$ pixels loaded into it to produce the first processed
-pixel. Then proceeds to multiply the pixels with the kernel's coefficients and
-sum everything. Finally, it truncates the result to reduce the bit length and
-the result is saved into the first position of the memory.
+input. The MAC unit first needs to load $k$ pixels from each columns so as to
+have $k\times k$ pixels loaded into it to produce the first processed
+pixel. Then it proceeds to multiply the pixels with the kernel's coefficients and
+sum every term. Finally, it truncates the result and then stores it into the first position of the memory.
 
-Once a pixel is processed, it is saved into the memory while the MAC unit shifts
-its image register, discarding the oldest $k$ pixels and loading new $k$ pixels,
-i.e. one from each input column, like firt input firt output (FIFO) structure.
+Once a pixel is processed, it is stored in the memory while the MAC unit shifts
+its image register, discarding the previous $k$ pixels and loading new $k$ pixels,
+i.e. one from each input column, and this is equivalent to a first input first output (FIFO) structure.
 This procedure is equivalent to shifting the kernel vertically on the image. All
-this steps are synchronized in such a way that one processed pixel is generated
+these steps are synchronized in such a way that one processed pixel is generated
 in every clock cycle.
 
 The AGU manages the memory's read and write addresses, and it takes into account the
@@ -764,7 +763,7 @@ equal to $k$ plus some more clock cycles needed to latch values during the
 convolution, and the difference between the read address and the write address
 must be equal to it.
 
-Until this point the analysis was over a single MAC unit, now the
+Up to this point the analysis was over a single MAC unit, now the
 approach to work with multiple MAC units in parallel is
 described.
 
@@ -777,20 +776,20 @@ described.
 \end{figure}
 
 As mentioned above, $k$ columns are needed as input to produce one processed
-column in a MAC unit, that means that $2k$ columns are needed for two MAC units.
+column in a MAC unit, that means that $2 \times k$ columns are needed for two MAC units.
 However, given the nature of the convolution operation, to produce a contiguous
 column it is necessary to shift the input columns by one. Hence, there is an
-overlap between the two inputs and this produces that even $k$ input columns are
+overlap between the two inputs and this causes that despite $k$ input columns are
 still needed per MAC unit, only $k+1$ different input columns are needed for all
-the units. For this reason, MAC units in parallel produces contiguous processed
-columns, sharing the common input columns. Therefore, $N$ MAC units the number
-of memory columns needed gets reduced from $N\cdot k$ to $N+k-1$ and concluding
-that adding a new MAC unit only adds one new memory columns.
+the units. For this reason, MAC units in parallel produce contiguous processed
+columns, sharing the common input columns. Therefore, for $N$ MAC units, the number
+of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
+that adding a new MAC unit only adds one new memory column.
 
-The same overlap explained above also results in repeated data being used
+As a consequence of the overlap explained, repeated data is being used
 between one batch and the next. Therefore, batches that are not in memory are
 sent between iterations. Given $N$ MAC units and a $k\times k$ kernel, a $N+k-1$
-batch width is needed, but the processed batch has a width of $N$ columns, i.e.
+batch width is necessary, but the processed batch has a width of $N$ columns, i.e.
 one for each MAC unit. So, the last $k-1$ memory columns are not overwritten and
 maintain the input data. This $k-1$ columns are reused as the first columns
 of the next batch, thus the batch width is reduced to $N$, with the exception of
