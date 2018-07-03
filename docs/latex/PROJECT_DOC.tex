@@ -423,7 +423,7 @@
   enough RAM memory to instantiate and store a complete image. Not only
   processing speed is prioritized, but also efficient resource utilization and
   scalability in design, so as to add as many convolution operations in parallel
-  as needed without requiring any major changes. With the proposed structure,
+  as needed without requiring any major changes. In the proposed structure,
  dynamic memory reuse is accomplished, with a linear increase in memory utilization
  with respect to parallelism level.
 
@@ -475,7 +475,7 @@ Keywords: FPGA, hardware architecture, convolution, kernel filter, multiplier-ac
 % and 135MP/sec if the load and output stage are taken into account.
 
 The origin of digital image processing is directly related to the development and evolution of computers. Most
-filters for images that focus, blur, enhance edges and detect edges, among
+image filters that focus, blur, enhance edges and detect edges, among
 others, use convolution as a mathematical operation. Image processing is a very
 extensive research area with a large number of applications in multiple fields
 such as medicine, engineering, navigation, aeronautics, among others.
@@ -486,7 +486,7 @@ convolution implementation.
 The implementation of high-speed image processing systems in field programmable
 gate array (FPGA) has been a very active field. This is mainly due to the
 ability to take advantage of bit level parallelism, pixel level, neighborhood
-level and task level to speed up the calculation. In addition, FPGAs are
+level and task level to increase computing performance and speed. In addition, FPGAs are
 reconfigurable, allowing the flexibility that is often desired in neural
 networks. This coupling of processing, parallelism and flexibility at very high
 speed is what makes FPGAs a platform of choice for the development of these
@@ -494,7 +494,7 @@ areas~\cite{papercnn}.
 
 There are many examples in the literature of two-dimensional (2D) convolution
 implementations, where most of the work focuses on high performance, resource
-reduction and the FPGA area. As shown in~\cite{paper3}, block random access
+reduction and FPGA area efficiency. As shown in~\cite{paper3}, block random access
 memory (BRAM) is one of the most used elements with the highest energy
 consumption. Therefore, the architectures seek to reduce the use of BRAMs by
 dividing them into two groups that consider the total or partial storage of the
@@ -506,7 +506,7 @@ these schemes is the non-modularization of processing, making it difficult to
 improve the work rate by increasing parallelism.
 
 In this work, we explain the concept of dynamic reuse of BRAM in 2D convolution
-and its implementation complexity for parallel architectures. Moreover, we
+and its complexity concerning implementation for parallel architectures. Moreover, we
 propose a modular architecture, where it is easy to appreciate that when the
 parallelism level increases, the complexity of BRAM increases linearly.
 
@@ -549,7 +549,7 @@ image.
 
 \subsection{Convolution Operation}
 
-Bidimensional convolution is defined mathematically as
+Bidimensional convolution is mathematically defined as
 
 \begin{equation}\label{conv-org}
   G(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K(i,j)I(x-i,y-j)
