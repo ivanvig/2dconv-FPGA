@@ -871,12 +871,12 @@ inputs are defined respectively as
 \end{equation}
 where the symbol $\%$ represents the module operation and $i$ goes from $0$ to $It-1$.
 
-A comparison between the naive (which would be assign $k$ independent
+A comparison between the naive (which assigns $k$ independent
 memory columns to each MAC unit), the shared inputs and the
 shared inputs with circular shift approaches is shown in Fig.~\ref{comp}.
-Figure~\ref{mem} shows the amount of memory required in function of the
-parallelism degree while Fig.~\ref{transmitted} shows the amount of transferred
-bytes (considering that every byte transmitted is stored in only one memory
+Figure~\ref{mem} shows the amount of memory required as a function of the
+parallelism degree whereas Fig.~\ref{transmitted} shows the amount of transferred
+bytes (considering that every transmitted byte is stored in only one memory
 register) for processing a $1600\times1024$ image and a $3\times3$ kernel.
 
 As shown in Fig.~\ref{transmitted}, with the naive approach the transferred data is
@@ -901,19 +901,19 @@ scenario where no redundant data is transferred at all.
 % \end{figure}
 
 \section{Implementation and Results}\label{sec:implementation}
-The design was implemented in an Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using
-Xilinx Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock frequency
+The design was implemented in a Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using
+Xilinx Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock
 was synthesized. The script for pre and post-processing was written in Python
 2.7.
 
-In the first instance the desired kernel's coefficients are loaded followed by
+In the first instance the desired kernel coefficients are loaded followed by
 the corresponding image batch via UART\@. Although UART is slow with respect to
 the processing time, it is used because of its simplicity and low resource
-consumption compared with other transmission medias.
+consumption compared with other transmission media.
 As far as data representation is concerned, fixed point arithmetic was used with
 a resolution of $U(8,0)$ for input and output image and $S(8,7)$ for kernel.
 
-To ensure the proper functioning of the architecture, multiple kernels were
+To ensure the proper behavior of the architecture, multiple kernels were
 coded in python and applied to an image, and then the same kernels were applied
 using the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0,
 0]$ sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1,
@@ -937,9 +937,9 @@ using the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0,
 \end{figure}
 
 The architecture was synthesized for different degrees of parallelism.
-Table~\ref{res_table} shows the complexity by the module and the microprocessor
-on the FPGA with and without DSP respectively. As a result, a linear increase is
-shown according to parallelism. Due to limitations of the FPGA used a
+Table~\ref{res_table} shows module and microprocessor complexity
+on the FPGA with and without DSP respectively, meassured by resource utilization. As a result, a linear increase is
+shown according to parallelism. Due to implemented FPGA limitations a
 parallelism up to 8 was achieved using DSP and up to 24 without DSP but with a
 more intensive use of LUT.
 
@@ -969,14 +969,14 @@ more intensive use of LUT.
 
 A comparison between the estimated BRAM utilization and the results obtained
 from synthesis is shown in Fig.~\ref{bram_n}. Normalization was made with
-respect to BRAM utilization percentage dividing by maximun utilization
+respect to BRAM utilization percentage dividing by the maximun utilization
 percentage value, and considering that microblaze instance already occupies $18\%$
-of BRAM resources. As a result, utilization increment linear behaviour was
+of BRAM resources. As a result, a linear behaviour regarding resource utilization increase was
 achieved.
 
 Considering convolution operation processing, one pixel per clock cycle is
-obtained, per instantiated MAC unit, i.e. if $16$ MAC unit were instantiated,
-with a reference clock at $100$ MHz , $1.6$ Gigapixels/second (Gp/s) throughput
+obtained per instantiated MAC unit, i.e. if $16$ MAC unit are instantiated,
+with a reference clock of $100$ MHz , $1.6$ Gigapixels/second (Gp/s) throughput
 is achieved. In addition, regarding load and read stage, where one pixel every
 two clock cycles is loaded, $23.2$ Megapixels/second (Mp/s) throughput is
 obtained.
@@ -1086,24 +1086,23 @@ obtained.
 
 
 \section{Conclusion}\label{sec:conclusion}
-Using FPGA we are able to process the filtering at the same time of reading the
+Using FPGA we are able to process the filtering at the same time as reading the
 current image batch. In this paper, we have presented the implementation of
 two-dimensional convolution on a Xilinx Arty 7 FPGA platform based on resource
 efficiency and system parallelism. We implemented a whole image processing
 system taking into account load stage, processing stage, and output stage.
-Moreover, a relationship between instantiated BRAM blocks and MAC units was
-found in the architecture presented, which allows our system work with different
+Moreover, a ratio relationship between instantiated BRAM blocks and MAC units was
+found in the presented architecture, which allows our system to work with different
 parallelism degrees.
 
 In addition, we optimized the use of memory resources implementing an algorithm
-used not only for reading and writing operations but also interaction between
-implemented modules. Performances and results show that resources utilization
-concerning BRAM resources, increase linearly, as desired.
+for memory operations and module synchronization. Performances and results show that resources utilization
+concerning BRAM resources increase linearly, as desired.
 
 High throughput was achieved in what processing is concerned. On the other hand,
 the limiting factor that impacted the implemented system the most was UART speed
 transmission. Another limiting factor was the DSP48A1 slices. Both factors
-mentioned above is easily solved by using an FPGA with more slices and
+are easily solved by using an FPGA with more slices and
 resources.
 
 
