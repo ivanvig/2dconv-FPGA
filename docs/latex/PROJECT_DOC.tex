@@ -96,9 +96,13 @@
   % IEEE Computer Society needs nocompress option
   % requires cite.sty v4.0 or later (November 2003)
   \usepackage[nocompress]{cite}
+  \usepackage{color}
+
 \else
   % normal IEEE
   \usepackage{cite}
+  \usepackage{color}
+  
 \fi
 % cite.sty was written by Donald Arseneau
 % V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
@@ -536,8 +540,11 @@ section~\ref{sec:conclusion}.
 %haga un uso eficiente de memoria, tenga un high throughput , sea paralelizable y escalable.
 
 \section{Image Processing Algorithms}\label{sec:preproc}
-
-Filtering process is widely used in many applications, such as aeronautics, navigation,
+\textcolor{red}{ Given its local and two dimensional nature, 2-D Convolution is one of the most used image processing algorithms. 
+Inherent parallelism of the image convolution algorithm can be exploited to increase the performance.
+We focus our study on a more efficient design of 2D convolution technique
+to reduce the usage of  FPGA resources. } 
+\textcolor{blue}{Filtering process is widely used in many applications, such as aeronautics, navigation,
 CNN, etc. It is applied as pre-processing to remove useless details and
 noise. One of the preferred devices for the development of these techniques is
 the FPGA, since it presents an excellent relationship between the speed of
@@ -545,7 +552,7 @@ development and the flexibility in the implementation. It allows the
 parallelization of the process and the reconfiguration of the design in a very
 short time. We focus our study on the efficient use of FPGA resources by applying the
 2D convolution technique and reducing the dynamic range of the pixels in the
-image.
+image. } 
 
 \subsection{Convolution Operation}
 
@@ -561,7 +568,10 @@ convolution~\cite{validconv}.
 
 \subsection{Change of Dynamic Range}
 
-The images used for processing are grayscale because of its implementation simplicity, but the design can be extrapolated to any other type of image.
+The images used for processing are grayscale because of its implementation simplicity, \textcolor{red}{but the design can be extrapolated
+to multiple channel images by considering each channel as an independent grayscale image.}
+\textcolor{blue}{but the design can be extrapolated to any other type of image.} 
+
 The pixels of the grayscale images $I(x,y)$ have a dynamic range between
 $[0,255]$ and Kernel values $K(x,y)$ can be negative or positive. This work is
 part of a Deep Learning project where it is usual to operate with a dynamic
@@ -645,7 +655,7 @@ entire process is divided into three stages, pre-processing, processing and
 post-processing. The pre-processing consists of capturing the image and applying
 the described transformation in Section~\ref{sec:preproc} using a Python script.
 In addition, the script divides the image into batches and sends them through
-the UART port to the FPGA. In the FPGA a microprocessor receives the information
+the UART port to the FPGA. \textcolor{red}{A batch consists on contiguous pixel columns which dimension is described in Section ~\ref{infstorage} . } In the FPGA a microprocessor receives the information
 and transfers it to the convolution module using a 32 bits general purpose
 input-output (GPIO) port. This port writes the BRAMs that store filtered data.
 Due to FPGA size limitations, no other
@@ -729,8 +739,9 @@ the module waits for \textbf{Out} state switch instruction. After this transitio
 
 \subsubsection{Data storage}\label{infstorage}
 The kernel coefficients are stored in registers within each MAC unit. To store a
-batch, the proposed approach is to organize the block of RAM in columns. An image batch
-of pixels is stored in each column. Therefore, the batch size is given
+batch, the proposed approach is to organize the block RAM in columns. \textcolor{red}{Each block RAM column corresponds to one batch
+ column.} \textcolor{blue}{An image batch
+of pixels is stored in each column.} Therefore, the batch size is given
 by the height of the image and the number of memory columns, and the maximum
 height of the image is restricted by the number of entries in each memory
 column.
@@ -903,7 +914,7 @@ scenario where no redundant data is transferred at all.
 \section{Implementation and Results}\label{sec:implementation}
 The design was implemented in a Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using
 Xilinx Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock
-was synthesized. The script for pre and post-processing was written in Python
+was synthesized. The script for pre-processing and post-processing was written in Python
 2.7.
 
 In the first instance the desired kernel coefficients are loaded followed by
