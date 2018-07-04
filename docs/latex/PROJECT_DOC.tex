@@ -715,7 +715,7 @@ At the beginning the module must be in a \textbf{reset} state, waiting to be
 configured, so it must receive a reset signal. After receiving coded
 instruction, its is switched to the \textbf{KernelLoad} state, in which the
 kernel coefficients are loaded to the module. The next state is
-\textbf{SizeLoad} state where the image's height, i.e  number of rows of BRAM, is
+\textbf{SizeLoad} state where the image's height, i.e.  number of rows of BRAM, is
 loaded. The convolution method is explained in the section~\ref{infstorage}. The
 three previous states are executed once throughout the work cycle. The process
 is repeated for each new image.
@@ -740,11 +740,15 @@ the module waits for \textbf{Out} state switch instruction. After this transitio
 \subsubsection{Data storage}\label{infstorage}
 The kernel coefficients are stored in registers within each MAC unit. To store a
 batch, the proposed approach is to organize the block RAM in columns. \textcolor{red}{Each block RAM column corresponds to one batch
- column.} \textcolor{blue}{An image batch
-of pixels is stored in each column.} Therefore, the batch size is given
+ column.} 
+\textcolor{red}{Therefore, the batch size is given
+by the height of the image and the number of memory columns. In addition, the maximum
+height of the image must be less than or equal to memory column height.}
+\textcolor{blue}{An image batch
+of pixels is stored in each column.Therefore, the batch size is given
 by the height of the image and the number of memory columns, and the maximum
 height of the image is restricted by the number of entries in each memory
-column.
+column.}
 
 During batch processing, every pixel is read only once, so in order to do a
 more efficient use of the memory, the pixels that were already used are
