@@ -762,7 +762,7 @@ For a $k\times k$ kernel, each MAC unit takes $k$ adjacent memory columns as
 input. The MAC unit first needs to load $k$ pixels from each columns so as to
 have $k\times k$ pixels loaded into it to produce the first processed
 pixel. Then it proceeds to multiply the pixels with the kernel's coefficients and
-sum every term. Finally, it truncates the result and then stores it into memory first position.
+sum every term. Finally, it truncates the result and stores it into memory first position.
 
 Once a pixel is processed, it is stored in the memory while the MAC unit shifts
 its image register, discarding the oldest $k$ pixels and loading new $k$ pixels,
@@ -795,14 +795,16 @@ described.
 \end{figure}
 
 As mentioned above, $k$ columns are needed as input to produce one processed
-column in a MAC unit, that means that $2 \times k$ columns are needed for two MAC units.
-However, given the nature of the convolution operation, to produce a contiguous
+column in a MAC unit, thus $2 \times k$ columns are needed for two MAC units.
+However, given the nature of convolution operation, to obtain a contiguous
 column it is necessary to shift the input columns by one. Hence, there is an
-overlap between the two inputs and this causes that despite $k$ input columns are
-still needed per MAC unit, only $k+1$ different input columns are needed for all
-units. For this reason, MAC units in parallel produce contiguous processed
-columns, sharing the common input columns. Therefore, for $N$ MAC units, the number
-of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
+overlap between two MAC units inputs which produce adjacents columns, so information can
+be shared.
+Consequently, despite $k$ input columns are still needed per MAC unit, only $k+1$
+different input columns are needed for given two units. 
+\textcolor{blue}{For this reason, MAC units in parallel produce contiguous processed
+columns, sharing the common input columns}. 
+Therefore, for $N$ MAC units, the number of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
 that adding a new MAC unit only adds one new memory column.
 
 As a consequence of the overlap explained, repeated data is being used
