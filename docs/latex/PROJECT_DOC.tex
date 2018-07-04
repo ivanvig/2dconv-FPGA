@@ -762,21 +762,25 @@ For a $k\times k$ kernel, each MAC unit takes $k$ adjacent memory columns as
 input. The MAC unit first needs to load $k$ pixels from each columns so as to
 have $k\times k$ pixels loaded into it to produce the first processed
 pixel. Then it proceeds to multiply the pixels with the kernel's coefficients and
-sum every term. Finally, it truncates the result and then stores it into the first position of the memory.
+sum every term. Finally, it truncates the result and then stores it into memory first position.
 
 Once a pixel is processed, it is stored in the memory while the MAC unit shifts
-its image register, discarding the previous $k$ pixels and loading new $k$ pixels,
-i.e. one from each input column, and this is equivalent to a first input first output (FIFO) structure.
+its image register, discarding the oldest $k$ pixels and loading new $k$ pixels,
+i.e. one from each input column identical to a first input first output (FIFO) structure.
 This procedure is equivalent to shifting the kernel vertically on the image. All
 these steps are synchronized in such a way that one processed pixel is generated
 in every clock cycle.
 
-The AGU manages the memory's read and write addresses, and it takes into account the
+\textcolor{red}{ The AGU manages read and write memory addresses taking into account the latency that occurs
+since a pixel is loaded into a MAC unit until the corresponding processed pixel is stored.}
+
+
+\textcolor{blue}{,and it takes into account the
 latency between the clock cycle where the first pixel in the memory is read and
-the clock cycle where the first processed pixel is written in memory. This latency is
+the clock cycle where the first processed pixel is written in memory.This latency is
 equal to $k$ plus some more clock cycles needed to latch values during the
 convolution, and the difference between the read address and the write address
-must be equal to it.
+must be equal to it.} 
 
 Up to this point the analysis was over a single MAC unit, now the
 approach to work with multiple MAC units in parallel is
@@ -796,7 +800,7 @@ However, given the nature of the convolution operation, to produce a contiguous
 column it is necessary to shift the input columns by one. Hence, there is an
 overlap between the two inputs and this causes that despite $k$ input columns are
 still needed per MAC unit, only $k+1$ different input columns are needed for all
-the units. For this reason, MAC units in parallel produce contiguous processed
+units. For this reason, MAC units in parallel produce contiguous processed
 columns, sharing the common input columns. Therefore, for $N$ MAC units, the number
 of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
 that adding a new MAC unit only adds one new memory column.
@@ -956,7 +960,7 @@ Table~\ref{res_table} shows module and microprocessor complexity
 on the FPGA with and without DSP respectively, meassured by resource utilization. As a result, a linear increase is
 shown according to parallelism. Due to implemented FPGA limitations a
 parallelism up to 8 was achieved using DSP and up to 24 without DSP but with a
-more intensive use of LUT.
+more intensive LUT usage.
 
 \begin{table}[!t]
 % increase table row spacing, adjust to taste
