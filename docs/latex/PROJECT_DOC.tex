@@ -798,7 +798,7 @@ As mentioned above, $k$ columns are needed as input to produce one processed
 column in a MAC unit, thus $2 \times k$ columns are needed for two MAC units.
 However, given the nature of convolution operation, to obtain a contiguous
 column it is necessary to shift the input columns by one. Hence, there is an
-overlap between two MAC units inputs which produce adjacents columns, so information can
+overlap between two MAC units inputs which produce adjacent columns, so information can
 be shared.
 Consequently, despite $k$ input columns are still needed per MAC unit, only $k+1$
 different input columns are needed for given two units. 
@@ -807,22 +807,26 @@ columns, sharing the common input columns}.
 Therefore, for $N$ MAC units, the number of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
 that adding a new MAC unit only adds one new memory column.
 
-As a consequence of the overlap explained, repeated data is being used
+As a consequence of the overlap explained, \textcolor{red}{there is repeated data
+between one batch and the next. In order to reduce data transmission, repeated
+information is kept in memory and only the missing part of 
+the incoming batch is transmitted.}\textcolor{blue}{repeated data is being used
 between one batch and the next. Therefore, batches that are not in memory are
-sent between iterations. Given $N$ MAC units and a $k\times k$ kernel, a $N+k-1$
+sent between iterations.} Given $N$ MAC units and a $k\times k$ kernel, a $N+k-1$
 batch width is necessary, but the processed batch has a width of $N$ columns, i.e.
 one for each MAC unit. So, the last $k-1$ memory columns are not overwritten and
 maintain the input data. This $k-1$ columns are reused as the first columns
-of the next batch, thus the batch width is reduced to $N$, with the exception of
-the first batch that has a width of $N+k-1$.
+of the next batch, thus the transmitted batch width is reduced to $N$, with the exception of
+the first batch that maintains a width of $N+k-1$.
 
 A consequence of reusing the memory columns written by the previous batch is
 that in every iteration the position of memory columns associated with each
 MAC unit describes a circular shift by $N$ places. From the above it
-follows that a periodicity in the ratio between the memory columns and the
+follows that a periodicity in the \textcolor{blue}{ratio}
+\textcolor{red}{relationship} between the memory columns and the
 MAC unit's inputs must exist, where the period $It$ is the number of
 iterations necessary to get to the original memory columns - MAC units
-inputs ratio, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
+inputs \textcolor{blue}{ratio} \textcolor{red}{relationship}, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
 must be an integer $m$ such that 
 
 \begin{equation}\label{niter}
@@ -844,12 +848,15 @@ must be an integer $m$ such that
 
 The logic is implemented in the MMU, which serves as an interface between the
 memories and the rest of the components, keeping them independent from the
-parallelism degree and the iteration number. An example of implementation of the
-memories is shown in Fig.~\ref{algorithm}. We consider $N=4$ MAC units, a kernel
-$k=3$ and 6 memory columns. In the first iteration, the memories 1 to 6 are
-loaded with the new batch, and the result is stored in memories 1 to 4. In the next
-iteration, a new batch is loaded without overwriting memories 5 and 6. After
-processing, the data is stored in memories 5 to 8. 
+parallelism degree and the iteration number. An example of \textcolor{blue}{implementation of the
+memories} \textcolor{red}{data-flow in memories} is shown in Fig.~\ref{algorithm}. \textcolor{blue}{We consider $N=4$ MAC units, a kernel
+$k=3$ and 6 memory columns} \textcolor{red}{We consider a kernel $k=3$, $N=4$ MAC
+units thus 6 memory columns are needed}. In the first iteration, the memories 1 to 6 
+are loaded with the new batch, and the result is stored in memories 1 to 4. In the next
+iteration, \textcolor{red}{data from a new batch is loaded }\textcolor{blue}{a new batch is loaded} without overwriting memories 5 and 6. After
+processing, \textcolor{blue}{the data is stored in memories 5 to
+  8.}\textcolor{red}{the data is stored starting from memory 5 until the last
+  one and then overwriting previous batch data from the beginning.}
 
 The MMU keeps track of the memory positions where the input batch must be stored,
 the information that must be fed to every MAC unit, the memory position where
@@ -992,8 +999,10 @@ A comparison between the estimated BRAM utilization and the results obtained
 from synthesis is shown in Fig.~\ref{bram_n}. Normalization was made with
 respect to BRAM utilization percentage dividing by the maximun utilization
 percentage value, and considering that microblaze instance already occupies $18\%$
-of BRAM resources. As a result, a linear behaviour regarding resource utilization increase was
-achieved.
+of BRAM resources. \textcolor{red}{It can be appreciated that the linear
+  behaviour anticipated by theoretical calculations is consistent with the
+  synthesis results.} \textcolor{blue}{As a result, a linear behaviour regarding resource utilization increase was
+achieved.}
 
 Considering convolution operation processing, one pixel per clock cycle is
 obtained per instantiated MAC unit, i.e. if $16$ MAC unit are instantiated,
@@ -1109,7 +1118,7 @@ obtained.
 \section{Conclusion}\label{sec:conclusion}
 Using FPGA we are able to process the filtering at the same time as reading the
 current image batch. In this paper, we have presented the implementation of
-two-dimensional convolution on a Xilinx Arty 7 FPGA platform based on resource
+two-dimensional convolution on a Xilinx Artix 7 FPGA platform based on resource
 efficiency and system parallelism. We implemented a whole image processing
 system taking into account load stage, processing stage, and output stage.
 Moreover, a ratio relationship between instantiated BRAM blocks and MAC units was
@@ -1154,7 +1163,16 @@ xxxxxxxxxx xxxxxxxxxxxx xxxxxxx xxxxxx xxxxxxxxx xxxxxxxx xxxxxxxxx.
 %%
 %%The authors would like to thank PhD. Mario R. Hueda and PhD. Damian Morero for supporting their
 %%design through Fulgor fundation research program.
-
+\section{Throughput}
+\begin{tabular}{|c|c|c|}
+  \hline
+  \textbf{N}  & \textbf{Ours}            & \textbf{Theirs \ref{paper2}} \\ \hline
+  2  &          & 1845(9)    & 10(20)     & ---         & 3168(15)      & 10(20)         \\ \hline
+  4  & 40(44)         & 2022(10)   & 11(22)     & ---         & 4627(22)      & 11(22)         \\ \hline
+  8  & 80(89)         & 2448(12)   & 13(26)     & ---         & 7756(37)      & 13(26)         \\ \hline
+  16 & ---            & ---        & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
+\end{tabular}           
+\end{table}
 
 
 
