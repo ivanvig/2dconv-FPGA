@@ -807,8 +807,8 @@ columns, sharing the common input columns}.
 Therefore, for $N$ MAC units, the number of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
 that adding a new MAC unit only adds one new memory column.
 
-As a consequence of the overlap explained, \textcolor{red}{there is repeated data
-between one batch and the next. In order to reduce data transmission, repeated
+As a consequence of explained overlap, \textcolor{red}{there is repeated data
+between one batch and the next one. In order to reduce data transmission, repeated
 information is kept in memory and only the missing part of 
 the incoming batch is transmitted.}\textcolor{blue}{repeated data is being used
 between one batch and the next. Therefore, batches that are not in memory are
@@ -819,11 +819,17 @@ maintain the input data. This $k-1$ columns are reused as the first columns
 of the next batch, thus the transmitted batch width is reduced to $N$, with the exception of
 the first batch that maintains a width of $N+k-1$.
 
-A consequence of reusing the memory columns written by the previous batch is
+
+textcolor{red}{Reusing memory columns written by the previous batch results in
+ a circular shift by $N$ places, shifting memory columns possition associated with each
+MAC unit, in each iteration.}
+textcolor{blue}{A consequence of reusing the memory columns written by the previous batch is
 that in every iteration the position of memory columns associated with each
-MAC unit describes a circular shift by $N$ places. From the above it
-follows that a periodicity in the \textcolor{blue}{ratio}
-\textcolor{red}{relationship} between the memory columns and the
+MAC unit describes a circular shift by $N$ places.} 
+\textcolor{red}{From the above it
+follows that a periodicity in the relationship} 
+\textcolor{blue}{From the above it
+follows that a periodicity in the relationship} between the memory columns and the
 MAC unit's inputs must exist, where the period $It$ is the number of
 iterations necessary to get to the original memory columns - MAC units
 inputs \textcolor{blue}{ratio} \textcolor{red}{relationship}, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
@@ -845,17 +851,17 @@ must be an integer $m$ such that
   storage. \protect\subref{int_struct} The internal structure of MMB and PMB.}
 \label{muxes}
 \end{figure}
-
-The logic is implemented in the MMU, which serves as an interface between the
+\textcolor{red}{System logic is implemented in the MMU}
+\textcolor{blue}{The logic is implemented in the MMU}, which serves as an interface between the
 memories and the rest of the components, keeping them independent from the
 parallelism degree and the iteration number. An example of \textcolor{blue}{implementation of the
 memories} \textcolor{red}{data-flow in memories} is shown in Fig.~\ref{algorithm}. \textcolor{blue}{We consider $N=4$ MAC units, a kernel
 $k=3$ and 6 memory columns} \textcolor{red}{We consider a kernel $k=3$, $N=4$ MAC
-units thus 6 memory columns are needed}. In the first iteration, the memories 1 to 6 
+units thus 6 memory columns are needed}. In the first iteration, memories 1 to 6 
 are loaded with the new batch, and the result is stored in memories 1 to 4. In the next
 iteration, \textcolor{red}{data from a new batch is loaded }\textcolor{blue}{a new batch is loaded} without overwriting memories 5 and 6. After
-processing, \textcolor{blue}{the data is stored in memories 5 to
-  8.}\textcolor{red}{the data is stored starting from memory 5 until the last
+processing \textcolor{red}{step}, \textcolor{blue}{the data is stored in memories 5 to
+  8.}\textcolor{red}{the data is stored, starting from memory 5 until the last
   one and then overwriting previous batch data from the beginning.}
 
 The MMU keeps track of the memory positions where the input batch must be stored,
@@ -1163,16 +1169,16 @@ xxxxxxxxxx xxxxxxxxxxxx xxxxxxx xxxxxx xxxxxxxxx xxxxxxxx xxxxxxxxx.
 %%
 %%The authors would like to thank PhD. Mario R. Hueda and PhD. Damian Morero for supporting their
 %%design through Fulgor fundation research program.
-\section{Throughput}
-\begin{tabular}{|c|c|c|}
-  \hline
-  \textbf{N}  & \textbf{Ours}            & \textbf{Theirs \ref{paper2}} \\ \hline
-  2  &          & 1845(9)    & 10(20)     & ---         & 3168(15)      & 10(20)         \\ \hline
-  4  & 40(44)         & 2022(10)   & 11(22)     & ---         & 4627(22)      & 11(22)         \\ \hline
-  8  & 80(89)         & 2448(12)   & 13(26)     & ---         & 7756(37)      & 13(26)         \\ \hline
-  16 & ---            & ---        & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
-\end{tabular}           
-\end{table}
+%\section{Throughput}
+%\begin{tabular}{|c|c|c|}
+ %\hline
+ %\textbf{N}  & \textbf{Ours}            & \textbf{Theirs \ref{paper2}} \\ \hline
+ %2  &          & 1845(9)    & 10(20)     & ---         & 3168(15)      & 10(20)         \\ \hline
+ %4  & 40(44)         & 2022(10)   & 11(22)     & ---         & 4627(22)      & 11(22)         \\ \hline
+ %8  & 80(89)         & 2448(12)   & 13(26)     & ---         & 7756(37)      & 13(26)         \\ \hline
+ %16 & ---            & ---        & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
+%\end{tabular}           
+%\end{table}
 
 
 
