@@ -346,31 +346,31 @@
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
+% \author{\IEEEauthorblockN{
+%     xxxxxx xxxxxxxxx,
+%     xxxxxx xxxxx,
+%     xxxx xxxxxxxxx,
+%     xxxxx xx xxxx
+%   }
+%   \IEEEauthorblockA{
+%     xxxxxxxxxx xx xxxxxxxx xxx xxxxxxxxxxx\\
+%     xxxxxxxxx xxxxxx \\
+%     xxxxxxx xxxxxxxx xxx, xxxxxxx xxxxxxxx, xxxxxxxxx\\
+%     xxxxx: xxxxxx.xxxxxxxxx@xxxxx.xxx, xxx.xxxx@xxxxx.xxx,
+%     xxxxxxxx@xxxxx.xxx, xxxxxxxxx@xxxxx.xxx}
+% }
 \author{\IEEEauthorblockN{
-    xxxxxx xxxxxxxxx,
-    xxxxxx xxxxx,
-    xxxx xxxxxxxxx,
-    xxxxx xx xxxx
+    Martin Casabella,
+    Sergio Sulca,
+    Ivan Vignolles,
+    Ariel L. Pola
   }
-  \IEEEauthorblockA{
-    xxxxxxxxxx xx xxxxxxxx xxx xxxxxxxxxxx\\
-    xxxxxxxxx xxxxxx \\
-    xxxxxxx xxxxxxxx xxx, xxxxxxx xxxxxxxx, xxxxxxxxx\\
-    xxxxx: xxxxxx.xxxxxxxxx@xxxxx.xxx, xxx.xxxx@xxxxx.xxx,
-    xxxxxxxx@xxxxx.xxx, xxxxxxxxx@xxxxx.xxx}
+  \IEEEauthorblockA{Department of Research and Development\\
+    Fundacion Fulgor \\
+    Ernesto Romagosa 518, C\'ordoba X5016GQN, Argentina\\
+    Email: martin.casabella@gmail.com, ser.0090@gmail.com,
+    ivanmvig@gmail.com, arielpola@gmail.com}
 }
-%\author{\IEEEauthorblockN{
-    %Martin Casabella,
-    %Sergio Sulca,
-    %Ivan Vignolles,
-    %Ariel L. Pola
-  %}
-  %\IEEEauthorblockA{Department of Research and Development\\
-    %Fundacion Fulgor \\
-    %Ernesto Romagosa 518, C\'ordoba X5016GQN, Argentina\\
-    %Email: martin.casabella@gmail.com, ser.0090@gmail.com,
-    %ivanmvig@gmail.com, arielpola@gmail.com}
-%}
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
 % the acknowledgment of grants, issue a \IEEEoverridecommandlockouts
@@ -544,15 +544,6 @@ section~\ref{sec:conclusion}.
 Inherent parallelism of the image convolution algorithm can be exploited to increase the performance.
 We focus our study on a more efficient design of 2D convolution technique
 to reduce the usage of  FPGA resources. } 
-\textcolor{blue}{Filtering process is widely used in many applications, such as aeronautics, navigation,
-CNN, etc. It is applied as pre-processing to remove useless details and
-noise. One of the preferred devices for the development of these techniques is
-the FPGA, since it presents an excellent relationship between the speed of
-development and the flexibility in the implementation. It allows the
-parallelization of the process and the reconfiguration of the design in a very
-short time. We focus our study on the efficient use of FPGA resources by applying the
-2D convolution technique and reducing the dynamic range of the pixels in the
-image. } 
 
 \subsection{Convolution Operation}
 
@@ -570,7 +561,7 @@ convolution~\cite{validconv}.
 
 The images used for processing are grayscale because of its implementation simplicity, \textcolor{red}{but the design can be extrapolated
 to multiple channel images by considering each channel as an independent grayscale image.}
-\textcolor{blue}{but the design can be extrapolated to any other type of image.} 
+ 
 
 The pixels of the grayscale images $I(x,y)$ have a dynamic range between
 $[0,255]$ and Kernel values $K(x,y)$ can be negative or positive. This work is
@@ -707,9 +698,17 @@ implemented with a set of columns of the FPGA's block RAM.
 
 \subsubsection{States}
 The convolution module goes through several states during the work cycle, as
-shown in Fig.~\ref{state}. States transitions are controlled by coded
+shown in Fig.~\ref{state}. states transitions are controlled by coded
 instructions embedded in the 32-bits input frame, and the module remain in
 its current state until it receives a valid instruction.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[scale=0.55]{states.pdf}
+  \caption{State diagram that describes the transitions of events for the
+    processing of the image.}
+  \label{state}
+\end{figure}
 
 At the beginning the module must be in a \textbf{reset} state, waiting to be
 configured, so it must receive a reset signal. After receiving coded
@@ -728,15 +727,6 @@ are ignored until the batch is completely processed. As soon as processing step
 ends, a notification is emitted through Control Unit's \textit{EoP} pin and
 the module waits for \textbf{Out} state switch instruction. After this transition, processed batch is sent back to the microprocessor.
 
-
-\begin{figure}[!t]
-  \centering
-  \includegraphics[scale=0.55]{states.pdf}
-  \caption{State diagram that describes the transitions of events for the
-    processing of the image.}
-  \label{state}
-\end{figure}
-
 \subsubsection{Data storage}\label{infstorage}
 The kernel coefficients are stored in registers within each MAC unit. To store a
 batch, the proposed approach is to organize the block RAM in columns. \textcolor{red}{Each block RAM column corresponds to one batch
@@ -744,11 +734,6 @@ batch, the proposed approach is to organize the block RAM in columns. \textcolor
 \textcolor{red}{Therefore, the batch size is given
 by the height of the image and the number of memory columns. In addition, the maximum
 height of the image must be less than or equal to memory column height.}
-\textcolor{blue}{An image batch
-of pixels is stored in each column.Therefore, the batch size is given
-by the height of the image and the number of memory columns, and the maximum
-height of the image is restricted by the number of entries in each memory
-column.}
 
 During batch processing, every pixel is read only once, so in order to do a
 more efficient use of the memory, the pixels that were already used are
@@ -774,25 +759,9 @@ in every clock cycle.
 \textcolor{red}{ The AGU manages read and write memory addresses taking into account the latency that occurs
 since a pixel is loaded into a MAC unit until the corresponding processed pixel is stored.}
 
-
-\textcolor{blue}{,and it takes into account the
-latency between the clock cycle where the first pixel in the memory is read and
-the clock cycle where the first processed pixel is written in memory.This latency is
-equal to $k$ plus some more clock cycles needed to latch values during the
-convolution, and the difference between the read address and the write address
-must be equal to it.} 
-
 Up to this point the analysis was over a single MAC unit, now the
 approach to work with multiple MAC units in parallel is
 described.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[scale=0.55]{algorithm}
-\caption{Memory writing process using circular shift for $N = 4$ MAC units and
-  Kernel $k = 3$.}
-\label{algorithm}
-\end{figure}
 
 As mentioned above, $k$ columns are needed as input to produce one processed
 column in a MAC unit, thus $2 \times k$ columns are needed for two MAC units.
@@ -802,42 +771,59 @@ overlap between two MAC units inputs which produce adjacent columns, so informat
 be shared.
 Consequently, despite $k$ input columns are still needed per MAC unit, only $k+1$
 different input columns are needed for given two units. 
-\textcolor{blue}{For this reason, MAC units in parallel produce contiguous processed
-columns, sharing the common input columns}. 
+. 
 Therefore, for $N$ MAC units, the number of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
 that adding a new MAC unit only adds one new memory column.
 
 As a consequence of explained overlap, \textcolor{red}{there is repeated data
 between one batch and the next one. In order to reduce data transmission, repeated
 information is kept in memory and only the missing part of 
-the incoming batch is transmitted.}\textcolor{blue}{repeated data is being used
-between one batch and the next. Therefore, batches that are not in memory are
-sent between iterations.} Given $N$ MAC units and a $k\times k$ kernel, a $N+k-1$
+the incoming batch is transmitted.} Given $N$ MAC units and a $k\times k$ kernel, a $N+k-1$
 batch width is necessary, but the processed batch has a width of $N$ columns, i.e.
 one for each MAC unit. So, the last $k-1$ memory columns are not overwritten and
 maintain the input data. This $k-1$ columns are reused as the first columns
 of the next batch, thus the transmitted batch width is reduced to $N$, with the exception of
 the first batch that maintains a width of $N+k-1$.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[scale=0.55]{algorithm}
+\caption{Memory writing process using circular shift for $N = 4$ MAC units and
+  Kernel $k = 3$.}
+\label{algorithm}
+\end{figure}
 
-textcolor{red}{Reusing memory columns written by the previous batch results in
+\textcolor{red}{Reusing memory columns written by the previous batch results in
  a circular shift by $N$ places, shifting memory columns possition associated with each
 MAC unit, in each iteration.}
-textcolor{blue}{A consequence of reusing the memory columns written by the previous batch is
-that in every iteration the position of memory columns associated with each
-MAC unit describes a circular shift by $N$ places.} 
 \textcolor{red}{From the above it
 follows that a periodicity in the relationship} 
-\textcolor{blue}{From the above it
-follows that a periodicity in the relationship} between the memory columns and the
+ between the memory columns and the
 MAC unit's inputs must exist, where the period $It$ is the number of
 iterations necessary to get to the original memory columns - MAC units
-inputs \textcolor{blue}{ratio} \textcolor{red}{relationship}, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
+inputs  \textcolor{red}{relationship}, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
 must be an integer $m$ such that 
 
 \begin{equation}\label{niter}
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
+
+\textcolor{red}{System logic is implemented in the MMU}
+, which serves as an interface between the
+memories and the rest of the components, keeping them independent from the
+parallelism degree and the iteration number. An example of  \textcolor{red}{data-flow in memories} is shown in Fig.~\ref{algorithm}.  \textcolor{red}{We consider a kernel $k=3$, $N=4$ MAC
+units thus 6 memory columns are needed}. In the first iteration, memories 1 to 6 
+are loaded with the new batch, and the result is stored in memories 1 to 4. In the next
+iteration, \textcolor{red}{data from a new batch is loaded } without overwriting memories 5 and 6. After
+processing \textcolor{red}{step}, \textcolor{red}{the data is stored, starting from memory 5 until the last
+  one and then overwriting previous batch data from the beginning.}
+
+The MMU keeps track of the memory positions where the input batch must be stored,
+the information that must be fed to every MAC unit, the memory position where
+the processed data must be stored and the order in which the processed data must
+be returned, for each iteration. To do so, it has a finite state machine where
+each state corresponds to a set of the aforementioned positions. The number of states
+is given by the iteration number in eq.~\eqref{niter}.
 
 \begin{figure}[!t]
 \centering
@@ -851,26 +837,18 @@ must be an integer $m$ such that
   storage. \protect\subref{int_struct} The internal structure of MMB and PMB.}
 \label{muxes}
 \end{figure}
-\textcolor{red}{System logic is implemented in the MMU}
-\textcolor{blue}{The logic is implemented in the MMU}, which serves as an interface between the
-memories and the rest of the components, keeping them independent from the
-parallelism degree and the iteration number. An example of \textcolor{blue}{implementation of the
-memories} \textcolor{red}{data-flow in memories} is shown in Fig.~\ref{algorithm}. \textcolor{blue}{We consider $N=4$ MAC units, a kernel
-$k=3$ and 6 memory columns} \textcolor{red}{We consider a kernel $k=3$, $N=4$ MAC
-units thus 6 memory columns are needed}. In the first iteration, memories 1 to 6 
-are loaded with the new batch, and the result is stored in memories 1 to 4. In the next
-iteration, \textcolor{red}{data from a new batch is loaded }\textcolor{blue}{a new batch is loaded} without overwriting memories 5 and 6. After
-processing \textcolor{red}{step}, \textcolor{blue}{the data is stored in memories 5 to
-  8.}\textcolor{red}{the data is stored, starting from memory 5 until the last
-  one and then overwriting previous batch data from the beginning.}
 
-The MMU keeps track of the memory positions where the input batch must be stored,
-the information that must be fed to every MAC unit, the memory position where
-the processed data must be stored and the order in which the processed data must
-be returned, for each iteration. To do so, it has a finite state machine where
-each state corresponds to a set of the aforementioned positions. The number of states
-is given by the iteration number in eq.~\eqref{niter}.
-
+The MMU has a set of multiplexers whose select lines are managed by the finite
+state machine (Fig.~\ref{general}) to route the incoming and outgoing data. The
+data multiplexer is conformed by a set of smaller blocks which are classified
+into two classes according to their function: memory multiplexer blocks (MMB)
+and processing multiplexer blocks (PMB). The MMB routes the raw data and the
+data from the MACs to a memory, whereas the PMB routes the data from the memories
+to a MAC. The information flow between
+memories$\rightarrow$MMU$\rightarrow$MACs$\rightarrow$MMU$\rightarrow$memories
+is shown in Fig.~\ref{muxes}. Both the MMBs and PMBs have a number of inputs
+proportional to the number of states from the MMU FSM and their multiplexers
+inputs are defined respectively as
 
 \begin{figure}[!t]
 \centering
@@ -885,17 +863,6 @@ is given by the iteration number in eq.~\eqref{niter}.
 \label{comp}
 \end{figure}
 
-The MMU has a set of multiplexers whose select lines are managed by the finite
-state machine (Fig.~\ref{general}) to route the incoming and outgoing data. The
-data multiplexer is conformed by a set of smaller blocks which are classified
-into two classes according to their function: memory multiplexer blocks (MMB)
-and processing multiplexer blocks (PMB). The MMB routes the raw data and the
-data from the MACs to a memory, whereas the PMB routes the data from the memories
-to a MAC. The information flow between
-memories$\rightarrow$MMU$\rightarrow$MACs$\rightarrow$MMU$\rightarrow$memories
-is shown in Fig.~\ref{muxes}. Both the MMBs and PMBs have a number of inputs
-proportional to the number of states from the MMU FSM and their multiplexers
-inputs are defined respectively as
 
 \begin{equation}%\label{niter}
   O_j^i = O_{[(k-1)i+j]\%N}
@@ -920,6 +887,7 @@ diminish the redundant data transferred as $N$ increases, that is because the
 redundant data in a $N+k-1$ batch is $k-1$ and $\frac{k-1}{N+k-1}$ tends to zero
 as N increases. The shared inputs with circular shift approach is the best case
 scenario where no redundant data is transferred at all.
+
 
 % \begin{figure}[!t]
 % \centering
@@ -1007,8 +975,7 @@ respect to BRAM utilization percentage dividing by the maximun utilization
 percentage value, and considering that microblaze instance already occupies $18\%$
 of BRAM resources. \textcolor{red}{It can be appreciated that the linear
   behaviour anticipated by theoretical calculations is consistent with the
-  synthesis results.} \textcolor{blue}{As a result, a linear behaviour regarding resource utilization increase was
-achieved.}
+  synthesis results.} 
 
 \begin{figure}[!t]
 \centering
@@ -1023,14 +990,7 @@ the time needed to load the image into memory, one pixel per clock cycle ($100$ 
 obtained per instantiated MAC unit. Thus the throughput increases linearly with
 parallelism degree. Table \ref{conv_tp} shows the througput obtained for
 different paralellism degrees.}
-\textcolor{blue}{
-Considering convolution operation processing, one pixel per clock cycle is
-obtained per instantiated MAC unit, i.e. if $16$ MAC unit are instantiated,
-with a reference clock of $100$ MHz , $1.6$ Gigapixels/second (Gp/s) throughput
-is achieved. In addition, regarding load and read stage, where one pixel every
-two clock cycles is loaded, $23.2$ Megapixels/second (Mp/s) throughput is
-obtained.
-}
+
 
 
 \begin{table}[!t]
@@ -1168,11 +1128,6 @@ transmission. Another limiting factor was the DSP48A1 slices. Both factors
 are easily solved by using an FPGA with more slices and
 resources.
 
-
-\section{Throughput}
-
-
-
 % conference papers do not normally have an appendix
 
 
@@ -1181,10 +1136,10 @@ resources.
 \ifCLASSOPTIONcompsoc
   % The Computer Society usually uses the plural form
   \section*{Acknowledgments}
-xxx xxxxxxx xxxxx xxxx xx xxxxx xxxx xxxxx xx xxxxx xxx xxxx xxxxxx xxxxxx xxx
-xxxxxxxxxx xxxxxxxxxxxx xxxxxxx xxxxxx xxxxxxxxx xxxxxxxx xxxxxxxxx.
-%The authors would like to thank PhD. Mario R. Hueda and PhD. Damian Morero for supporting their
-%design through Fuglor fundation research program.
+%xxx xxxxxxx xxxxx xxxx xx xxxxx xxxx xxxxx xx xxxxx xxx xxxx xxxxxx xxxxxx xxx
+%xxxxxxxxxx xxxxxxxxxxxx xxxxxxx xxxxxx xxxxxxxxx xxxxxxxx xxxxxxxxx.
+The authors would like to thank PhD. Mario R. Hueda and PhD. Damian Morero for supporting their
+design through Fulgor fundation research program.
 
 
 
