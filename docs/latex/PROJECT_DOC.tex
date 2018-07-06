@@ -423,7 +423,7 @@
 
 \begin{abstract}
   This paper presents a hardware architecture for two-dimensional (2D)
-  convolution implementation on a Xilinx Arty 7 FPGA platform when there is not
+  convolution implementation on a Xilinx Artix 7 FPGA platform when there is not
   enough RAM memory to instantiate and store a complete image. Not only
   processing speed is prioritized, but also efficient resource utilization and
   scalability in design, so as to add as many convolution operations in parallel
@@ -540,10 +540,10 @@ section~\ref{sec:conclusion}.
 %haga un uso eficiente de memoria, tenga un high throughput , sea paralelizable y escalable.
 
 \section{Image Processing Algorithms}\label{sec:preproc}
-\textcolor{red}{ Given its local and two dimensional nature, 2-D Convolution is one of the most used image processing algorithms. 
+Given its local and two dimensional nature, 2-D Convolution is one of the most used image processing algorithms. 
 Inherent parallelism of the image convolution algorithm can be exploited to increase the performance.
 We focus our study on a more efficient design of 2D convolution technique
-to reduce the usage of  FPGA resources. } 
+to reduce the usage of  FPGA resources. 
 
 \subsection{Convolution Operation}
 
@@ -559,8 +559,8 @@ convolution~\cite{validconv}.
 
 \subsection{Change of Dynamic Range}
 
-The images used for processing are grayscale because of its implementation simplicity, \textcolor{red}{but the design can be extrapolated
-to multiple channel images by considering each channel as an independent grayscale image.}
+The images used for processing are grayscale because of its implementation simplicity, but the design can be extrapolated
+to multiple channel images by considering each channel as an independent grayscale image.
  
 
 The pixels of the grayscale images $I(x,y)$ have a dynamic range between
@@ -646,7 +646,7 @@ entire process is divided into three stages, pre-processing, processing and
 post-processing. The pre-processing consists of capturing the image and applying
 the described transformation in Section~\ref{sec:preproc} using a Python script.
 In addition, the script divides the image into batches and sends them through
-the UART port to the FPGA. \textcolor{red}{A batch consists on contiguous pixel columns which dimension is described in Section ~\ref{infstorage} . } In the FPGA a microprocessor receives the information
+the UART port to the FPGA. A batch consists of contiguous pixel columns whose dimension is described in Section ~\ref{infstorage}. In the FPGA a microprocessor receives the information
 and transfers it to the convolution module using a 32 bits general purpose
 input-output (GPIO) port. This port writes the BRAMs that store filtered data.
 Due to FPGA size limitations, no other
@@ -729,11 +729,11 @@ the module waits for \textbf{Out} state switch instruction. After this transitio
 
 \subsubsection{Data storage}\label{infstorage}
 The kernel coefficients are stored in registers within each MAC unit. To store a
-batch, the proposed approach is to organize the block RAM in columns. \textcolor{red}{Each block RAM column corresponds to one batch
- column.} 
-\textcolor{red}{Therefore, the batch size is given
+batch, the proposed approach is to organize the block RAM in columns. Each block RAM column corresponds to one batch
+ column.
+Therefore, the batch size is given
 by the height of the image and the number of memory columns. In addition, the maximum
-height of the image must be less than or equal to memory column height.}
+height of the image must be less than or equal to memory column height.
 
 During batch processing, every pixel is read only once, so in order to do a
 more efficient use of the memory, the pixels that were already used are
@@ -756,8 +756,8 @@ This procedure is equivalent to shifting the kernel vertically on the image. All
 these steps are synchronized in such a way that one processed pixel is generated
 in every clock cycle.
 
-\textcolor{red}{ The AGU manages read and write memory addresses taking into account the latency that occurs
-since a pixel is loaded into a MAC unit until the corresponding processed pixel is stored.}
+The AGU manages read and write memory addresses taking into account the latency from the time
+a pixel is loaded into a MAC unit until the corresponding processed pixel is stored.
 
 Up to this point the analysis was over a single MAC unit, now the
 approach to work with multiple MAC units in parallel is
@@ -775,10 +775,10 @@ different input columns are needed for given two units.
 Therefore, for $N$ MAC units, the number of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
 that adding a new MAC unit only adds one new memory column.
 
-As a consequence of explained overlap, \textcolor{red}{there is repeated data
+As a consequence of explained overlap, there is repeated data
 between one batch and the next one. In order to reduce data transmission, repeated
 information is kept in memory and only the missing part of 
-the incoming batch is transmitted.} Given $N$ MAC units and a $k\times k$ kernel, a $N+k-1$
+the incoming batch is transmitted. Given $N$ MAC units and a $k\times k$ kernel, a $N+k-1$
 batch width is necessary, but the processed batch has a width of $N$ columns, i.e.
 one for each MAC unit. So, the last $k-1$ memory columns are not overwritten and
 maintain the input data. This $k-1$ columns are reused as the first columns
@@ -793,37 +793,36 @@ the first batch that maintains a width of $N+k-1$.
 \label{algorithm}
 \end{figure}
 
-\textcolor{red}{Reusing memory columns written by the previous batch results in
+Reusing memory columns written by the previous batch results in
  a circular shift by $N$ places, shifting memory columns possition associated with each
-MAC unit, in each iteration.}
-\textcolor{red}{From the above it
-follows that a periodicity in the relationship} 
- between the memory columns and the
+MAC unit, in each iteration.
+From the above it
+follows that a periodicity in the relation
+between the memory columns and the
 MAC unit's inputs must exist, where the period $It$ is the number of
 iterations necessary to get to the original memory columns - MAC units
-inputs  \textcolor{red}{relationship}, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
+inputs relation, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
 must be an integer $m$ such that 
 
 \begin{equation}\label{niter}
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
 
-\textcolor{red}{System logic is implemented in the MMU}
+System logic is implemented in the MMU
 , which serves as an interface between the
 memories and the rest of the components, keeping them independent from the
-parallelism degree and the iteration number. An example of  \textcolor{red}{data-flow in memories} is shown in Fig.~\ref{algorithm}.  \textcolor{red}{We consider a kernel $k=3$, $N=4$ MAC
-units thus 6 memory columns are needed}. In the first iteration, memories 1 to 6 
-are loaded with the new batch, and the result is stored in memories 1 to 4. In the next
-iteration, \textcolor{red}{data from a new batch is loaded } without overwriting memories 5 and 6. After
-processing \textcolor{red}{step}, \textcolor{red}{the data is stored, starting from memory 5 until the last
-  one and then overwriting previous batch data from the beginning.}
+parallelism degree and the iteration number. An example of data-flow in memories is shown in Fig.~\ref{algorithm}.
+We consider a kernel $k=3$ and $N=4$ MAC units, thus 6 memory columns are needed. In the first iteration, memories 1 to 6 
+are loaded with the new batch, and the result is stored in memories 1 to 4. In the next iteration, data from a new batch 
+is loaded without overwriting memories 5 and 6. After processing step, the data is stored, starting from memory 5 up to the last
+one and then overwriting previous batch data from the beginning.
 
 The MMU keeps track of the memory positions where the input batch must be stored,
 the information that must be fed to every MAC unit, the memory position where
 the processed data must be stored and the order in which the processed data must
 be returned, for each iteration. To do so, it has a finite state machine where
 each state corresponds to a set of the aforementioned positions. The number of states
-is given by the iteration number in eq.~\eqref{niter}.
+is given by the iteratiotn number in eq.~\eqref{niter}.
 
 \begin{figure}[!t]
 \centering
@@ -973,9 +972,9 @@ A comparison between the estimated BRAM utilization and the results obtained
 from synthesis is shown in Fig.~\ref{bram_n}. Normalization was made with
 respect to BRAM utilization percentage dividing by the maximun utilization
 percentage value, and considering that microblaze instance already occupies $18\%$
-of BRAM resources. \textcolor{red}{It can be appreciated that the linear
+of BRAM resources. It can be appreciated that the linear
   behaviour anticipated by theoretical calculations is consistent with the
-  synthesis results.} 
+  synthesis results.
 
 \begin{figure}[!t]
 \centering
@@ -984,12 +983,12 @@ of BRAM resources. \textcolor{red}{It can be appreciated that the linear
 \label{bram_n}
 \end{figure}
 
-\textcolor{red}{
+
 Considering only convolution operation processing, i.e. not taking into account
 the time needed to load the image into memory, one pixel per clock cycle ($100$ Mhz) is
-obtained per instantiated MAC unit. Thus the throughput increases linearly with
-parallelism degree. Table \ref{conv_tp} shows the througput obtained for
-different paralellism degrees.}
+obtained per instantiated MAC unit. Thus, throughput increases linearly with
+parallelism degree. Table \ref{conv_tp} shows througput obtained for
+different paralellism degrees.
 
 
 
@@ -1114,7 +1113,7 @@ current image batch. In this paper, we have presented the implementation of
 two-dimensional convolution on a Xilinx Artix 7 FPGA platform based on resource
 efficiency and system parallelism. We implemented a whole image processing
 system taking into account load stage, processing stage, and output stage.
-Moreover, a ratio relationship between instantiated BRAM blocks and MAC units was
+Moreover, a relation between instantiated BRAM blocks and MAC units was
 found in the presented architecture, which allows our system to work with different
 parallelism degrees.
 
