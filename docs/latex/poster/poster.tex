@@ -47,7 +47,7 @@ headerFontColor=white, % Text color for the header text in the content boxes
 boxColorOne=white, % Background color of the content boxes
 textborder=rounded, %rectangle, % Format of the border around content boxes, can be: none, bars, coils, triangles, rectangle, rounded, roundedsmall, roundedright or faded
 eyecatcher=false, % Set to false for ignoring the left logo in the title and move the title left
-headerheight=0.11\textheight, % Height of the header
+headerheight=0.15\textheight, % Height of the header
 headershape=rounded, % Specify the rounded corner in the content box headers, can be: rectangle, small-rounded, roundedright, roundedleft or rounded
 headershade=plain,
 headerfont=\Large\textsf, % Large, bold and sans serif font in the headers of content boxes
@@ -60,10 +60,10 @@ linewidth=2pt % Width of the border lines around content boxes
 %	TITLE AND AUTHOR NAME
 %----------------------------------------------------------------------------------------
 %
-{
-\textsf %Sans Serif
-{Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing
-}
+{  
+  {\includegraphics[width=\textwidth]{DSP-02}} % SASE logo
+  \textsf %Sans Serif  
+  { Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing}
 } % Poster title
 % {\vspace{1em} Marta Stepniewska, Pawel Siedlecki\\ % Author names
 % {\small \vspace{0.7em} Department of Bioinformatics, Institute of Biochemistry and Biophysics, PAS, Warsaw, Pawinskiego 5a}} % Author email addresses
@@ -78,10 +78,10 @@ linewidth=2pt % Width of the border lines around content boxes
 martin.casabella@gmail.com, ser.0090@gmail.com,
     ivanmvig@gmail.com and arielpola@gmail.com}
 }
-{\includegraphics[width=0.1\textwidth]{logo}} % University/lab logo
+%{\includegraphics[width=0.1\textwidth]{logo}} % University/lab logo
 
 {\small	
-\headerbox{1. Introduction}{name=introduction,column=0,row=0, span=3}{
+  \headerbox{1. Introduction}{name=introduction,column=0,row=0, span=3}{
 
 %The origin of digital image processing is directly related to the development and evolution of computers. Most
 %image filters that focus, blur, enhance edges and detect edges, among
@@ -137,9 +137,9 @@ All data was cleaned accordingly prior evaluation. Furthermore, by using cross-v
     \includegraphics[width=\linewidth]{cv}
 \end{center}
 
-\begin{center}
-    \includegraphics[width=\linewidth]{kfoldrep}
-\end{center}
+%\begin{center}
+%    \includegraphics[width=\linewidth]{kfoldrep}
+%\end{center}
 }
 
 \headerbox{3. Results}{name=screen,span=2,column=1,below=introduction}{ % To reduce this block to 1 column width, remove 'span=2'
@@ -160,30 +160,51 @@ At every fold during the cross-validation process, each model returns a set of p
 
 \headerbox{4. Discussion}{name=sea,span=2,column=1,below=screen}{ % To reduce this block to 1 column width, remove 'span=2'
 
-Similarly to what Percy et al. \cite{percy_predicting_2016} achieved, the sequential NN model produced very close results to the RF with a mean accuracy score of 79.643\% and 82.585\% respectively. The ELM approach achieved comparable results to the NN. Sensitivity wise, the boosting methods LightGBM and XGBoost achieved the highest score out of the whole bunch as a result of 85.167\%. RF achieved the highest overall accuracy and AUROC score of 82.582\% and 0.8258 respectively. Concerning the sensitivity score, the least performing model was the GNB achieving an abysmal result of 24.72\%. The SVM model performed quite mediocre, achieving an overall AUROC and accuracy of 0.76724 and 75.204\% respectively.\\
+%  Similarly to what Percy et al. \cite{percy_predicting_2016} achieved,
+The sequential NN model produced very close results to the RF with a mean accuracy score of 79.643\% and 82.585\% respectively. The ELM approach achieved comparable results to the NN. Sensitivity wise, the boosting methods LightGBM and XGBoost achieved the highest score out of the whole bunch as a result of 85.167\%. RF achieved the highest overall accuracy and AUROC score of 82.582\% and 0.8258 respectively. Concerning the sensitivity score, the least performing model was the GNB achieving an abysmal result of 24.72\%. The SVM model performed quite mediocre, achieving an overall AUROC and accuracy of 0.76724 and 75.204\% respectively.\\
 
 \raggedright
 
 Theil-Sen ranked with the set of lower performing models, achieving an overall AUROC of 0.683, with an even more inferior sensitivity score of 60.82\%. Similarly, LDA produced close AUROC results with an improved sensitivity value, still below average. Both the LogReg and LR models achieved better performance than the latter. Since LR managed a specificity value of only 59.13\%, this implies that 40.87\% samples were classified incorrectly. The K-Means clustering algorithm achieved the worst results. This technique is highly sensitive to data scaling and the range of values, which could explain the poor performance. Moreover, this algorithm also assumes that all features present are continuous, and even if transforming these variables to dummy-variables, this could negatively affect its performance.
-\begin{center}
-  \includegraphics[width=0.35\linewidth]{deep}
-\end{center}
+%\begin{center}
+%  \includegraphics[width=0.35\linewidth]{deep}
+%\end{center}
 }
 
 
+{\small	
 \headerbox{5. Conclusions}{name=conclusion,column=1,below=sea,span=2,above=bottom}{
 % DeCAF is a chemoinformatical tool that can be helpful in ligand-based drug design.
 % It provides a comprehensive molecule description and a fast algorithms for comparing and aligning multiple ligands.
-This research proves that Random Forests and the boosting methods LightGBM and XGBoost are amongst of the most highly effective techniques to predict and classify players as either exhibiting problematic behaviour characteristics or not.
+%This research proves that Random Forests and the boosting methods LightGBM and XGBoost are amongst of the most highly effective techniques to predict and classify players as either exhibiting problematic behaviour characteristics or not.
 
-\begin{boenumerate}\compresslist
-    \item All three algorithms achieved over 80\% accuracy across all of the performance metrics calculated.
-    \item These three approaches achieved the top three execution times.
-    \item These three methods were the most consistent out of all the evaluated techniques.
-\end{boenumerate}
+%\begin{boenumerate}\compresslist
+%    \item All three algorithms achieved over 80\% accuracy across all of the performance metrics calculated.
+%    \item These three approaches achieved the top three execution times.
+%    \item These three methods were the most consistent out of all the evaluated techniques.
+%\end{boenumerate}
+
 % It can be also used in other [procedures], such as database screening or drug repositioning.
 % DeCAF is written in Python and freely available at \textbf{\color{darkgreen}http://bitbucket.org/marta-sd/decaf}. 
-}
+Using FPGA we are able to process the filtering at the same time as reading the
+current image batch. In this paper, we have presented the implementation of
+two-dimensional convolution on a Xilinx Artix 7 FPGA platform based on resource
+efficiency and system parallelism. We implemented a whole image processing
+system taking into account load stage, processing stage, and output stage.
+Moreover, a relation between instantiated BRAM blocks and MAC units was
+found in the presented architecture, which allows our system to work with different
+parallelism degrees.
+
+In addition, we optimized the use of memory resources implementing an algorithm
+for memory operations and module synchronization. Performances and results show that resources utilization
+concerning BRAM resources increase linearly, as desired.
+
+High throughput was achieved in what processing is concerned. On the other hand,
+the limiting factor that impacted the implemented system the most was UART speed
+transmission. Another limiting factor was the DSP48A1 slices. Both factors
+are easily solved by using an FPGA with more slices and
+resources.
+}}
 
 
 \headerbox{6. References}{name=references,column=0,span=1,below=model,above=bottom}{
@@ -195,7 +216,7 @@ This research proves that Random Forests and the boosting methods LightGBM and X
 
 
 \bibliographystyle{unsrt}
-{\tiny
+{\footnotesize
 \bibliography{poster} % Use sample.bib as the bibliography file
 }
 }
