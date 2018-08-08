@@ -62,24 +62,70 @@ linewidth=2pt % Width of the border lines around content boxes
 %
 {
 \textsf %Sans Serif
-{Machine Learning Techniques for the Determination and Prediction of Online Gambling Addiction
+{Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing
 }
 } % Poster title
 % {\vspace{1em} Marta Stepniewska, Pawel Siedlecki\\ % Author names
 % {\small \vspace{0.7em} Department of Bioinformatics, Institute of Biochemistry and Biophysics, PAS, Warsaw, Pawinskiego 5a}} % Author email addresses
 {\sf\vspace{0.5em}\\
-David Farrugia* and Dr Lalit Garg
+    Martin Casabella,
+    Sergio Sulca,
+    Ivan Vignolles,
+    Ariel L. Pola
 \vspace{0.1em}\\
-\small{Faculty of Information and Communication Technology, University of Malta
+\small{Department of Research and Development Fundacion Fulgor 
 \vspace{0.2em}\\
-david.farrugia.15@um.edu.mt}
+martin.casabella@gmail.com, ser.0090@gmail.com,
+    ivanmvig@gmail.com and arielpola@gmail.com}
 }
 {\includegraphics[width=0.1\textwidth]{logo}} % University/lab logo
 
-
+{\small	
 \headerbox{1. Introduction}{name=introduction,column=0,row=0, span=3}{
-Gambling is a form of entertainment where numerous players frequently fall in love with the thrill and the roller-coaster of emotions that the whole playing experience entails. However, gambling may become the root of the destruction of their lives due to falling victims of addiction, which often wills its victims into experiencing other mental and physical issues, such as depression, distress, and anxiety symptoms. This impulse-control habit leaves the victims it haunts lacking self-control and rather effortless in trying to reduce or stop such behaviour \cite{noauthor_gambling_nodate}. This habit is becoming more and more of a problem, in fact, in the year 2013 alone, statistics \cite{noauthor_global_2011} show that the online gambling market generated a revenue of 6.1 billion. Statisticians and researchers predict an increase of 10.1\% in 2018 \cite{noauthor_global_2011}. Without the proper and necessary precautions and measures, the latter results in the victim continually seeking to engage in this unhealthy behaviour; hence, meaning that the problem only gets bigger and bigger \cite{goodman_addiction:_1990}. Thus, this research aims to contribute to this problem by evaluating and proposing some novel and existing machine learning techniques to help predict such pathological behaviour with the effort of controlling the gambling environment.
-}
+
+%The origin of digital image processing is directly related to the development and evolution of computers. Most
+%image filters that focus, blur, enhance edges and detect edges, among
+%others, use convolution as a mathematical operation. Image processing is a very
+%extensive research area with a large number of applications in multiple fields
+%such as medicine, engineering, navigation, aeronautics, among others.
+%Convolutional neural networks (CNN)~\cite{Lecun-et-al-1998} have received
+%increasing attention in recent years. This technique uses a fast and efficient
+%convolution implementation.
+
+The implementation of high-speed image processing systems in field programmable
+gate array (FPGA) has been a very active field. This is mainly due to the
+ability to take advantage of bit level parallelism, pixel level, neighborhood
+level and task level to increase computing performance and speed. %In addition, FPGAs are
+%reconfigurable, allowing the flexibility that is often desired in neural
+%networks. This combination of parallel processing and flexibility at very high
+%speed, is what makes FPGAs a platform of choice for the development of these
+%areas~\cite{papercnn}.
+
+There are many examples in the literature of two-dimensional (2D) convolution
+implementations, where most of the work focuses on high performance, resource
+reduction and FPGA area efficiency. As shown in~\cite{paper3}, block random access
+memory (BRAM) is one of the most used elements with the highest energy
+consumption. Therefore, the architectures seek to reduce the use of BRAMs by
+dividing them into two groups that consider either total storage or partial storage of the
+image. The first of them increases processing by applying parallelization as
+well as reusing resources to reduce complexity~\cite{paper1,paper5}. On the
+other hand, architectures with partial storage partition the image into as many
+parts as convolders are used~\cite{paper2,paper4}. The drawback presented by
+these schemes is the non-modularization of processing, making it difficult to
+improve the work rate by increasing parallelism.
+
+In this work, we explain the concept of dynamic reuse of BRAM in 2D convolution
+and its complexity concerning implementation for parallel architectures. Moreover, we
+propose a modular architecture, where it is easy to appreciate that when the
+parallelism level increases, the complexity of BRAM increases linearly.
+
+%This paper is organized as follows. Section~\ref{sec:preproc} introduces the
+%image processing algorithm. The archicterure design is
+%presented in section~\ref{sec:architecture}. In
+%section~\ref{sec:implementation}, hardware implementation and experimental
+%results are shown. Finally, conclusions are drawn in
+%section~\ref{sec:conclusion}.
+}}
 
 
 \headerbox{2. Materials and Method}{name=model,column=0,below=introduction,span=1}{
@@ -149,7 +195,9 @@ This research proves that Random Forests and the boosting methods LightGBM and X
 
 
 \bibliographystyle{unsrt}
+{\tiny
 \bibliography{poster} % Use sample.bib as the bibliography file
+}
 }
 
 \end{poster}
