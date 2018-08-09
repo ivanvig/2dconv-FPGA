@@ -57,7 +57,7 @@ linewidth=2pt % Width of the border lines around content boxes
 %----------------------------------------------------------------------------------------
 %
 {  
-  {\includegraphics[width=\textwidth]{DSP-02}\vspace{0.2em}} % SASE logo
+  {\includegraphics[width=\textwidth]{DSP-02}\vspace{0.5em}} % SASE logo
   \bf\textsf %Sans Serif  
   {Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing}
 } % Poster title
@@ -73,12 +73,11 @@ linewidth=2pt % Width of the border lines around content boxes
 \vspace{0.2em}\\
 martin.casabella@gmail.com, ser.0090@gmail.com,
     ivanmvig@gmail.com and arielpola@gmail.com}
-}\vspace{1em}}
+}\vspace{2em}}
 %{\includegraphics[width=0.1\textwidth]{logo}} % University/lab logo
 
-{\small	
-  \headerbox{1. Introduction}{name=introduction,column=0,row=0, span=3}{
-
+\headerbox{1. Introduction}{name=introduction,column=0,row=0, span=3}{
+\small{
 %The origin of digital image processing is directly related to the development and evolution of computers. Most
 %image filters that focus, blur, enhance edges and detect edges, among
 %others, use convolution as a mathematical operation. Image processing is a very
@@ -166,10 +165,9 @@ Theil-Sen ranked with the set of lower performing models, achieving an overall A
 %  \includegraphics[width=0.35\linewidth]{deep}
 %\end{center}
 }
-
-
-{\small	
+	
 \headerbox{5. Conclusions}{name=conclusion,column=1,below=sea,span=2,above=bottom}{
+\small{
 % DeCAF is a chemoinformatical tool that can be helpful in ligand-based drug design.
 % It provides a comprehensive molecule description and a fast algorithms for comparing and aligning multiple ligands.
 %This research proves that Random Forests and the boosting methods LightGBM and XGBoost are amongst of the most highly effective techniques to predict and classify players as either exhibiting problematic behaviour characteristics or not.
@@ -202,21 +200,18 @@ are easily solved by using an FPGA with more slices and
 resources.
 }}
 
-
 \headerbox{6. References}{name=references,column=0,span=1,below=model,above=bottom}{
 
+  % \small % Reduce the font size in this block
+  \renewcommand{\section}[2]{\vskip 0.05em} % Get rid of the default
+  % "References" section title
+  % \nocite{*} % Insert publications even if they are not cited in the poster
 
-%\small % Reduce the font size in this block
-\renewcommand{\section}[2]{\vskip 0.05em} % Get rid of the default "References" section title
-%\nocite{*} % Insert publications even if they are not cited in the poster
-
-
-\bibliographystyle{unsrt}
-{\footnotesize
-\bibliography{poster} % Use sample.bib as the bibliography file
-}
+  \bibliographystyle{unsrt}
+  {\footnotesize
+    \bibliography{poster} % Use sample.bib as the bibliography file
+  }
 }
 
 \end{poster}
-
 \end{document}
