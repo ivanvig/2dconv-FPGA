@@ -9,29 +9,25 @@
 \usepackage[utf8]{inputenc} %unicode support
 \usepackage[T1]{fontenc}
 
-
 \selectcolormodel{cmyk}
 
 \graphicspath{{figures/}} % Directory in which figures are stored
 
-
 \newcommand{\compresslist}{%
-\setlength{\itemsep}{0pt}%
-\setlength{\parskip}{1pt}%
-\setlength{\parsep}{0pt}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parskip}{1pt}%
+  \setlength{\parsep}{0pt}%
 }
 
 \newenvironment{boenumerate}
   {\begin{enumerate}\renewcommand\labelenumi{\textbf\theenumi.}}
   {\end{enumerate}}
 
-
-
 \begin{document}
-
 
 \definecolor{darkgreen}{cmyk}{0,0.90,0.74,0.28}
 \definecolor{lightgreen}{cmyk}{0,0.90,0.74,0.28}
+\definecolor{chartreuse(web)}{rgb}{0.5, 1.0, 0.1}
 
 \begin{poster}
 {
@@ -40,8 +36,8 @@ headerborder=open, % Adds a border around the header of content boxes
 colspacing=1em, % Column spacing
 bgColorOne=white, % Background color for the gradient on the left side of the poster
 bgColorTwo=white, % Background color for the gradient on the right side of the poster
-borderColor=darkgreen, % Border color
-headerColorOne=lightgreen, % Background color for the header in the content boxes (left side)
+borderColor=black, % Border color
+headerColorOne=chartreuse(web), % Background color for the header in the content boxes (left side)
 headerColorTwo=lightgreen, % Background color for the header in the content boxes (right side)
 headerFontColor=white, % Text color for the header text in the content boxes
 boxColorOne=white, % Background color of the content boxes
@@ -50,7 +46,7 @@ eyecatcher=false, % Set to false for ignoring the left logo in the title and mov
 headerheight=0.15\textheight, % Height of the header
 headershape=rounded, % Specify the rounded corner in the content box headers, can be: rectangle, small-rounded, roundedright, roundedleft or rounded
 headershade=plain,
-headerfont=\Large\textsf, % Large, bold and sans serif font in the headers of content boxes
+headerfont=\Large\bf\textsf, % Large, bold and sans serif font in the headers of content boxes
 %textfont={\setlength{\parindent}{1.5em}}, % Uncomment for paragraph indentation
 linewidth=2pt % Width of the border lines around content boxes
 }
@@ -61,23 +57,23 @@ linewidth=2pt % Width of the border lines around content boxes
 %----------------------------------------------------------------------------------------
 %
 {  
-  {\includegraphics[width=\textwidth]{DSP-02}} % SASE logo
-  \textsf %Sans Serif  
-  { Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing}
+  {\includegraphics[width=\textwidth]{DSP-02}\vspace{0.2em}} % SASE logo
+  \bf\textsf %Sans Serif  
+  {Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing}
 } % Poster title
 % {\vspace{1em} Marta Stepniewska, Pawel Siedlecki\\ % Author names
 % {\small \vspace{0.7em} Department of Bioinformatics, Institute of Biochemistry and Biophysics, PAS, Warsaw, Pawinskiego 5a}} % Author email addresses
-{\sf\vspace{0.5em}\\
+{{\sf\vspace{0.2em}\\
     Martin Casabella,
     Sergio Sulca,
     Ivan Vignolles,
     Ariel L. Pola
-\vspace{0.1em}\\
+\vspace{0.2em}\\
 \small{Department of Research and Development Fundacion Fulgor 
 \vspace{0.2em}\\
 martin.casabella@gmail.com, ser.0090@gmail.com,
     ivanmvig@gmail.com and arielpola@gmail.com}
-}
+}\vspace{1em}}
 %{\includegraphics[width=0.1\textwidth]{logo}} % University/lab logo
 
 {\small	
