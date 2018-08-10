@@ -41,7 +41,7 @@ headerColorOne=chartreuse(web), % Background color for the header in the content
 headerColorTwo=lightgreen, % Background color for the header in the content boxes (right side)
 headerFontColor=white, % Text color for the header text in the content boxes
 boxColorOne=white, % Background color of the content boxes
-textborder=rounded, %rectangle, % Format of the border around content boxes, can be: none, bars, coils, triangles, rectangle, rounded, roundedsmall, roundedright or faded
+textborder=roundedleft, %rectangle, % Format of the border around content boxes, can be: none, bars, coils, triangles, rectangle, rounded, roundedsmall, roundedright or faded
 eyecatcher=false, % Set to false for ignoring the left logo in the title and move the title left
 headerheight=0.15\textheight, % Height of the header
 headershape=rounded, % Specify the rounded corner in the content box headers, can be: rectangle, small-rounded, roundedright, roundedleft or rounded
@@ -77,7 +77,7 @@ martin.casabella@gmail.com, ser.0090@gmail.com,
 %{\includegraphics[width=0.1\textwidth]{logo}} % University/lab logo
 
 \headerbox{1. Introduction}{name=introduction,column=0,row=0, span=3}{
-\small{
+\footnotesize{
 %The origin of digital image processing is directly related to the development and evolution of computers. Most
 %image filters that focus, blur, enhance edges and detect edges, among
 %others, use convolution as a mathematical operation. Image processing is a very
@@ -86,7 +86,7 @@ martin.casabella@gmail.com, ser.0090@gmail.com,
 %Convolutional neural networks (CNN)~\cite{Lecun-et-al-1998} have received
 %increasing attention in recent years. This technique uses a fast and efficient
 %convolution implementation.
-
+%
 The implementation of high-speed image processing systems in field programmable
 gate array (FPGA) has been a very active field. This is mainly due to the
 ability to take advantage of bit level parallelism, pixel level, neighborhood
@@ -123,37 +123,78 @@ parallelism level increases, the complexity of BRAM increases linearly.
 }}
 
 
-\headerbox{2. Materials and Method}{name=model,column=0,below=introduction,span=1}{
-
-Python was the programming language utilised for all data and model analysis, and application development purposes. Some third-party libraries used in this experiment were: PyQt5, numpy, pandas, pickle, scikit-learn, xgboost, lightgbm, rgf, elm, keras and tensorflow.\\
-
-All data was cleaned accordingly prior evaluation. Furthermore, by using cross-validation techniques, the data was split up into training and testing sets. The training of all models by fitting the training sets (all data split into partitions by cross-validation) was then followed by fitting the testing features to obtain a prediction set. In turn, by utilising these predictions for evaluation, some scoring metrics resulted for comparison.
-\begin{center}
-    \includegraphics[width=\linewidth]{cv}
-\end{center}
+\headerbox{2. Method}{name=model,column=0,below=introduction,span=1}{
+\footnotesize{
+%Python was the programming language utilised for all data and model analysis, and application development purposes. Some third-party libraries used in this experiment were: PyQt5, numpy, pandas, pickle, scikit-learn, xgboost, lightgbm, rgf, elm, keras and tensorflow.\\
+%
+%All data was cleaned accordingly prior evaluation. Furthermore, by using cross-validation techniques, the data was split up into training and testing sets. The training of all models by fitting the training sets (all data split into partitions by cross-validation) was then followed by fitting the testing features to obtain a prediction set. In turn, by utilising these predictions for evaluation, some scoring metrics resulted for comparison.
+%\begin{center}
+%    \includegraphics[width=\linewidth]{cv}
+%\end{center}
 
 %\begin{center}
 %    \includegraphics[width=\linewidth]{kfoldrep}
-%\end{center}
+%  \end{center}
+Given its local and two dimensional nature, 2-D Convolution is one of the most used image processing algorithms. 
+Inherent parallelism of the image convolution algorithm can be exploited to increase the performance.
+We focus our study on a more efficient design of 2D convolution technique
+to reduce the usage of  FPGA resources. So the images used for processing are grayscale. %because of its implementation simplicity, but the design can be extrapolated
+%to multiple channel images by considering each channel as an independent grayscale image.
+
+The pixels of the grayscale images $I(x,y)$ have a dynamic range between
+$[0,255]$ and Kernel values $K(x,y)$ can be negative or positive. This work is
+part of a Deep Learning project where it is usual to operate with a dynamic
+range centered on zero. Therefore, we apply dynamic range expansion
+$(\mathcal{D}[.])$~\cite{dinamic_rango} and maximum norm
+$(\mathcal{M}[.])$~\cite{max_norm} to rearrange
+$\mathcal{D}[I(x,y)]=I^\prime(x,y)$ between $[0,1]$ and
+$\mathcal{M}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$, respectively
+Therefore, replacing in bidimensional convolution formula 
+
+%The complete processing is described in Fig.~\ref{transformation}.
+
+\begin{center}
+\includegraphics[width=\linewidth]{wflow3}
+%\caption{Transformations of the dynamic range during the processing of the image.}
+\end{center}
+Where $\mathcal{D}^{-1}[.]$ is the dynamic range change between $[0,255]$ in the
+FPGA. Finally, all the processed blocks are reordered by software.
+}
 }
 
-\headerbox{3. Results}{name=screen,span=2,column=1,below=introduction}{ % To reduce this block to 1 column width, remove 'span=2'
+\headerbox{3. Architecture Design}{name=screen,span=2,column=1,below=introduction}{ % To reduce this block to 1 column width, remove 'span=2'
 
-\begin{wrapfigure}{l}{0.35\textwidth}
-    \vspace{10pt}
-    \begin{center}
-        \includegraphics[width=\linewidth]{r1}
-    \end{center}
+%\begin{wrapfigure}{l}{0.35\textwidth}
+%    \vspace{10pt}
+%    \begin{center}
+%        \includegraphics[width=\linewidth]{r1}
+%    \end{center}
     %\vspace{-145pt}
-\end{wrapfigure}
+%\end{wrapfigure}
 
-At every fold during the cross-validation process, each model returns a set of predictions, which the application stores. At the end of all iterations (10 iterations, since the cross-validation method implemented, is tuned to partition the data in 10 folds), the mean for every performance metric and each executed algorithm was calculated.
+%At every fold during the cross-validation process, each model returns a set of predictions, which the application stores. At the end of all iterations (10 iterations, since the cross-validation method implemented, is tuned to partition the data in 10 folds), the mean for every performance metric and each executed algorithm was calculated.
 
-\hspace{0pt}\includegraphics[width=\linewidth]{r2}
+%\hspace{0pt}\includegraphics[width=\linewidth]{r2}
 
+The pre-processing consists of capturing the image and applying
+the described transformation in Section ??? using a Python script.
+In addition, the script divides the image into batches and sends them through
+the UART port to the FPGA. A batch consists of contiguous pixel columns whose
+dimension is described in Section ???. In the FPGA a microprocessor receives the information
+and transfers it to the convolution module using a 32 bits general purpose
+input-output (GPIO) port. This port writes the BRAMs that store filtered data.
+Due to FPGA size limitations, no other
+interface was used, such as Ethernet or direct memory access, to read the
+image directly from a storage device. However, the proposed architecture is
+indifferent to these methods. The second stage is the processing. The batch is
+convolved with the kernel inside the module, which is established by the user through
+the GPIO. When the operation ends, a notification is sent to the microprocessor,
+which gives the order to recover the processed batch from the module and sends it
+to the central processing unit (CPU). Finally, the post-processing stage combines
+the batches on the CPU using a Python script.
 }
 
-\headerbox{4. Discussion}{name=sea,span=2,column=1,below=screen}{ % To reduce this block to 1 column width, remove 'span=2'
+\headerbox{4. Results}{name=sea,span=2,column=1,below=screen}{ % To reduce this block to 1 column width, remove 'span=2'
 
 %  Similarly to what Percy et al. \cite{percy_predicting_2016} achieved,
 The sequential NN model produced very close results to the RF with a mean accuracy score of 79.643\% and 82.585\% respectively. The ELM approach achieved comparable results to the NN. Sensitivity wise, the boosting methods LightGBM and XGBoost achieved the highest score out of the whole bunch as a result of 85.167\%. RF achieved the highest overall accuracy and AUROC score of 82.582\% and 0.8258 respectively. Concerning the sensitivity score, the least performing model was the GNB achieving an abysmal result of 24.72\%. The SVM model performed quite mediocre, achieving an overall AUROC and accuracy of 0.76724 and 75.204\% respectively.\\
@@ -167,7 +208,7 @@ Theil-Sen ranked with the set of lower performing models, achieving an overall A
 }
 	
 \headerbox{5. Conclusions}{name=conclusion,column=1,below=sea,span=2,above=bottom}{
-\small{
+\footnotesize{
 % DeCAF is a chemoinformatical tool that can be helpful in ligand-based drug design.
 % It provides a comprehensive molecule description and a fast algorithms for comparing and aligning multiple ligands.
 %This research proves that Random Forests and the boosting methods LightGBM and XGBoost are amongst of the most highly effective techniques to predict and classify players as either exhibiting problematic behaviour characteristics or not.
@@ -208,7 +249,7 @@ resources.
   % \nocite{*} % Insert publications even if they are not cited in the poster
 
   \bibliographystyle{unsrt}
-  {\footnotesize
+  {\scriptsize
     \bibliography{poster} % Use sample.bib as the bibliography file
   }
 }
