@@ -3,6 +3,13 @@
 \columnsep=70pt % This is the amount of white space between the columns in the poster
 \columnseprule=3pt % This is the thickness of the black line between the columns in the poster
 
+\usepackage{multicol} % Required for multiple columns
+\setlength{\columnsep}{1.5em} % Slightly increase the space between columns
+\setlength{\columnseprule}{0mm} % No horizontal rule between columns
+\setlength{\multicolsep}{0mm} % No horizontal rule between columns
+
+\usepackage[font=small,labelfont=bf]{caption}
+
 \usepackage{wrapfig}
 \usepackage{lmodern}
 
@@ -11,7 +18,7 @@
 
 \selectcolormodel{cmyk}
 
-\graphicspath{{figures/}} % Directory in which figures are stored
+\graphicspath{{figures/}{../../schematics/svg/}} % Directory in which figures are stored
 
 \newcommand{\compresslist}{%
   \setlength{\itemsep}{0pt}%
@@ -125,8 +132,7 @@ parallelism level increases, the complexity of BRAM increases linearly.
 }}
 
 
-\headerbox{2. Method}{name=model,column=0,below=introduction,span=1}{
-\footnotesize{
+\headerbox{2. Image Processing}{name=model,column=0,below=introduction,span=1}{
 %Python was the programming language utilised for all data and model analysis, and application development purposes. Some third-party libraries used in this experiment were: PyQt5, numpy, pandas, pickle, scikit-learn, xgboost, lightgbm, rgf, elm, keras and tensorflow.\\
 %
 %All data was cleaned accordingly prior evaluation. Furthermore, by using cross-validation techniques, the data was split up into training and testing sets. The training of all models by fitting the training sets (all data split into partitions by cross-validation) was then followed by fitting the testing features to obtain a prediction set. In turn, by utilising these predictions for evaluation, some scoring metrics resulted for comparison.
@@ -140,10 +146,10 @@ parallelism level increases, the complexity of BRAM increases linearly.
 Given its local and two dimensional nature, 2-D Convolution is one of the most used image processing algorithms. 
 Inherent parallelism of the image convolution algorithm can be exploited to increase the performance.
 We focus our study on a more efficient design of 2D convolution technique
-to reduce the usage of  FPGA resources. So the images used for processing are grayscale. %because of its implementation simplicity, but the design can be extrapolated
+to reduce the usage of  FPGA resources.% So the images used for processing are grayscale. %because of its implementation simplicity, but the design can be extrapolated
 %to multiple channel images by considering each channel as an independent grayscale image.
 
-The pixels of the grayscale images $I(x,y)$ have a dynamic range between
+The pixels of grayscale images $I(x,y)$ have a dynamic range between
 $[0,255]$ and Kernel values $K(x,y)$ can be negative or positive. This work is
 part of a Deep Learning project where it is usual to operate with a dynamic
 range centered on zero. Therefore, we apply dynamic range expansion
@@ -152,61 +158,98 @@ $(\mathcal{M}[.])$~\cite{max_norm} to rearrange
 $\mathcal{D}[I(x,y)]=I^\prime(x,y)$ between $[0,1]$ and
 $\mathcal{M}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$, respectively
 Therefore, replacing in bidimensional convolution formula 
-
-%The complete processing is described in Fig.~\ref{transformation}.
-
-\begin{center}
-\includegraphics[width=\linewidth]{wflow3}
-%\caption{Transformations of the dynamic range during the processing of the image.}
-\end{center}
+ $$G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],$$ 
 Where $\mathcal{D}^{-1}[.]$ is the dynamic range change between $[0,255]$ in the
 FPGA. Finally, all the processed blocks are reordered by software.
-}
+\begin{center}
+  \includegraphics[width=\linewidth]{wflow3}
+\end{center}
 }
 
 \headerbox{3. Architecture Design}{name=screen,span=2,column=1,below=introduction}{ % To reduce this block to 1 column width, remove 'span=2'
 
-%\begin{wrapfigure}{l}{0.35\textwidth}
-%    \vspace{10pt}
-%    \begin{center}
-%        \includegraphics[width=\linewidth]{r1}
-%    \end{center}
-    %\vspace{-145pt}
-%\end{wrapfigure}
 
 %At every fold during the cross-validation process, each model returns a set of predictions, which the application stores. At the end of all iterations (10 iterations, since the cross-validation method implemented, is tuned to partition the data in 10 folds), the mean for every performance metric and each executed algorithm was calculated.
 
 %\hspace{0pt}\includegraphics[width=\linewidth]{r2}
 
+\begin{multicols}{2}
+    \includegraphics[width=\linewidth]{general}
+\vfill\null
+\columnbreak
 The pre-processing consists of capturing the image and applying
-the described transformation in Section ??? using a Python script.
-In addition, the script divides the image into batches and sends them through
-the UART port to the FPGA. A batch consists of contiguous pixel columns whose
-dimension is described in Section ???. In the FPGA a microprocessor receives the information
-and transfers it to the convolution module using a 32 bits general purpose
-input-output (GPIO) port. This port writes the BRAMs that store filtered data.
-Due to FPGA size limitations, no other
-interface was used, such as Ethernet or direct memory access, to read the
-image directly from a storage device. However, the proposed architecture is
-indifferent to these methods. The second stage is the processing. The batch is
-convolved with the kernel inside the module, which is established by the user through
-the GPIO. When the operation ends, a notification is sent to the microprocessor,
+the transformation using a Python script. In addition, the script divides the
+image into batches and sends them through the UART port to the FPGA. A batch
+consists of contiguous pixel columns. In the FPGA a microprocessor receives the
+information and transfers it to the convolution module using a 32 bits general
+purpose input-output (GPIO) port. The second stage is the processing. The batch is convolved with the kernel inside
+the module, which is established by the user through the GPIO.
+The \textbf{control unit} is the one in charge of handling the communication with
+the processor and the \textbf{multiplier-accumulator (MAC) unit} executes the sum
+of the products of the kernel's coefficients with the pixels. The \textbf{address generation unit (AGU)}
+\end{multicols}
+manages the memory addresses along with
+the \textbf{memory management unit (MMU)}, that decides how the values in memory
+are read and written.
+The last module is the \textbf{storage} one, which is
+implemented with a set of columns of the FPGA's block RAM. 
+
+When the operation ends, a notification is sent to the microprocessor,
 which gives the order to recover the processed batch from the module and sends it
 to the central processing unit (CPU). Finally, the post-processing stage combines
 the batches on the CPU using a Python script.
 }
 
-\headerbox{4. Results}{name=sea,span=2,column=1,below=screen}{ % To reduce this block to 1 column width, remove 'span=2'
+\headerbox{4. Implementation and Results}{name=sea,span=2,column=1,below=screen}{ % To reduce this block to 1 column width, remove 'span=2'
 
-%  Similarly to what Percy et al. \cite{percy_predicting_2016} achieved,
-The sequential NN model produced very close results to the RF with a mean accuracy score of 79.643\% and 82.585\% respectively. The ELM approach achieved comparable results to the NN. Sensitivity wise, the boosting methods LightGBM and XGBoost achieved the highest score out of the whole bunch as a result of 85.167\%. RF achieved the highest overall accuracy and AUROC score of 82.582\% and 0.8258 respectively. Concerning the sensitivity score, the least performing model was the GNB achieving an abysmal result of 24.72\%. The SVM model performed quite mediocre, achieving an overall AUROC and accuracy of 0.76724 and 75.204\% respectively.\\
+\begin{multicols}{2}
 
-\raggedright
+The design was implemented in a Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using
+Xilinx Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock
+was synthesized.
 
-Theil-Sen ranked with the set of lower performing models, achieving an overall AUROC of 0.683, with an even more inferior sensitivity score of 60.82\%. Similarly, LDA produced close AUROC results with an improved sensitivity value, still below average. Both the LogReg and LR models achieved better performance than the latter. Since LR managed a specificity value of only 59.13\%, this implies that 40.87\% samples were classified incorrectly. The K-Means clustering algorithm achieved the worst results. This technique is highly sensitive to data scaling and the range of values, which could explain the poor performance. Moreover, this algorithm also assumes that all features present are continuous, and even if transforming these variables to dummy-variables, this could negatively affect its performance.
-%\begin{center}
-%  \includegraphics[width=0.35\linewidth]{deep}
-%\end{center}
+Considering only convolution operation processing, i.e. not taking into account
+the time needed to load the image into memory, one pixel per clock cycle ($100$ Mhz) is
+obtained per instantiated MAC unit. Thus, throughput increases linearly with
+parallelism degree. Table \ref{conv_tp} shows throughput obtained for
+different parallelism degrees.
+The architecture was synthesized for different degrees of parallelism.
+Table~\ref{res_table} shows module and microprocessor complexity
+on the FPGA with and without DSP respectively, measured by resource utilization. As a result, a linear increase is
+shown according to parallelism. Due to implemented FPGA limitations a
+parallelism up to 8 was achieved using DSP and up to 24 without DSP but with a
+more intensive LUT usage.
+
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Parallelism}  &    \textbf{Processing Speed [Mp/s]}  \\ \hline
+        2             &                     200              \\ \hline
+        4             &                     400              \\ \hline
+        8             &                     800              \\ \hline
+\end{tabular}           
+\captionof{table}{Throughput achieved in convolution processing.}
+\label{conv_tp}
+\end{center}
+
+\end{multicols}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  & \multicolumn{3}{c|}{\textbf{With DSP [N](\%)}} & \multicolumn{3}{c|}{\textbf{Without DSP [N](\%)}} \\ \hline
+  \textbf{P}  & \textbf{DSP}            & \textbf{LUT}        & \textbf{BRAM}       & \textbf{DSP}         & \textbf{LUT}           & \textbf{BRAM}         \\ \hline
+  2  & 20(22)         & 1845(9)    & 10(20)     & ---         & 3168(15)      & 10(20)         \\ \hline
+  4  & 40(44)         & 2022(10)   & 11(22)     & ---         & 4627(22)      & 11(22)         \\ \hline
+  6  & 60(67)         & 2175(10)   & 12(24)     & ---         & 6063(29)      & 12(24)         \\ \hline
+  8  & 80(89)         & 2448(12)   & 13(26)     & ---         & 7756(37)      & 13(26)         \\ \hline
+  10 & ---            & ---        & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
+  12 & ---            & ---        & ---        & ---         & 10917(52)     & 15(30)         \\ \hline
+  24 & ---            & ---        & ---        & ---         & 20209(97)     & 21(42)         \\ \hline
+\end{tabular}           
+\captionof{table}{Resource utilization table with and without DSP.}
+\label{res_table}
+\end{center}
 }
 	
 \headerbox{5. Conclusions}{name=conclusion,column=1,below=sea,span=2,above=bottom}{
