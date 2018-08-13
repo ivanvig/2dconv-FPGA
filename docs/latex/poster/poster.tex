@@ -103,21 +103,19 @@ to reduce the usage of  FPGA resources.
 \vfill\null
 \columnbreak
 The pre-processing consists of capturing the image and applying
-the transformation using a Python script. In addition, the script divides the
+a transformation using a Python script. In addition, the script divides the
 image into batches and sends them through the UART port to the FPGA.  In the FPGA a microprocessor receives the
 information and transfers it to the convolution module using a 32 bits general
 purpose input-output (GPIO) port. 
-he second stage is the processing. The batch is convolved with the kernel inside
-the module, which is established by the user through the GPIO.
 The \textbf{control unit} is the one in charge of handling the communication with
 the processor and the \textbf{multiplier-accumulator (MAC) unit} executes the sum
 of the products of the kernel's coefficients with the pixels. The \textbf{address generation unit (AGU)}
 manages the memory addresses along with
-\end{multicols}
 the \textbf{memory management unit (MMU)}, that decides how the values in memory
-are read and written.
-The last module is the \textbf{storage} one, which is
-implemented with a set of columns of the FPGA's block RAM. 
+are read and
+written. The last module is the \textbf{storage} one, which
+\end{multicols}
+is implemented with a set of columns of the FPGA's block RAM. 
 
 When the operation ends, a notification is sent to the microprocessor,
 which gives the order to recover the processed batch from the module and sends it
@@ -138,14 +136,12 @@ that adding a new MAC unit only adds one new memory column.
 In order to reduce data transmission, repeated
 information is kept in memory and only the missing part of 
 the incoming batch is transmitted.
-Given $N$ MAC units and a 
-$k\times k$ kernel, a $N+k-1$
-batch width is necessary, but the processed batch has a width of $N$ columns, i.e.
-one for each MAC unit. So, the last $k-1$ memory columns are not overwritten and
-maintain the input data. This $k-1$ columns are reused as the first columns
-of the next batch, thus the transmitted batch width is reduced to $N$, with the exception of
-the first batch that maintains a width of $N+k-1$.
-
+\vfill\null
+\columnbreak
+\hfill \break
+\includegraphics[width=\linewidth]{muxes}
+\end{multicols}
+\vspace{-0.43cm}
 Reusing memory columns written by the previous batch results in
 a circular shift by $N$ places, shifting memory columns possition associated with each
 MAC unit, in each iteration.
@@ -155,14 +151,19 @@ between the memory columns and the
 MAC unit's inputs must exist, where the period $It$ is the number of
 iterations necessary to get to the original memory columns - MAC units
 inputs relation, i.e. when $It(k-1)$ is a multiple of $N+k-1$. 
+
+\begin{multicols}{2}
+\hfill \break
+\includegraphics[width=\linewidth]{datas_mems}
 \vfill\null
 \columnbreak
 \hfill \break
-\includegraphics[width=\linewidth]{muxes}
 \hfill \break
-\includegraphics[width=\linewidth]{datas_mems}
+Figure on the left, shows the amount of memory required as a function of the
+parallelism degree whereas figure on the right shows the amount of transferred
+bytes (considering that every transmitted byte is stored in only one memory
+register) for processing a $1600\times1024$ image and a $3\times3$ kernel.
 \end{multicols}
-\vspace{-0.43cm}
 }
 
 \headerbox{4. Implementation and Results}{name=sea,span=1,column=0,below=introduction}{ % To reduce this block to 1 column width, remove 'span=2'
@@ -214,9 +215,13 @@ more intensive LUT usage.
 \captionof{table}{Resource utilization table with and without DSP.}
 \label{res_table}
 \end{center}
+
+\includegraphics[width=\linewidth]{emboss_c2}
+\hfill\break
+\hfill\break
 }
 	
-\headerbox{5. Conclusions}{name=conclusion,column=0,below=sea,span=1,above=bottom}{
+\headerbox{5. Conclusions}{name=conclusion,column=1,below=screen,span=2,above=bottom}{
 Using FPGA we are able to process the filtering at the same time as reading the
 current image batch. In this paper, we have presented the implementation of
 two-dimensional convolution on a Xilinx Artix 7 FPGA platform based on resource
@@ -225,30 +230,9 @@ system taking into account load stage, processing stage, and output stage.
 Moreover, a relation between instantiated BRAM blocks and MAC units was
 found in the presented architecture, which allows our system to work with different
 parallelism degrees.
-
 In addition, we optimized the use of memory resources implementing an algorithm
 for memory operations and module synchronization. Performances and results show that resources utilization
-concerning BRAM resources increase linearly, as desired.
-
-High throughput was achieved in what processing is concerned. On the other hand,
-the limiting factor that impacted the implemented system the most was UART speed
-transmission. Another limiting factor was the DSP48A1 slices. Both factors
-are easily solved by using an FPGA with more slices and
-resources.
-}
-
-\headerbox{6. References}{name=references,column=0,span=1,below=model,above=bottom}{
-
-  % \small % Reduce the font size in this block
-  \renewcommand{\section}[2]{\vskip 0.05em} % Get rid of the default
-  % "References" section title
-  % \nocite{*} % Insert publications even if they are not cited in the poster
-
-  \bibliographystyle{unsrt}
-  {\scriptsize
-    \bibliography{poster} % Use sample.bib as the bibliography file
-  }
-}
+concerning BRAM resources increase linearly, as desired. High throughput was achieved in what processing is concerned.}
 
 \end{poster}
 \end{document}
