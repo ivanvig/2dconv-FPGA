@@ -69,11 +69,11 @@ linewidth=2pt % Width of the border lines around content boxes
 
 
   \huge\bf\textsf %Sans Serif  
-  {Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing}
-} % Poster title
+  {Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing}}
+ % Poster title
 % {\vspace{1em} Marta Stepniewska, Pawel Siedlecki\\ % Author names
 % {\small \vspace{0.7em} Department of Bioinformatics, Institute of Biochemistry and Biophysics, PAS, Warsaw, Pawinskiego 5a}} % Author email addresses
-{{\sf\vspace{0.5em}\\
+{\sf\vspace{0.5em}\\
     Martin Casabella,
     Sergio Sulca,
     Ivan Vignolles,
@@ -81,42 +81,10 @@ linewidth=2pt % Width of the border lines around content boxes
     \small{
 
       Department of Research and Development Fundacion Fulgor}\vspace{0.2em}
-}}
+}
 %{\includegraphics[width=0.1\textwidth]{logo}} % University/lab logo
 
-\headerbox{1. Introduction}{name=introduction,column=0,row=0, span=3}{
-\footnotesize{
-%The origin of digital image processing is directly related to the development and evolution of computers. Most
-%image filters that focus, blur, enhance edges and detect edges, among
-%others, use convolution as a mathematical operation. Image processing is a very
-%extensive research area with a large number of applications in multiple fields
-%such as medicine, engineering, navigation, aeronautics, among others.
-%Convolutional neural networks (CNN)~\cite{Lecun-et-al-1998} have received
-%increasing attention in recent years. This technique uses a fast and efficient
-%convolution implementation.
-%
-%The implementation of high-speed image processing systems in field programmable
-%gate array (FPGA) has been a very active field. This is mainly due to the
-%ability to take advantage of bit level parallelism, pixel level, neighborhood
-%level and task level to increase computing performance and speed. %In addition, FPGAs are
-%reconfigurable, allowing the flexibility that is often desired in neural
-%networks. This combination of parallel processing and flexibility at very high
-%speed, is what makes FPGAs a platform of choice for the development of these
-%areas~\cite{papercnn}.
-
-%There are many examples in the literature of two-dimensional (2D) convolution
-%implementations, where most of the work focuses on high performance, resource
-%reduction and FPGA area efficiency. As shown in~\cite{paper3}, block random access
-%memory (BRAM) is one of the most used elements with the highest energy
-%consumption. Therefore, the architectures seek to reduce the use of BRAMs by
-%dividing them into two groups that consider either total storage or partial storage of the
-%image. The first of them increases processing by applying parallelization as
-%well as reusing resources to reduce complexity~\cite{paper1,paper5}. On the
-%other hand, architectures with partial storage partition the image into as many
-%parts as convolders are used~\cite{paper2,paper4}. The drawback presented by
-%these schemes is the non-modularization of processing, making it difficult to
-%improve the work rate by increasing parallelism.
-
+\headerbox{1. Introduction}{name=introduction,column=0,row=0, span=1}{
 In this work, we explain the concept of dynamic reuse of BRAM in 2D convolution
 and its complexity concerning implementation for parallel architectures. Moreover, we
 propose a modular architecture, where it is easy to appreciate that when the
@@ -125,52 +93,10 @@ Given its local and two dimensional nature, 2-D Convolution is one of the most u
 Inherent parallelism of the image convolution algorithm can be exploited to increase the performance.
 We focus our study on a more efficient design of 2D convolution technique
 to reduce the usage of  FPGA resources.
-%This paper is organized as follows. Section~\ref{sec:preproc} introduces the
-%image processing algorithm. The archicterure design is
-%presented in section~\ref{sec:architecture}. In
-%section~\ref{sec:implementation}, hardware implementation and experimental
-%results are shown. Finally, conclusions are drawn in
-%section~\ref{sec:conclusion}.
-}}
-
-
-\headerbox{2. Image Processing}{name=model,column=0,below=introduction,span=1}{
-%Python was the programming language utilised for all data and model analysis, and application development purposes. Some third-party libraries used in this experiment were: PyQt5, numpy, pandas, pickle, scikit-learn, xgboost, lightgbm, rgf, elm, keras and tensorflow.\\
-%
-%All data was cleaned accordingly prior evaluation. Furthermore, by using cross-validation techniques, the data was split up into training and testing sets. The training of all models by fitting the training sets (all data split into partitions by cross-validation) was then followed by fitting the testing features to obtain a prediction set. In turn, by utilising these predictions for evaluation, some scoring metrics resulted for comparison.
-%\begin{center}
-%    \includegraphics[width=\linewidth]{cv}
-%\end{center}
-
-%\begin{center}
-%    \includegraphics[width=\linewidth]{kfoldrep}
-%  \end{center}
-% So the images used for processing are grayscale. %because of its implementation simplicity, but the design can be extrapolated
-%to multiple channel images by considering each channel as an independent grayscale image.
-
-The pixels of grayscale images $I(x,y)$ have a dynamic range between
-$[0,255]$ and Kernel values $K(x,y)$ can be negative or positive. This work is
-part of a Deep Learning project where it is usual to operate with a dynamic
-range centered on zero. Therefore, we apply dynamic range expansion
-$(\mathcal{D}[.])$~\cite{dinamic_rango} and maximum norm
-$(\mathcal{M}[.])$~\cite{max_norm} to rearrange
-$\mathcal{D}[I(x,y)]=I^\prime(x,y)$ between $[0,1]$ and
-$\mathcal{M}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$, respectively
-Therefore, replacing in bidimensional convolution formula 
- $$G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],$$ 
-Where $\mathcal{D}^{-1}[.]$ is the dynamic range change between $[0,255]$ in the
-FPGA. Finally, all the processed blocks are reordered by software.
-\begin{center}
-  \includegraphics[width=\linewidth]{wflow3}
-\end{center}
 }
 
-\headerbox{3. Architecture Design}{name=screen,span=2,column=1,below=introduction}{ % To reduce this block to 1 column width, remove 'span=2'
+\headerbox{2. Architecture Design}{name=screen,span=2,column=1}{ % To reduce this block to 1 column width, remove 'span=2'
 
-
-%At every fold during the cross-validation process, each model returns a set of predictions, which the application stores. At the end of all iterations (10 iterations, since the cross-validation method implemented, is tuned to partition the data in 10 folds), the mean for every performance metric and each executed algorithm was calculated.
-
-%\hspace{0pt}\includegraphics[width=\linewidth]{r2}
 
 \begin{multicols}{2}
     \includegraphics[width=\linewidth]{general}
@@ -186,8 +112,8 @@ the module, which is established by the user through the GPIO.
 The \textbf{control unit} is the one in charge of handling the communication with
 the processor and the \textbf{multiplier-accumulator (MAC) unit} executes the sum
 of the products of the kernel's coefficients with the pixels. The \textbf{address generation unit (AGU)}
-\end{multicols}
 manages the memory addresses along with
+\end{multicols}
 the \textbf{memory management unit (MMU)}, that decides how the values in memory
 are read and written.
 The last module is the \textbf{storage} one, which is
@@ -197,11 +123,49 @@ When the operation ends, a notification is sent to the microprocessor,
 which gives the order to recover the processed batch from the module and sends it
 to the central processing unit (CPU). Finally, the post-processing stage combines
 the batches on the CPU using a Python script.
-}
-
-\headerbox{4. Implementation and Results}{name=sea,span=2,column=1,below=screen}{ % To reduce this block to 1 column width, remove 'span=2'
 
 \begin{multicols}{2}
+To produce one processed column in a MAC unit, $k$ columns are needed as input,
+thus $2 \times k$ columns are needed for two MAC units. 
+However, given the nature of convolution operation, to obtain a contiguous
+column it is necessary to shift the input columns by one. Hence, there is an
+overlap between two MAC units inputs which produce adjacent columns, so information can
+be shared.
+Consequently, despite $k$ input columns are still needed per MAC unit, only $k+1$
+different input columns are needed for given two units. 
+Therefore, for $N$ MAC units, the number of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
+that adding a new MAC unit only adds one new memory column.
+In order to reduce data transmission, repeated
+information is kept in memory and only the missing part of 
+the incoming batch is transmitted.
+Given $N$ MAC units and a 
+$k\times k$ kernel, a $N+k-1$
+batch width is necessary, but the processed batch has a width of $N$ columns, i.e.
+one for each MAC unit. So, the last $k-1$ memory columns are not overwritten and
+maintain the input data. This $k-1$ columns are reused as the first columns
+of the next batch, thus the transmitted batch width is reduced to $N$, with the exception of
+the first batch that maintains a width of $N+k-1$.
+
+Reusing memory columns written by the previous batch results in
+a circular shift by $N$ places, shifting memory columns possition associated with each
+MAC unit, in each iteration.
+From the above it
+follows that a periodicity in the relation
+between the memory columns and the
+MAC unit's inputs must exist, where the period $It$ is the number of
+iterations necessary to get to the original memory columns - MAC units
+inputs relation, i.e. when $It(k-1)$ is a multiple of $N+k-1$. 
+\vfill\null
+\columnbreak
+\hfill \break
+\includegraphics[width=\linewidth]{muxes}
+\hfill \break
+\includegraphics[width=\linewidth]{datas_mems}
+\end{multicols}
+\vspace{-0.43cm}
+}
+
+\headerbox{4. Implementation and Results}{name=sea,span=1,column=0,below=introduction}{ % To reduce this block to 1 column width, remove 'span=2'
 
 The design was implemented in a Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using
 Xilinx Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock
@@ -232,39 +196,27 @@ more intensive LUT usage.
 \label{conv_tp}
 \end{center}
 
-\end{multicols}
+
 \begin{center}
-\begin{tabular}{|c|c|c|c|c|c|c|}
+  \scalebox{0.7}{
+\begin{tabular}{|c|c|c|c|c|c|}
   \hline
-  & \multicolumn{3}{c|}{\textbf{With DSP [N](\%)}} & \multicolumn{3}{c|}{\textbf{Without DSP [N](\%)}} \\ \hline
-  \textbf{P}  & \textbf{DSP}            & \textbf{LUT}        & \textbf{BRAM}       & \textbf{DSP}         & \textbf{LUT}           & \textbf{BRAM}         \\ \hline
-  2  & 20(22)         & 1845(9)    & 10(20)     & ---         & 3168(15)      & 10(20)         \\ \hline
-  4  & 40(44)         & 2022(10)   & 11(22)     & ---         & 4627(22)      & 11(22)         \\ \hline
-  6  & 60(67)         & 2175(10)   & 12(24)     & ---         & 6063(29)      & 12(24)         \\ \hline
-  8  & 80(89)         & 2448(12)   & 13(26)     & ---         & 7756(37)      & 13(26)         \\ \hline
-  10 & ---            & ---        & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
-  12 & ---            & ---        & ---        & ---         & 10917(52)     & 15(30)         \\ \hline
-  24 & ---            & ---        & ---        & ---         & 20209(97)     & 21(42)         \\ \hline
-\end{tabular}           
+  & \multicolumn{3}{c|}{\textbf{With DSP [N](\%)}} & \multicolumn{2}{c|}{\textbf{Without DSP [N](\%)}} \\ \hline
+  \textbf{P}  & \textbf{DSP}            & \textbf{LUT}        & \textbf{BRAM}         & \textbf{LUT}           & \textbf{BRAM}         \\ \hline
+  2  & 20(22)         & 1845(9)    & 10(20)      & 3168(15)      & 10(20)         \\ \hline
+  4  & 40(44)         & 2022(10)   & 11(22)      & 4627(22)      & 11(22)         \\ \hline
+  6  & 60(67)         & 2175(10)   & 12(24)      & 6063(29)      & 12(24)         \\ \hline
+  8  & 80(89)         & 2448(12)   & 13(26)      & 7756(37)      & 13(26)         \\ \hline
+  10 & ---            & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
+  12 & ---            & ---        & ---         & 10917(52)     & 15(30)         \\ \hline
+  24 & ---            & ---        & ---         & 20209(97)     & 21(42)         \\ \hline
+\end{tabular}}           
 \captionof{table}{Resource utilization table with and without DSP.}
 \label{res_table}
 \end{center}
 }
 	
-\headerbox{5. Conclusions}{name=conclusion,column=1,below=sea,span=2,above=bottom}{
-\footnotesize{
-% DeCAF is a chemoinformatical tool that can be helpful in ligand-based drug design.
-% It provides a comprehensive molecule description and a fast algorithms for comparing and aligning multiple ligands.
-%This research proves that Random Forests and the boosting methods LightGBM and XGBoost are amongst of the most highly effective techniques to predict and classify players as either exhibiting problematic behaviour characteristics or not.
-
-%\begin{boenumerate}\compresslist
-%    \item All three algorithms achieved over 80\% accuracy across all of the performance metrics calculated.
-%    \item These three approaches achieved the top three execution times.
-%    \item These three methods were the most consistent out of all the evaluated techniques.
-%\end{boenumerate}
-
-% It can be also used in other [procedures], such as database screening or drug repositioning.
-% DeCAF is written in Python and freely available at \textbf{\color{darkgreen}http://bitbucket.org/marta-sd/decaf}. 
+\headerbox{5. Conclusions}{name=conclusion,column=0,below=sea,span=1,above=bottom}{
 Using FPGA we are able to process the filtering at the same time as reading the
 current image batch. In this paper, we have presented the implementation of
 two-dimensional convolution on a Xilinx Artix 7 FPGA platform based on resource
@@ -283,7 +235,7 @@ the limiting factor that impacted the implemented system the most was UART speed
 transmission. Another limiting factor was the DSP48A1 slices. Both factors
 are easily solved by using an FPGA with more slices and
 resources.
-}}
+}
 
 \headerbox{6. References}{name=references,column=0,span=1,below=model,above=bottom}{
 
