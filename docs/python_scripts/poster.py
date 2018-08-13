@@ -24,9 +24,9 @@ def all_mem_trasnmission():
         x2.append((i+2.0))
 
     #fig = plt.figure(figsize=(8.5, 8.5))
-    fig = plt.figure(figsize=(21, 8.5))
+    fig = plt.figure(figsize=(21, 21))
     
-    ax1 = plt.subplot(121)
+    ax1 = plt.subplot(211)
     #ax1.set_aspect(1)
     plt.xticks(vec2)
 
@@ -49,7 +49,7 @@ def all_mem_trasnmission():
     plt.xlim((1.8,10.2))
     plt.ylim((min(x2)-0.4,max(x1)+0.4))
     plt.grid(True,linestyle='--')
-    plt.legend(fontsize=16,loc=2)
+    plt.legend(fontsize=20,loc=2)
 
     #plt.savefig('./mem_space2.eps',bbox_inches = 'tight')
     #plt.savefig('./mem_space2.pdf',bbox_inches = 'tight')
@@ -82,7 +82,7 @@ def all_mem_trasnmission():
     #fig = plt.figure(figsize=(8.5, 8.5))
 
     plt.xticks(vec2)
-    ax2 = plt.subplot(122)
+    ax2 = plt.subplot(212)
     # ax1.plot(vec1, y1, color='g', mew= 2, linestyle='--')
     # ax1.plot(vec1, y2, color='r', mew=0.01, linestyle='--')
     # ax1.plot(vec1, y3, color='b', mew=0.01, linestyle='--')
@@ -104,7 +104,7 @@ def all_mem_trasnmission():
     plt.xlim((1.8,10.2))
     plt.ylim((1500,5000))
     plt.grid(True,linestyle='--')
-    plt.legend(fontsize=16,loc=0)
+    plt.legend(fontsize=20,loc=0)
 
     #plt.savefig('./data_sent.eps',bbox_inches = 'tight')
     plt.savefig('./datas_mems.pdf',bbox_inches = 'tight')
@@ -114,3 +114,6 @@ def all_mem_trasnmission():
 
 
 all_mem_trasnmission()
+
+
+# {0.33, 0.41, 0.47} %cadet
