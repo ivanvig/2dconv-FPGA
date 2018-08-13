@@ -24,7 +24,7 @@ def all_mem_trasnmission():
         x2.append((i+2.0))
 
     #fig = plt.figure(figsize=(8.5, 8.5))
-    fig = plt.figure(figsize=(17, 8.5))
+    fig = plt.figure(figsize=(21, 8.5))
     
     ax1 = plt.subplot(121)
     #ax1.set_aspect(1)
