@@ -9,8 +9,8 @@
 \setlength{\multicolsep}{0mm} % No horizontal rule between columns
 
 \usepackage[font=small,labelfont=bf]{caption}
+\renewcommand{\figurename}{Fig.}
 
-\usepackage{wrapfig}
 \usepackage{lmodern}
 
 \usepackage[utf8]{inputenc} %unicode support
@@ -97,76 +97,75 @@ to reduce the usage of  FPGA resources.
 
 \headerbox{2. Architecture Design}{name=screen,span=2,column=1}{ % To reduce this block to 1 column width, remove 'span=2'
 
+The pre-processing consists of applying
+a transformation to the image. Then the script divides the
+image into batches and sends them through the UART port to the FPGA. In the FPGA a microprocessor receives the
+information and transfers it to the convolution module using a 32 bits GPIO port. 
+\begin{multicols}{2}
+  \begin{center}
+  \hfill\break
+  \includegraphics[width=\linewidth]{general}
+  \captionof{figure}{Simplified block diagram of the convolution module implemented in FPGA.}
+  \label{general}
+  \end{center}
+  \vfill\null
+  \columnbreak
+  The module is composed of the following units:
+  \begin{description}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}
+  \item[Control Unit] is the one in charge of handling the communication with
+    the processor
+  \item[Multiplier-Accumulator (MAC) Unit] executes the sum of the products of the kernel's coefficients with the pixels.
+  \item[Address Generation Unit (AGU)] manages the memory addresses
+  \item[Memory Management Unit (MMU)] decides how the values in memory are read and written.
+  \item[Storage] is implemented with a set of columns of the FPGA's block RAM. 
+  \end{description}
+  When the operation ends, a notification is sent to the microprocessor, which
+  gives the order to recover the processed batch from the module and sends it to
+  the central processing unit (CPU). \end{multicols} Finally, the
+post-processing stage combines the batches on the CPU.
 
 \begin{multicols}{2}
-    \includegraphics[width=\linewidth]{general}
-\vfill\null
-\columnbreak
-The pre-processing consists of capturing the image and applying
-a transformation using a Python script. In addition, the script divides the
-image into batches and sends them through the UART port to the FPGA.  In the FPGA a microprocessor receives the
-information and transfers it to the convolution module using a 32 bits general
-purpose input-output (GPIO) port. 
-The \textbf{control unit} is the one in charge of handling the communication with
-the processor and the \textbf{multiplier-accumulator (MAC) unit} executes the sum
-of the products of the kernel's coefficients with the pixels. The \textbf{address generation unit (AGU)}
-manages the memory addresses along with
-the \textbf{memory management unit (MMU)}, that decides how the values in memory
-are read and
-written. The last module is the \textbf{storage} one, which
-\end{multicols}
-is implemented with a set of columns of the FPGA's block RAM. 
+  Given the nature of convolution operation there is an
+  overlap between two MAC units inputs which produce adjacent columns. Consequently, despite $k$ input columns are needed per MAC unit, only $k+1$
+  different input columns are needed for given two units. 
+  Therefore, for $N$ MAC units, the number of required memory columns is reduced from $N \times k$ to $N+k-1$ 
+  \setcounter{figure}{2}
+  \begin{center}
+  \hfill \break
+  \includegraphics[width=\linewidth]{datas_mems}
+  \captionof{figure}{Resources saving reusing data in memory for processing a
+    $1600\times1024$ image and a $3\times3$ kernel.\\ Top - Amount of memory
+    required. Bottom - Amount of transferred bytes}
+  \label{dflow}
+  \end{center}
+  \vfill\null
+  \columnbreak
 
-When the operation ends, a notification is sent to the microprocessor,
-which gives the order to recover the processed batch from the module and sends it
-to the central processing unit (CPU). Finally, the post-processing stage combines
-the batches on the CPU using a Python script.
-
-\begin{multicols}{2}
-To produce one processed column in a MAC unit, $k$ columns are needed as input,
-thus $2 \times k$ columns are needed for two MAC units. 
-However, given the nature of convolution operation, to obtain a contiguous
-column it is necessary to shift the input columns by one. Hence, there is an
-overlap between two MAC units inputs which produce adjacent columns, so information can
-be shared.
-Consequently, despite $k$ input columns are still needed per MAC unit, only $k+1$
-different input columns are needed for given two units. 
-Therefore, for $N$ MAC units, the number of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
-that adding a new MAC unit only adds one new memory column.
-In order to reduce data transmission, repeated
-information is kept in memory and only the missing part of 
-the incoming batch is transmitted.
-\vfill\null
-\columnbreak
-\hfill \break
-\includegraphics[width=\linewidth]{muxes}
-\end{multicols}
-\vspace{-0.43cm}
-Reusing memory columns written by the previous batch results in
-a circular shift by $N$ places, shifting memory columns possition associated with each
-MAC unit, in each iteration.
-From the above it
-follows that a periodicity in the relation
-between the memory columns and the
-MAC unit's inputs must exist, where the period $It$ is the number of
-iterations necessary to get to the original memory columns - MAC units
-inputs relation, i.e. when $It(k-1)$ is a multiple of $N+k-1$. 
-
-\begin{multicols}{2}
-\hfill \break
-\includegraphics[width=\linewidth]{datas_mems}
-\vfill\null
-\columnbreak
-\hfill \break
-\hfill \break
-Figure on the left, shows the amount of memory required as a function of the
-parallelism degree whereas figure on the right shows the amount of transferred
-bytes (considering that every transmitted byte is stored in only one memory
-register) for processing a $1600\times1024$ image and a $3\times3$ kernel.
+  \setcounter{figure}{1}
+  \begin{center}
+  \hfill \break
+  \includegraphics[width=\linewidth]{muxes}
+  \captionof{figure}{The data flow between the MACs and the
+  storage.}
+  \label{dflow}
+  \end{center}
+  In order to reduce data transmission, repeated
+  information is kept in memory and only the missing part of 
+  the incoming batch is transmitted. This results in
+  a circular shift by $N$ places, shifting memory columns possition associated with each
+  MAC unit, in each iteration.
+  The MMU has a set of multiplexers to route
+  the incoming and outgoing data. The data multiplexer is
+  conformed by two set of blocks: \textbf{memory multiplexer blocks (MMB)} and \textbf{processing multiplexer blocks (PMB)}. The MMB routes the
+  raw data and the data from the MACs to a memory, whereas the PMB routes the data
+  from the memories to a MAC.
 \end{multicols}
 }
 
-\headerbox{4. Implementation and Results}{name=sea,span=1,column=0,below=introduction}{ % To reduce this block to 1 column width, remove 'span=2'
+\headerbox{3. Implementation and Results}{name=sea,span=1,column=0,below=introduction}{ % To reduce this block to 1 column width, remove 'span=2'
 
 The design was implemented in a Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using
 Xilinx Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock
@@ -199,7 +198,7 @@ more intensive LUT usage.
 
 
 \begin{center}
-  \scalebox{0.7}{
+  \scalebox{0.75}{
 \begin{tabular}{|c|c|c|c|c|c|}
   \hline
   & \multicolumn{3}{c|}{\textbf{With DSP [N](\%)}} & \multicolumn{2}{c|}{\textbf{Without DSP [N](\%)}} \\ \hline
@@ -216,15 +215,18 @@ more intensive LUT usage.
 \label{res_table}
 \end{center}
 
-\includegraphics[width=\linewidth]{emboss_c2}
-\hfill\break
-\hfill\break
+\setcounter{figure}{3}
+\begin{center}
+  \includegraphics[height=3.45cm,keepaspectratio]{emboss_c2}
+  \captionof{figure}{On the left, an image processed in a CPU using python and on the right the
+  same image processed with the FPGA module.}
+  \label{general}
+\end{center}
 }
 	
-\headerbox{5. Conclusions}{name=conclusion,column=1,below=screen,span=2,above=bottom}{
-Using FPGA we are able to process the filtering at the same time as reading the
-current image batch. In this paper, we have presented the implementation of
-two-dimensional convolution on a Xilinx Artix 7 FPGA platform based on resource
+\headerbox{4. Conclusions}{name=conclusion,column=1,below=screen,span=2,above=bottom}{
+In this paper, we have presented the implementation of
+two-dimensional convolution based on resource
 efficiency and system parallelism. We implemented a whole image processing
 system taking into account load stage, processing stage, and output stage.
 Moreover, a relation between instantiated BRAM blocks and MAC units was
@@ -232,7 +234,9 @@ found in the presented architecture, which allows our system to work with differ
 parallelism degrees.
 In addition, we optimized the use of memory resources implementing an algorithm
 for memory operations and module synchronization. Performances and results show that resources utilization
-concerning BRAM resources increase linearly, as desired. High throughput was achieved in what processing is concerned.}
+concerning BRAM resources increase linearly, as desired. High throughput was
+achieved in what processing is concerned.
+}
 
 \end{poster}
 \end{document}
