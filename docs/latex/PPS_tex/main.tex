@@ -42,12 +42,12 @@
 \clearpage
 \maketitle
 
-\section*{Objetivo}
+\section*{Objetivo} \label{objetivo_sec}
 El objetivo de la Práctica Profesional Supervisada, en adelante PPS, es lograr la inserción laboral del alumno en la realidad profesional del país, en el área que mejor responda a sus aspiraciones profesionales e intereses vocacionales, con el propósito de fortalecer su formación académica y de establecer un vínculo que facilite su ingreso como profesional al mercado de trabajo. 
 Este proyecto consta en el diseño e implementación en una FPGA (Field Programmable Gate Array) de un sistema destinado al procesamiento digital de imágenes vía hardware. 
 Fue desarrollado en la institución Fulgor, bajo la supervisión del Dr.Ing. Ariel Luis Pola.
 
-\section*{Motivación}
+\section*{Motivación}  \label{motiv_sec}
 El filtrado y procesamiento de imágenes es utilizado en múltiples campos, como la medicina, ingeniería, navegación, aeronáutica, entre otros. En el campo de la inteligencia artificial, área emergente que es de mero interés hoy en día, la convolución en 2D es la operación principal que se realiza durante el feed forward de una CNN (Red neuronal Convolucional). 
 Dada su naturaleza, la operación de convolución en 2-D es la más empleada en los algoritmos de procesamiento de imágenes. El paralelismo inherente de algoritmos basados en la convolución es explotado logrando alta performance en estos sistemas que los utilizan.
 El uso de Field Programmable Gate Arrays (FPGAs) para implementar este tipo de sistemas, se debe a la ventaja que presentan estos dispositivos en lo que concierne al paralelismo a nivel bit, pixel, vecindad y a nivel tarea, lo incrementa la performance y velocidad de cómputo.
@@ -55,7 +55,7 @@ Se presenta una arquitectura para la implementación en hardware de la operació
 
 
 
-\section{Introducción al proyecto} \label{intro}
+\section{Introducción al proyecto} \label{intro_secc}
 \subsection{Representación en punto fijo y cambio de rango dinámico }\label{fixedpoint}
 La convolucion bidimensional, se define matemáticamente como:
 \begin{equation}\label{conv-org}
@@ -100,7 +100,7 @@ siendo $\mathcal{D}^{-1}[.]$ el cambio de rango dinamico entre $[0,255]$ en la F
 \label{transformation}
 \end{figure}
 
-\subsection{Flujo de diseño}
+\subsection{Flujo de diseño} \label{flujo_subsecc}
 Se estructuró el proyecto y se siguió el siguiente flujo o estructura para llevarlo a cabo en el tiempo disponible\\
 
 \begin{figure}[H]
@@ -123,8 +123,8 @@ Como instancias intermedias se realizaron diferentes tipos de testing: test unit
 \label{design_flow}
 \end{figure}
 
-\section{Arquitectura del sistema}
-\subsection{Flujo de trabajo}
+\section{Arquitectura del sistema}  \label{arquitectura_sec}
+\subsection{Flujo de trabajo}  \label{workflow_subsecc}
 
 Describiremos el diseño confeccionado en detalle. Se tienen tres etapas fundamentales:
 
@@ -152,7 +152,7 @@ Se anexa el diagrama de estados del sistema, para procesar cierta imagen de entr
 \label{statesfig}
 \end{figure}
 
-\subsubsection{Estados y transiciones}
+\subsubsection{Estados y transiciones}  \label{states_subsecc}
 
 La transición entre un estado y otro se realiza mediante instrucciones codificadas en el frame de entrada de 32 bits asentado en el GPIO. El modulo permanece en su estado actual hasta recibir una instrucción valida.
 
@@ -176,7 +176,7 @@ Cuando se finaliza el procesamiento de un lote, se emite una notificación hacia
 \label{statesfig2}
 \end{figure}
 
-\subsection{Arquitectura propuesta}
+\subsection{Arquitectura propuesta}  \label{ourdesign_subsecs}
 
 
 El diseño planteado prioriza la reutilización dinámica de memoria, en donde por cada iteración en la etapa de procesamiento, se aprovecha la disponibilidad de datos cargados en memoria en la iteración anterior. 
@@ -203,13 +203,13 @@ En el diagrama en bloques anexado en la parte superior, se muestran los bloques 
 \label{statesfig2}
 \end{figure}
 
-\subsubsection{Almacenamiento}
+\subsubsection{Almacenamiento}  \label{storage_subsecc}
 Los coeficientes del kernel se almacenan en registros dentro de cada MAC Unit. Para almacenar un lote, el enfoque que se opto fue organizar la BRAM en columnas. Cada columna entonces, corresponde a una columna del lote.
 El tamaño del lote está dado por la altura de la imagen y por el número de columnas de memoria instanciadas.  La máxima altura de la imagen, entonces, debe ser menor o igual a la altura de la memoria instanciada.
 Durante el procesamiento del lote, cada pixel se lee únicamente una vez, lo que permite un uso mas eficiente de la memoria. Los pixeles que ya se utilizaron, se sobrescriben con los pixeles procesados. 
 Esto permite reducir la cantidad de memoria necesaria, ya que reúsa la misma memoria para almacenar el lote de entrada, y el lote procesado.
 
-\subsubsection{Procesamiento de datos}
+\subsubsection{Procesamiento de datos}  \label{processing_subsecc}
 Para un kernel de  $(k \times k)$, cada MAC Unit toma $k$ columnas de memoria adyacentes como entrada.\\
 
 El bloque $MAC$  $Unit$ necesita primero que se carguen k pixeles de cada columna para asi tener $(k \times k)$ pixeles cargados dentro de ella para así producir el primer pixel procesado.\\
@@ -313,7 +313,7 @@ En la figura se muestra como el diseño planteado con el desplazamiento circular
 \bigskip
 \bigskip
 
-\subsubsection{Proceso de escritura en memoria}
+\subsubsection{Proceso de escritura en memoria}  \label{writing_subsecc}
 \smallskip
 Se analiza el caso de tener instanciadas $N=4$, $MACs$ y un kernel con $k=3$ para clarificar la operación del algoritmo descrito.
 El proceso de escritura en memoria, utilizando el desplazamiento circular de columnas mencionado.\\
@@ -346,7 +346,7 @@ manteniéndolos independientes al grado de paralelismo del sistema y al número 
 
 \bigskip
 
-\subsection {MMU (Memory Managment Unit) }
+\subsection {MMU (Memory Managment Unit) }  \label{mmu_subsecc}
 Este bloque, en cada iteración, mantiene un seguimiento de las posiciones de memoria donde el lote entrante debe ser almacenado,
 la información que debe alimentar a cada unidad $MAC$, lLa posición de memoria donde la información procesada debe ser almacenada
 y del orden en el cual la información procesada debe ser devuelta.
@@ -408,7 +408,7 @@ donde el símbolo $ \% $ representa la operación módulo, e $i$ toma valores de
 \end{figure}
 
 
-\section{Implementación y resultados}
+\section{Implementación y resultados}  \label{implementations_sec}
  diseño e implementación
 El diseño fue implementado en una FPGA Xilinx Artix-35T (xc7a35ticsg324-1L) utilizando las herramientas del software
 Xilinx Vivado Design Suite 2017.4. Se trabajó con un clock de referencia de $100$ MHz, y el script para el pre-procesamiento 
@@ -555,6 +555,29 @@ obtenido para los diferentes grados de paralelismo.
           8             &                     800              \\ \hline
 \end{tabular}           
 \end{table}
+
+
+\section{Conclusión}  \label{conclusion_sec}
+
+La flexibilidad y elevada potencia de cálculo de una FPGA permite que se pueda
+procesar y filtrar el lote de imagen, al mismo tiempo que se está cargando el lote
+actual. \\
+
+Se diseñó y presentó una implementación de la operación de convolución bidimensional en una
+plataforma Xilinx Artix 7 FPGA basada en eficiencia en la utilización de recursos y en el paralelismo del sistema.\\
+Se implementaron todas las etapas necesarias, considerando la etapa de carga, procesamiento, y salida. Se
+encontró una relación entre ciertos bloques instanciados, lo que permitió a nuestro sistema trabajar con diferentes
+niveles de paralelismo.\\
+
+Ademas, se optimizó la utilización de recursos de almacenamiento implementando un algoritmo para las
+operaciones con memoria y para la sincronización de módulos.\\
+Esto permitió con una parametrización total del sistema, lo que hace escalable a la arquitectura propuesta.
+El desempeño del sistema y los resultados obtenidos muestran que la utilización de recursos relacionados con
+Block RAMs incrementan de forma lineal, como se buscó.\\
+
+En lo que refiere al procesamiento, se obtuvo un throughput elevado, por ende del factor limitante mencionado relacionado 
+con la velocidad de transmisión del UART.
+
 
 
 
