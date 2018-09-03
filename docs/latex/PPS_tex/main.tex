@@ -1,0 +1,260 @@
+\documentclass[a4paper]{article}
+
+%% Language and font encodings
+\usepackage[english,spanish]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+%% para subrayar, colores, bold, etc
+\usepackage{color,soul}
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[colorinlistoftodos]{todonotes}
+
+
+\begin{document}
+
+\title{%
+\includegraphics[scale = 0.5]{./header_unc.png}\\[1.0 cm]	% University Logo
+  Practica Profesional Supervisada\\
+  \large Ingeniería en Computación FCEFyN - UNC
+  }
+
+
+  \author{ Casabella Martin, 39694763\\
+			Sulca Sergio, xxxxxxxx\\
+			Vignolles Ivan Maximiliano, xxxxxxxx
+}
+\clearpage
+\maketitle
+
+\section*{Objetivo}
+El objetivo de la Práctica Profesional Supervisada, en adelante PPS, es lograr la inserción laboral del alumno en la realidad profesional del país, en el área que mejor responda a sus aspiraciones profesionales e intereses vocacionales, con el propósito de fortalecer su formación académica y de establecer un vínculo que facilite su ingreso como profesional al mercado de trabajo. 
+Este proyecto consta en el diseño e implementación en una FPGA (Field Programmable Gate Array) de un sistema destinado al procesamiento digital de imágenes vía hardware. 
+Fue desarrollado en la institución Fulgor, bajo la supervisión del Dr.Ing. Ariel Luis Pola.
+
+\section*{Motivación}
+El filtrado y procesamiento de imágenes es utilizado en múltiples campos, como la medicina, ingeniería, navegación, aeronáutica, entre otros. En el campo de la inteligencia artificial, área emergente que es de mero interés hoy en día, la convolución en 2D es la operación principal que se realiza durante el feed forward de una CNN (Red neuronal Convolucional). 
+Dada su naturaleza, la operación de convolución en 2-D es la más empleada en los algoritmos de procesamiento de imágenes. El paralelismo inherente de algoritmos basados en la convolución es explotado logrando alta performance en estos sistemas que los utilizan.
+El uso de Field Programmable Gate Arrays (FPGAs) para implementar este tipo de sistemas, se debe a la ventaja que presentan estos dispositivos en lo que concierne al paralelismo a nivel bit, pixel, vecindad y a nivel tarea, lo incrementa la performance y velocidad de cómputo.
+Se presenta una arquitectura para la implementación en hardware de la operación de convolución 2-D priorizando el uso eficiente de recursos junto con la escalabilidad del diseño y velocidad de procesamiento.
+
+
+
+\section{Introducción al proyecto} \label{intro}
+\subsection{Representación en punto fijo y cambio de rango dinámico }\label{fixedpoint}
+La convolucion bidimensional, se define matemáticamente como:
+\begin{equation}\label{conv-org}
+  G(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K(i,j)I(x-i,y-j)
+\end{equation}
+Donde $I(x,y)$ es una imagen de $(m \times n)$ pixels, $K(i,j)$ un conjunto de coeficientes denominado kernel, de tamaño
+$(k \times k)$ and $G(x,y)$ es la convolucion resultante de tamaño  $(m-2 \times n-2)$ .\\
+
+\underline{\textbf{Representación en punto fijo:}}
+
+La representación en punto flotante, almacena los números en términos de la mantisa y del exponente. El hardware que soporta el formato punto flotante, luego de ejecutar cada computo, 
+automáticamente escala la mantisa y actualiza el exponente para que el resultado se corresponda con el número de bits de forma definida. Todas estas operaciones hacen que el hardware que soporte punto flotante,
+sea más costoso en términos de área y potencia. Emerge una alternativa: la representación en punto fijo.
+Este formato se emplea para almacenar y manipular datos, con cierto número de bits fijos. Esto implica que luego del cómputo, no se sigue la posición del punto decimal, y
+se le delega esta responsabilidad al diseñador del hardware. El punto decimal, valga la redundancia, es fijo para cada variable, y es predefinido.
+Fijando el punto, una variable se limita a tomar un rango fijo de valores.
+Pese a que este límite nos brinda ventajas en lo que refiere a utilización de recursos, si el resultado del cómputo cae fuera del rango, se produce un overflow. Existen varias
+formas de manipular los overflows que emergen como resultado de un cómputo en punto fijo (redondeo, saturación, truncamiento) y sigue siendo responsabilidad del diseñador optar por
+la representación adecuada según el sistema que pretende llevar a cabo.
+
+FALTA:    QUE REPRESENTACION USAMOS Y  PORQUE (GRAFICOS). NO LO PUSE PORQUE NO SE CON CUAL NOS QUEDAMOS AL FINAL
+
+\subsection{Expansión dinámica de rango y Maximun Norm}\label{dynamicrange}
+Los pixeles de la imagen en escala de grises $I(x,y)$ tienen un rango dinámico de valores que se hallan entre $[0,255]$,
+y los valores que toma el kernel $K(x,y)$ pueden ser positivos o negativos.\\
+Dado que el sistema desarrollado forma parte de un proyecto de Deep Learning, donde es usual operar en un rango dinámico centrado en cero, se aplicó una transformación denominada  expansión dinámica de rango ( $\mathcal{D}[.])$ ),
+junto con Maximun Norm ($(\mathcal{M}[.])$) para reacomodar los diferentes rangos de valores.
+
+Para el caso de la imagen, se tiene $\mathcal{D}[I(x,y)]=I^\prime(x,y)$ y un rango resultante de $[0,1]$.
+Para el caso del kernel, $\mathcal{M}[K(x,y)]=K^\prime(x,y)$ con un rango $[-1,1]$, respectivamente.
+Asi, reemplazando en ~\eqref{conv-org}, se tiene 
+
+\begin{equation}\label{conv-org1}
+  G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],
+\end{equation}\\
+siendo $\mathcal{D}^{-1}[.]$ el cambio de rango dinamico entre $[0,255]$ en la FPGA.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.47]{wflow3}
+\caption{Transformaciones del rango dinámico durante el procesamiento de la imagen.}
+\label{transformation}
+\end{figure}
+
+\subsection{Flujo de diseño}
+Se estructuró el proyecto y se siguió el siguiente flujo o estructura para llevarlo a cabo en el tiempo disponible\\
+
+\begin{figure}[H]
+\centering
+\includegraphics{flujo_de_dis.png}
+\caption{Esquemático del flujo de diseño seguido.}
+\label{design_flow}
+\end{figure}
+
+En primera instancia se partió de las especificaciones, simulando el comportamiento en punto flotante mediante el lenguaje de alto nivel Python. Luego, se analizaron los resultados obtenidos tras implementar el sistema en punto fijo, a nivel software. 
+Fijados los requerimientos se comenzó con la programación del hardware, previamente habiendo estudiado y modelado la arquitectura del sistema, la cual se detallará posteriormente. \\\\
+
+
+Como instancias intermedias se realizaron diferentes tipos de testing: test unitarios de cada módulo (test bench del módulo), test de integración (varios módulos y su interacción) y finalmente test de sistema, donde se probó el funcionamiento del sistema completo dada cierta imagen de entrada.
+
+\begin{figure}[H]
+\centering
+\includegraphics{general_sch.png}
+\caption{Diagrama general del sistema: comunicación y lenguajes empleados.}
+\label{design_flow}
+\end{figure}
+
+\section{Arquitectura del sistema}
+\subsection{Flujo de trabajo}
+
+Describiremos el diseño confeccionado en detalle. Se tienen tres etapas fundamentales:
+
+
+\begin{frame}{}
+
+    
+      \begin{itemize}
+        \item \textbf{Pre-procesamiento:} consiste en capturar la imagen aplicando las transformaciones mencionadas en la sección \ref{fixedpoint}, empleando un script hecho en Python. Este script divide la imagen en lotes o batches y los envía a la FPGA, a través del puerto UART. Un batch o lote, consiste en columnas contiguas de pixeles cuya dimensión se explica en la sección x.
+%%Poner seccion aca
+        \item \textbf{Procesamiento:}	: el batch es convolucionado con el kernel dentro del módulo. Dicho kernel es configurable, y el usuario puede cargar los coeficientes del mismo mediante el GPIO. 
+Cuando la operación de la convolucion finaliza, una notificación es enviada al microprocesador, que da la orden de recuperar el batch procesado, para así enviarlo a la unidad central de procesamiento (CPU).
+       \item \textbf{Post-procesamiento:}Como etapa final, en el post-procesamiento se combinan los batches o lotes en CPU usando el script de Python.
+      \end{itemize}
+     
+\end{frame}
+
+
+Se anexa el diagrama de estados del sistema, para procesar cierta imagen de entrada dada:\\
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{states.pdf}
+\caption{Diagrama de estados del sistema.}
+\label{statesfig}
+\end{figure}
+
+\subsubsection{Estados y transiciones}
+
+La transición entre un estado y otro se realiza mediante instrucciones codificadas en el frame de entrada de 32 bits asentado en el GPIO. El modulo permanece en su estado actual hasta recibir una instrucción valida.
+
+Inicialmente, debe situarse al sistema en un estado de reset, y por ende debe recibir dicha señal de reset para establecerse en dicho estado, esperando a ser configurado.
+Luego de recibir la correspondiente instrucción, se produce una transición hacia el estado KernelLoad, en donde los coeficientes del kernel se cargan al módulo.
+El siguiente estado (SizeLoad), es en el cual se carga el tamaño de la imagen, más precisamente la altura de la misma o el número de filas de las BRAM a ser instanciadas.
+Estos tres estados mencionados, solo se ejecutan una vez durante todo el ciclo de trabajo. El proceso se repite por cada nueva imagen, por ende, si se desea procesar una nueva imagen, inicia el ciclo nuevamente.\\
+
+
+Arrancando con el procesamiento de los lotes, primero la transición es hacia el estado ImageLoad, donde se almacena el lote en la Block RAM de la FPGA. 
+Teniendo el lote almacenado, la transición luego es hacia el estado run donde se hace el procesamiento en si, y mientras el sistema se situe en este estado, no puede ser interrumpido. \\
+
+
+Como consecuencia, cualquier instrucción recibida se ignora hasta que se complete esta etapa de procesamiento de lote.
+Cuando se finaliza el procesamiento de un lote, se emite una notificación hacia el pin EoP (End Of Process) de la unidad de control (Control Unit), y el sistema espera a la última transición hacia el estado Out. Ni bien recibe la correspondiente instrucción codificada, se devuelve el lote procesado al microprocesador de la PC.
+
+\begin{figure}[H]
+\centering
+\includegraphics{states_2.png}
+\caption{Diferentes estados y las etapas involucradas }
+\label{statesfig2}
+\end{figure}
+
+\subsection{Arquitectura propuesta}
+
+
+El diseño planteado prioriza la reutilización dinámica de memoria, en donde por cada iteración en la etapa de procesamiento, se aprovecha la disponibilidad de datos cargados en memoria en la iteración anterior. 
+En el diagrama en bloques anexado en la parte superior, se muestran los bloques principales que conforman el diseño:
+
+\begin{frame}{}
+
+    
+      \begin{itemize}
+        \item \textbf{Control Unit:} se encarga del manejo de la comunicación entre el procesador
+         \item \textbf{MAC Unit -Multiplier-ACcumulator:} ejecuta la suma de los productos entre los coeficientes del kernel y los pixeles de la imagen. 
+        \item \textbf{Address Generation Unit (AGU):} modulo que maneja las direcciones de memoria que deben ser leídas o escritas
+       \item \textbf{Storage:} hace referencia a un conjunto de columnas almacenadas en block RAMs de la FPGA. El tamaño se explicara posteriormente con detalle, ya que depende de la cantidad de MACs instanciadas, o en otras palabras, el paralelismo a nivel de cantidad de convoluciones en paralelo, que se desee en el sistema.
+
+      \end{itemize}
+     
+\end{frame}
+	
+
+\begin{figure}[H]
+\centering
+\includegraphics{general_architecture}
+\caption{Arquitectura general del sistema }
+\label{statesfig2}
+\end{figure}
+
+\subsubsection{Almacenamiento}
+Los coeficientes del kernel se almacenan en registros dentro de cada MAC Unit. Para almacenar un lote, el enfoque que se opto fue organizar la BRAM en columnas. Cada columna entonces, corresponde a una columna del lote.
+El tamaño del lote está dado por la altura de la imagen y por el número de columnas de memoria instanciadas.  La máxima altura de la imagen, entonces, debe ser menor o igual a la altura de la memoria instanciada.
+Durante el procesamiento del lote, cada pixel se lee únicamente una vez, lo que permite un uso mas eficiente de la memoria. Los pixeles que ya se utilizaron, se sobrescriben con los pixeles procesados. 
+Esto permite reducir la cantidad de memoria necesaria, ya que reúsa la misma memoria para almacenar el lote de entrada, y el lote procesado.
+
+\subsubsection{Procesamiento de datos}
+Para un kernel de  $(k \times k)$, cada MAC Unit toma $k$ columnas de memoria adyacentes como entrada.\\
+
+El bloque $MAC$  $Unit$ necesita primero que se carguen k pixeles de cada columna para asi tener $(k \times k)$ pixeles cargados dentro de ella para así producir el primer pixel procesado.\\
+
+Luego, se procede a efectuar la multiplicación de los pixeles con los coeficientes del kernel y sumar cada termino.\\
+
+Finalmente se trunca el resultado, y se almacena el mismo en la primera posición de memoria.\\
+
+Una vez que se procesa un pixel, se almacena en la memoria mientras bloque $MAC$  $Unit$ efectua un desplazamiento (shift) de sus registros en donde se almacenan pixeles de la imagen, para asi descartar los k pixeles mas antiguos,
+ y se cargan los $k$ nuevos pixeles, es decir, uno de cada columna de entrada, lo que es equivalente a una estructura FIFO (First Input – First Output).
+Se sincroniza lo mencionado anteriormente de forma tal de obtener un pixel por cada ciclo de clock.\\
+
+Este procedimiento es equivalente a desplazar verticalmente el kernel sobre la imagen:
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{conv1_despl.png}
+\caption{Desplazamiento vertical del kernel sobre la imagen }
+\label{verticaldesp}
+\end{figure}
+
+
+El módulo $AGU$ maneja las direcciones de memoria, tanto lectura como de escritura, teniendo en cuenta la latencia desde que un pixel se carga en bloque $MAC$ $Unit$ hasta que el pixel procesado correspondiente sea almacenado.
+Todo lo mencionado anteriormente fue de manera genérica sobre una sola MAC Unit, pero ahora se explicara como poder trabajar en el sistema con mas de uno de estos modulos instanciados en paralelo:
+\begin{frame}{}
+
+    
+      \begin{itemize}
+
+\item Como se mencionó,  se necesitan $k$ columnas como entrada para producir una columna procesada en una $MAC$ $Unit$. Por lo tanto, $2 \times k$ columnas, se necesitan para $2$ $MACs$.
+\item Debido a la naturaleza de la operación de la convolucion, para obtener una columna contigua, se necesita desplazar una vez las columnas de entrada. Entonces, existe un solapamiento entre 2 de las entradas de las MACs que producen columnas adyacentes, y así la información puede ser compartida.
+Así, pese a necesitar $k$ columnas de entrada por cada unidad $MAC$, solamente $k+1$ columnas diferentes de entrada se necesitan para dos $MACs$ instanciadas.
+\item Entonces, para $N$ $MACs$, el número requerido de columnas de memoria, se reduce de $N \times k$ a $N+k-1$, concluyendo que agregar una nueva unidad $MAC$ solamente agrega una nueva columna de memoria.
+\item Debido al solapamiento explicado anteriormente, hay información repetida entre un lote recibido y el siguiente, por lo que, para reducir la transmisión de datos, esta información repetida se mantiene en memoria y solamente se transmite la parte faltante del lote entrante.
+Dadas $N$ $MACs$ y  un kernel de $k \times k$, un lote cuyo ancho (o cantidad de columnas) sea de $N+k-1$ es necesario. No obstante, el lote procesado tendrá un ancho de  $N$ columnas, es decir, una por unidad $MAC$, por lo que las ultimas $k+1$ memorias no se sobrescriben y mantienen los datos de entrada. Estas $k+1$ columnas se reutilizan como las primeras columnas del siguiente lote, y asi, el ancho del lote transmitido se reduce a $N$, con la excepción de que el primer lote mantiene un ancho de $N+k-1$.
+
+      \end{itemize}
+     
+\end{frame}
+
+
+La reutilización de columnas de memoria escritas por los lotes previos, resulta en un desplazamiento circular en $N$ lugares, desplazando la posición de las columnas de memoria asociadas con cada unidad $MAC$ en cada iteración.De lo anterior, se deduce que existe una periodicidad entre la relación de columnas de memoria y las entradas de las unidades $MAC$, donde el periodo It es el número de iteraciones necesario para obtener la relación ente las columnas de memoria originales con respecto a las entradas de las unidades $MAC$.
+Entonces, matemáticamente: Cuando $It(k-1)$ es un múltiplo de $N+k-1$, debe existir un numero entero $m$, tal que:
+
+\begin{equation}\label{niter}
+  \frac{It}{m} = \frac{N}{k-1} + 1
+\end{equation}
+
+
+
+
+
+\end{document}
