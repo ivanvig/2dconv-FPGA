@@ -253,8 +253,71 @@ Entonces, matemáticamente: Cuando $It(k-1)$ es un múltiplo de $N+k-1$, debe ex
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
 
+Sintetizando el algoritmo descrito, dadas $N$ $MACs$ y  un kernel de $ k \times k$:
+\begin{frame}{}
+	    
+      \begin{itemize}
+
+	\item Lote de imagen sin procesar,  con $N+k-1$ columnas es necesario
+	\item El lote procesado tendrá un ancho de $N$ columnas
+	\item Las ultimas $k+1$ memorias no se sobrescriben
+	\item Estas $k+1$ columnas se reutilizan como las primeras columnas del siguiente lote
+	\item El ancho del lote transmitido se reduce a $N$, con la excepción de que el primer lote mantiene un ancho de $N+k-1$.
+	\item Sea el periodo $It$  el número de iteraciones necesario para obtener la relación ente las columnas de memoria originales con respecto a las entradas de las unidades $MAC$.
+	\item Cuando $It(k-1)$ es un múltiplo de $N+k-1$, existe un numero entero $m$, tal que:
+\begin{equation}\label{niter}
+  \frac{It}{m} = \frac{N}{k-1} + 1
+\end{equation}
+
+
+\end{itemize}
+\end{frame}
+
+\bigskip
+\bigskip
+\bigskip
+
+Veamos las ventajas del diseño planteado de forma gráfica:
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{data_sent}
+\caption{Cantidad de memoria requerida en función del grado de paralelismo }
+\label{memoryrequired}
+\end{figure}
+
+\bigskip
+Se ve en la figura que a medida que se instancian más unidades $MAC$, o en otras palabras, a medida que se aumenta el grado de paralelismo del sistema haciendo referencia a la cantidad de convoluciones en paralelo con las que se trabaja, el primer enfoque propuesto requiere mucha mas memoria para operar que el enfoque de información compartida, donde se reutilizan ciertas columnas dada por la matemática y relaciones descritas.\\
+
+\bigskip
+\bigskip
+Por otra parte, para lo que refiere a la transmisión, se tiene:
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{mem_space2}
+\caption{Transmisión de datos en función de unidades MAC instanciadas }
+\label{datatransmision}
+\end{figure}
+
+Se mencionó que, debido al solapamiento, hay información repetida entre un lote recibido y el siguiente, por lo que, para reducir la transmisión de datos, esta información repetida se mantiene en memoria y solamente se transmite la parte faltante del lote entrante.\\
+
+En la figura se muestra como el diseño planteado con el desplazamiento circular requiere una transmisión constante notablemente menor a comparación del primer enfoque que se planteo, y como también el hecho de reutilizar la información compartida tiende a una disminución en la transmisión de datos durante el funcionamiento del sistema. La imagen con la que se efectuaron las gráficas tenía un tamaño de $1600 \times 1024$.
+
+\subsubsection{Proceso de escritura en memoria}
+Se analiza el caso de tener instanciadas $N=4$, $MACs$ y un kernel con $k=3$ para clarificar la operación del algoritmo descrito.
+El proceso de escritura en memoria, utilizando el desplazamiento circular de columnas mencionado, se puede apreciar en la siguiente figura:
 
 
 
 
-\end{document}
+
+
+
+
+
+
+
+
+
+\end{document}`
