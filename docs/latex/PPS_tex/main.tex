@@ -10,6 +10,8 @@
 \usepackage{subcaption}
 \usepackage{booktabs}
 
+
+
 %% Sets page size and margins
 \usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
 %% para subrayar, colores, bold, etc
@@ -19,6 +21,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage[colorinlistoftodos]{todonotes}
+
 
 
 \begin{document}
@@ -304,9 +307,148 @@ Se mencionó que, debido al solapamiento, hay información repetida entre un lot
 
 En la figura se muestra como el diseño planteado con el desplazamiento circular requiere una transmisión constante notablemente menor a comparación del primer enfoque que se planteo, y como también el hecho de reutilizar la información compartida tiende a una disminución en la transmisión de datos durante el funcionamiento del sistema. La imagen con la que se efectuaron las gráficas tenía un tamaño de $1600 \times 1024$.
 
+\bigskip
+\bigskip
+\bigskip
+
 \subsubsection{Proceso de escritura en memoria}
+\smallskip
 Se analiza el caso de tener instanciadas $N=4$, $MACs$ y un kernel con $k=3$ para clarificar la operación del algoritmo descrito.
-El proceso de escritura en memoria, utilizando el desplazamiento circular de columnas mencionado, se puede apreciar en la siguiente figura:
+El proceso de escritura en memoria, utilizando el desplazamiento circular de columnas mencionado.\\
+
+Como consideramos un kernel con k=3 y s N=4, MACs:
+\begin{frame}{}
+	    
+      \begin{itemize}
+        \item Se necesitan o requieren N+k-1=4+3-1=6 columnas de memoria
+	\item En la primera iteración, se cargan las memorias 1 a 6 con el nuevo lote (donde cada memoria instanciada alberga una columna del lote) y el resultado se almacena en las memorias 1 a 4, marcadas con otro color y en la etapa run  out.
+	\item En la segunda iteración, los datos del nuevo lote se cargan sin sobrescribir las memorias 5 y 6 . Luego del procesamiento, se almacenan los datos comenzando en la memoria  5 hasta la última, para luego sobrescribir los datos del lote previo desde el principio.
+
+\bigskip
+\bigskip
+Lo anterior se puede apreciar en la siguiente figura, donde se incluye una línea punteada que separa la etapa de carga y la de procesamiento y salida de dato:
+
+\end{itemize}
+\end{frame}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.8]{algorithm}
+\caption{Algoritmo de escritura para N=4, k=3 }
+\label{writingprocess}
+\end{figure}
+
+
+La lógica del sistema se implementa en el bloque $MMU$ ($Memory$ $Managment$ $Unit$), que sirve como interfaz entre las memorias y el resto de los componentes, 
+manteniéndolos independientes al grado de paralelismo del sistema y al número de iteración.
+
+\bigskip
+
+\subsection {MMU (Memory Managment Unit) }
+Este bloque, en cada iteración, mantiene un seguimiento de las posiciones de memoria donde el lote entrante debe ser almacenado,
+la información que debe alimentar a cada unidad $MAC$, lLa posición de memoria donde la información procesada debe ser almacenada
+y del orden en el cual la información procesada debe ser devuelta.
+
+Para cumplir con estas funciones, se basa en una máquina de estados finitos interna al módulo, donde cada estado corresponde a un conjunto de las posiciones citadas anteriormente.
+El número de estados está dado por el número de iteración de la ecuación:
+
+\begin{equation}\label{niter}
+  \frac{It}{m} = \frac{N}{k-1} + 1
+\end{equation}
+
+Este bloque consta de un conjunto de multiplexores cuyas líneas o entradas de selección son manejadas por la máquina de estados mencionada, para así hacer el routing de la información entrante y saliente, como se ve en la figura resaltado en color azul:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{arq_blue.png}
+\caption{}
+\label{mmu_location}
+\end{figure}
+
+Analizando la arquitectura interna de los bloques que conforman este módulo, el bloque data multiplexer está conformado por un conjunto de bloques más pequeños clasificados en dos clases acorde a la función que cumplen:
+\begin{frame}{}
+\begin{itemize}
+
+ \item \textbf{$MMB$(Memory Multiplexer Blocks)}
+  \item \textbf{$PMB$(Processing Multiplexer Blocks)}
+
+\end{itemize}
+\end{frame}
+
+
+Los $MMB$ hacen el routing de la información sin procesar (raw data) y la información desde las unidades $MAC$ hacia las memorias.
+Los $PMB$ hacen el routing de la información desde las memorias hacia las unidades $MAC$.\\
+
+Este flujo se puede ver en la siguiente figura:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.9]{muxes}
+\caption{ Enrutamiento de información}
+\label{mmu_routing}
+\end{figure}
+Tanto los bloques $MMB$ como los $PMB$ tienen un numero de entradas proporcional al numero de estados de la $FSM$ interna del bloque $MMU$. 
+Las entradas a sus multiplexores se definen respectivamente:
+\begin{equation}%\label{niter}
+  O_j^i = O_{[(k-1)i+j]\%N}
+\end{equation}
+\begin{equation}%\label{niter}
+  M_j^i = M_{(iN+j)\%(N+k-1)}
+\end{equation}
+\\
+donde el símbolo $ \% $ representa la operación modulo, e $i$ toma valores desde $0$ a $It-1$.
+
+\bigskip
+\bigskip
+\begin{figure}[H]
+\centering
+\includegraphics{muxes_cont}
+\caption{ Estructura de los bloques MMB y PMB}
+\label{mmu_structure}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%\begin{figure}[ht!]
+ % \centering
+ %\begin{subfigure}{.5\linewidth}
+ % \includegraphics[scale=0.7]{muxes}
+ %\caption{Enrutamiento de información}
+ %\end{subfigure}
+ %\hskip2em
+ %
+ %\begin{subfigure}{.5\linewidth}
+ % \includegraphics[scale=0.7]{muxes_cont}
+ %\caption{Estructura interna de PMB y MMB}
+%\end{subfigure}
+%\caption{Estructura interna del bloque MMU}
+%\end{figure}
+
+
+
 
 
 
