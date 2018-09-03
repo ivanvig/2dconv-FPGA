@@ -39,6 +39,15 @@
 			Sulca Sergio, xxxxxxxx\\
 			Vignolles Ivan Maximiliano, xxxxxxxx
 }
+%
+%
+%	Carrera: 		Ingeniería en Computación
+%
+%Tutor: 		Dr.Ing. Ariel L.Pola	
+%
+%2018
+%Department of Research and Development Fundacion Fulgor
+
 \clearpage
 \maketitle
 
@@ -318,7 +327,7 @@ En la figura se muestra como el diseño planteado con el desplazamiento circular
 Se analiza el caso de tener instanciadas $N=4$, $MACs$ y un kernel con $k=3$ para clarificar la operación del algoritmo descrito.
 El proceso de escritura en memoria, utilizando el desplazamiento circular de columnas mencionado.\\
 
-Como consideramos un kernel con k=3 y s N=4, MACs:
+Como consideramos un kernel con $k=3$ y $N=4$, $MACs$:
 \begin{frame}{}
 	    
       \begin{itemize}
@@ -337,8 +346,38 @@ Lo anterior se puede apreciar en la siguiente figura, donde se incluye una líne
 \centering
 \includegraphics[scale=0.8]{algorithm}
 \caption{Algoritmo de escritura para N=4, k=3 }
-\label{writingprocess}
+\label{writingprocess1}
 \end{figure}
+
+
+\bigskip
+
+Considerando ahora un kernel con $k=3$ y  $N=2$, $MACs$, se anexan graficos para ilustrar lo mencionado de forma mas clara, 
+donde se distinguen con colores las columnas involucradas y las etapas respectivas:
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.75]{conv2_despl.png}
+\caption{Desplazamiento del kernel paraa N=2, k=3 }
+\label{writingprocess2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{example_1}
+\caption{Primera iteración con N=2, k=3 }
+\label{writingprocess3}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{example_2}
+\caption{Siguiente iteración con N=2, k=3}
+\label{writingprocess4}
+\end{figure}
+
+
 
 
 La lógica del sistema se implementa en el bloque $MMU$ ($Memory$ $Managment$ $Unit$), que sirve como interfaz entre las memorias y el resto de los componentes, 
@@ -357,15 +396,17 @@ El número de estados está dado por el número de iteración de la ecuación:
 \begin{equation}\label{niter}
   \frac{It}{m} = \frac{N}{k-1} + 1
 \end{equation}
+\bigskip
 
 Este bloque consta de un conjunto de multiplexores cuyas líneas o entradas de selección son manejadas por la máquina de estados mencionada, para así hacer el routing de la información entrante y saliente, como se ve en la figura resaltado en color azul:
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{arq_blue.png}
-\caption{}
+\includegraphics[scale=0.8]{arq_blue.png}
+\caption{Bloque MMU}
 \label{mmu_location}
 \end{figure}
 
+\bigskip
 Analizando la arquitectura interna de los bloques que conforman este módulo, el bloque data multiplexer está conformado por un conjunto de bloques más pequeños clasificados en dos clases acorde a la función que cumplen:
 \begin{frame}{}
 \begin{itemize}
@@ -379,6 +420,7 @@ Analizando la arquitectura interna de los bloques que conforman este módulo, el
 
 Los $MMB$ hacen el routing de la información sin procesar (raw data) y la información desde las unidades $MAC$ hacia las memorias.
 Los $PMB$ hacen el routing de la información desde las memorias hacia las unidades $MAC$.\\
+\bigskip
 
 Este flujo se puede ver en la siguiente figura:
 \begin{figure}[H]
@@ -559,6 +601,23 @@ obtenido para los diferentes grados de paralelismo.
 
 \section{Conclusión}  \label{conclusion_sec}
 
+\underline{Características del proyecto}
+\begin{frame}{}
+    
+      \begin{itemize}
+        \item Implementación de la operación de convolución bidimensional en una FPGA
+        \item Particionamiento de imagen por columnas, y carga de las mismas en la placa
+        \item Manejo de uno o más módulos convolucionadores y memorias, es decir, procesamiento con cierto grado de paralelismo
+        \item Kernel de $ k \times k$, con $k$ configurable
+        \item Manejo de imágenes de escala de grises (cada píxel tiene asociado un valor de intensidad ó escala de gris)
+        \item Reutilización de hardware mediante un algoritmo descubierto y llevado a cabo en la implementación
+        \item Funcionalidades y etapas en su totalidad: el sistema implementado cubre todas las etapas (carga, procesamiento, devolución)
+        \item Escalabilidad
+      \end{itemize}
+    
+\end{frame}
+
+
 La flexibilidad y elevada potencia de cálculo de una FPGA permite que se pueda
 procesar y filtrar el lote de imagen, al mismo tiempo que se está cargando el lote
 actual. \\
@@ -578,12 +637,27 @@ Block RAMs incrementan de forma lineal, como se buscó.\\
 En lo que refiere al procesamiento, se obtuvo un throughput elevado, por ende del factor limitante mencionado relacionado 
 con la velocidad de transmisión del UART.
 
+\subsection{Futuras mejoras}
+Se plantean como mejoras posibles, la carga de la imagen completa, de disponer una FPGA más grande y tener un medio de comunicación más rápido (Ethernet , por ejemplo) 
+ya que más de un 99$\%$ del tiempo el sistema lo invierte en la carga. El procesamiento es muy rápido en relación al tiempo invertido en la carga de datos.
+Otras posibles mejoras incluirian trabajar con menos bits en lo que refiere a la resolución de la salida (actualmente 13 bits),  y el aprovechamiento del bus del GPIO para cargar 3 memorias por escritura en la etapa 
+de carga correspondiente. (Actualmente, por escritura se carga una sola). Análogamente para la etapa de salida de datos.
+De ser el tamaño de la imagen menor a la profundidad de las memorias definidas, se desaprovechan los restantes registros. 
+Una última  futura mejora también sería el aprovechamiento total de las mismas en dicha situación
+
+\subsection{CASE-2018}
+Ademas del tiempo invertido en el desarrollo del trabajo a fines de realizar la Practica Supervisada Profesional, luego de concluir con el proyecto, se logró publicarlo en
+el Congreso Argentino de Sistemas Embebidos del año actual. Dicha publicación nos sirvió fue una grata experiencia.
 
 
 
-
-
-
+de los recursos BRAM. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{certificado_CASE}
+\caption{Certificado por la publicación del proyecto llevado a cabo.}
+\label{CASE}
+\end{figure}
 
 
 
