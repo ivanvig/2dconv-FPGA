@@ -160,13 +160,36 @@ haya un flanco ascendente en el bit 28.
 
 \subsection{Address Generator Unit (AGU)}
 
-El bloque AGU es el encargado de generar las direcciones de memoria que son
+El AGU es el encargado de generar las direcciones de memoria que son
 consumidas por el MMU.
-\subsection{Multiplier Acumulator Unit (MAC)}
 
-\subsection{Memory Management Unit (MMU)}
+Durante el estado de ImageLoad, el AGU genera las direcciones donde se deben
+escribir estos datos, para ello cuenta con un contador que se incrementa con
+cada flanco de subida del bit 28 de la entrada del Control Unit
+(sección~\ref{sec:ctrl_u}). El AGU además conoce el alto de la imagen (cargado
+durante SizeLoad) por lo que una vez que el contador alcanza dicho valor envía
+una señal al MMU indicando que el pixel que se recibe a continuación pertenece a
+una nueva columna del lote.
 
-\subsection{Storage}
+Durante la etapa de procesamiento el AGU debe producir dos direcciones
+diferentes, una que indica al MMU los datos que debe entregar a las unidades MAC
+y otra que indica al MMU la posición donde los datos procesados por las MACs
+deben ser almacenados. Ambas direcciones se incrementan una vez por ciclo de
+reloj, pues las MAC generan un dato procesado por ciclo. La diferencia entre la
+dirección de lectura y la dirección de escritura es igual a la latencia que
+existe desde que se entrega el primer pixel a una unidad MAC hasta que el primer
+pixel procesado este listo para almacenarse.
+
+Durante el estado Out, o de salida de datos, el AGU genera las direcciones de
+lectura de los datos procesados, al igual que en el estado de ImageLoad, se
+incrementa con cada flanco de subida del bit 28 y tiene en cuenta el alto de la
+imagen para hacer el cambio de columna de datos.
+
+% \subsection{Multiplier Acumulator Unit (MAC)}
+
+% \subsection{Memory Management Unit (MMU)}
+
+% \subsection{Storage}
 \subsection{Almacenamiento}\label{storage_subsecc}
 Los coeficientes del kernel se almacenan en registros dentro de cada MAC Unit.
 Para almacenar un lote, el enfoque que se opto fue organizar la BRAM en
