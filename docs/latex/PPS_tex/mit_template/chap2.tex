@@ -5,15 +5,15 @@ Describiremos el diseño confeccionado en detalle. Se tienen tres etapas fundame
 
 \begin{itemize}
 \item \textbf{Pre-procesamiento:} consiste en capturar la imagen aplicando las
-  transformaciones mencionadas en la sección \ref{fixedpoint} y \ref{dynamicrange}, empleando un script hecho en Python. Este script divide la imagen en lotes o batches y los envía a la FPGA, a través del puerto UART. Un batch o lote, consiste en columnas contiguas de pixeles cuya dimensión se explica en la sección x.
+  transformaciones mencionadas en la sección \ref{dynamicrange} y \ref{fixedpoint}, empleando un script hecho en Python. Este script divide la imagen en lotes o batches y los envía a la FPGA, a través del puerto UART. Un batch o lote, consiste en columnas contiguas de pixeles cuya dimensión se explica en la sección x.
     %% Poner seccion aca
 \item \textbf{Procesamiento:}	: el batch es convolucionado con el kernel dentro del módulo. Dicho kernel es configurable, y el usuario puede cargar los coeficientes del mismo mediante el GPIO. 
-  Cuando la operación de la convolucion finaliza, una notificación es enviada al microprocesador, que da la orden de recuperar el batch procesado, para así enviarlo a la unidad central de procesamiento (CPU).
+  Cuando la operación de la convolucion finaliza, una notificación es enviada a
+  un microprocesador en la FPGA, que da la orden de recuperar el batch procesado, para así enviarlo a la unidad central de procesamiento (CPU).
 \item \textbf{Post-procesamiento:}Como etapa final, en el post-procesamiento se combinan los batches o lotes en CPU usando el script de Python.
 \end{itemize}
 
-
-La figura~\ref{statesfig} muestra el diagrama de estados del sistema, para procesar cierta imagen de entrada dada.
+\section{Estados y transiciones}  \label{states_subsecc}
 
 \begin{figure}
 \centering
@@ -22,24 +22,37 @@ La figura~\ref{statesfig} muestra el diagrama de estados del sistema, para proce
 \label{statesfig}
 \end{figure}
 
-\subsection{Estados y transiciones}  \label{states_subsecc}
+El módulo atraviesa distintos estados para llevar a cabo su tarea. Estos estados
+se pueden observar en la figura~\ref{statesfig}.
 
-La transición entre un estado y otro se realiza mediante instrucciones codificadas en el frame de entrada de 32 bits asentado en el GPIO. El modulo permanece en su estado actual hasta recibir una instrucción valida.
+La transición entre un estado y
+otro se realiza mediante instrucciones codificadas en el frame de entrada de 32
+bits asentado en el GPIO. El módulo permanece en su estado actual hasta recibir
+una instrucción valida.
 
-Inicialmente, debe situarse al sistema en un estado de reset, y por ende debe recibir dicha señal de reset para establecerse en dicho estado, esperando a ser configurado.
+Inicialmente, debe situarse al sistema en un estado de reset, y por ende debe
+recibir una señal de reset para establecerse en dicho estado, esperando a ser
+configurado.
 Luego de recibir la correspondiente instrucción, se produce una transición hacia el estado KernelLoad, en donde los coeficientes del kernel se cargan al módulo.
-El siguiente estado (SizeLoad), es en el cual se carga el tamaño de la imagen, más precisamente la altura de la misma o el número de filas de las BRAM a ser instanciadas.
+El siguiente estado (SizeLoad), es en el cual se carga el tamaño de la imagen,
+más precisamente la altura de la misma, esto permitirá conocer la posición del
+último dato en memoria.
 Estos tres estados mencionados, solo se ejecutan una vez durante todo el ciclo
 de trabajo. El proceso se repite por cada nueva imagen, por ende, si se desea
 procesar una nueva imagen, inicia el ciclo nuevamente.
 
-Arrancando con el procesamiento de los lotes, primero la transición es hacia el estado ImageLoad, donde se almacena el lote en la Block RAM de la FPGA. 
+Pasada la etapa de carga, la primera transición es hacia el
+estado ImageLoad, donde se almacena el lote en la Block RAM de la FPGA.
 Teniendo el lote almacenado, la transición luego es hacia el estado run donde se
-hace el procesamiento en si, y mientras el sistema se situe en este estado, no
+hace el filtrado del lote, y mientras el sistema se situe en este estado, no
 puede ser interrumpido.
+Como consecuencia, cualquier instrucción recibida se ignora hasta que se
+complete esta etapa de procesamiento de lote.
 
-Como consecuencia, cualquier instrucción recibida se ignora hasta que se complete esta etapa de procesamiento de lote.
-Cuando se finaliza el procesamiento de un lote, se emite una notificación hacia el pin EoP (End Of Process) de la unidad de control (Control Unit), y el sistema espera a la última transición hacia el estado Out. Ni bien recibe la correspondiente instrucción codificada, se devuelve el lote procesado al microprocesador de la PC.
+Cuando se finaliza el procesamiento de un lote, se emite una notificación y el sistema
+queda en espera de la última señal para pasar hacia el estado Out. Una vez recibida la
+correspondiente instrucción codificada, se devuelve el lote procesado al
+microprocesador de la PC.
 
 \begin{figure}
 \centering
@@ -48,19 +61,14 @@ Cuando se finaliza el procesamiento de un lote, se emite una notificación hacia
 \label{statesfig2}
 \end{figure}
 
-\section{Arquitectura propuesta}  \label{ourdesign_subsecs}
+\section{Arquitectura del módulo de convolución}  \label{ourdesign_subsecs}
 
+El diseño planteado prioriza la reutilización dinámica de memoria, en donde por
+cada iteración en la etapa de procesamiento, se aprovecha la disponibilidad de
+datos cargados en memoria en la iteración anterior.
+En la figura~\ref{general}, se muestran los bloques principales que conforman el
+diseño. Los bloques que integran el módulo son:
 
-El diseño planteado prioriza la reutilización dinámica de memoria, en donde por cada iteración en la etapa de procesamiento, se aprovecha la disponibilidad de datos cargados en memoria en la iteración anterior. 
-En el diagrama en bloques anexado en la parte superior, se muestran los bloques principales que conforman el diseño:
-
-\begin{itemize}
-\item \textbf{Control Unit:} se encarga del manejo de la comunicación entre el procesador
-\item \textbf{MAC Unit -Multiplier-ACcumulator:} ejecuta la suma de los productos entre los coeficientes del kernel y los pixeles de la imagen. 
-\item \textbf{Address Generation Unit (AGU):} modulo que maneja las direcciones de memoria que deben ser leídas o escritas
-\item \textbf{Storage:} hace referencia a un conjunto de columnas almacenadas en block RAMs de la FPGA. El tamaño se explicara posteriormente con detalle, ya que depende de la cantidad de MACs instanciadas, o en otras palabras, el paralelismo a nivel de cantidad de convoluciones en paralelo, que se desee en el sistema.
-\end{itemize}
-     
 \begin{figure}
 \centering
 \includegraphics{general}
@@ -68,9 +76,107 @@ En el diagrama en bloques anexado en la parte superior, se muestran los bloques 
 \label{general}
 \end{figure}
 
-\subsection{Almacenamiento}  \label{storage_subsecc}
-Los coeficientes del kernel se almacenan en registros dentro de cada MAC Unit. Para almacenar un lote, el enfoque que se opto fue organizar la BRAM en columnas. Cada columna entonces, corresponde a una columna del lote.
-El tamaño del lote está dado por la altura de la imagen y por el número de columnas de memoria instanciadas.  La máxima altura de la imagen, entonces, debe ser menor o igual a la altura de la memoria instanciada.
+\begin{itemize}
+\item \textbf{Control Unit:} se encarga del manejo de la comunicación entre el
+  módulo y el procesador instanciado en la FPGA.
+\item \textbf{MAC Unit -Multiplier-ACcumulator:} ejecuta la suma de los productos entre los coeficientes del kernel y los pixeles de la imagen. 
+\item \textbf{Address Generation Unit (AGU):} bloque que maneja las direcciones
+  de memoria que deben ser leídas o escritas.
+\item \textbf{Storage:} hace referencia a un conjunto de columnas formadas por
+  BRAMs de la FPGA. El tamaño depende de la cantidad de MACs instanciadas,
+  o en otras palabras, el paralelismo a nivel de cantidad de convoluciones en
+  paralelo, que se desee en el sistema.
+\end{itemize}
+%TODO: falta MMU
+     
+Estos bloques se describen en mas detalle en las secciones siguientes.
+
+\subsection{Control Unit}\label{sec:ctrl_u}
+El bloque Control Unit es el encargado de hacer de interfaz entre los bloques
+restantes del módulo de convolución y el microprocesador que se encuentra en la
+FPGA. Para hacer esto, cuenta con dos puertos de 32 bits conectados a los GPIO
+de entrada y salida del procesador.
+
+El bloque interpreta las instrucciones que recibe y modifica las señales de
+control conectadas a los otros bloques, esto representa la transición de
+estados mencionada en la sección~\ref{states_subsecc}.
+
+La organización del frame de entrada de 32 bits, junto con los códigos binarios
+de las instrucciones se muestra en la tabla~\ref{instr}.
+
+\begin{table}
+% increase table row spacing, adjust to taste
+\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+\caption{Código de instrucciones, la letra 'd' representa bit de datos.}
+\label{instr}
+\centering
+% some packages, such as mdw tools, offer better commands for making tables
+% than the plain latex2e tabular which is used here.
+\begin{tabular}{|l|c|c|c|c|c|}
+  \hline
+  \multicolumn{1}{|c|}{\multirow{2}{*}{\textbf{Instrucción}}} & \multicolumn{5}{c|}{\textbf{BITS}} \\ \cline{2-6}
+                                        & \textbf{31 - 29} & \textbf{28 - 25} & \textbf{24 - 14} & \textbf{13 - 1} & \textbf{0}\\\hline
+  Cargar kernel                         & 000              & xxx              & ddddddddddd      & ddddddddddddd   & 0         \\\hline
+  Cargar tamaño imagen                  & 001              & xxx              & xxxxxxxxxxx      & xxxdddddddddd   & 0         \\\hline
+  Cargar lote                           & 010              & xxx              & xxxxxxxxxxx      & ddddddddddddd   & 0         \\\hline
+  Recuperar dato                        & 011              & xxx              & xxxxxxxxxxx      & xxxxxxxxxxxxx   & 0         \\\hline
+  Finalización de lote                  & 100              & xxx              & xxxxxxxxxxx      & ddddddddddddd   & 0         \\\hline
+\end{tabular}           
+\end{table}
+
+Como el módulo y el procesador trabajan a distintas frecuencias de reloj, se
+puede producir un error al enviar y recibir datos entre ambos. Para superar este
+problema, el flanco ascendente del bit 28 se utiliza como indicador de que un
+nuevo dato esta listo para ser leído o escrito. 
+
+El bit 0 se utiliza como indicador del estado del módulo, en caso de ser 1 el
+módulo se pone en estado de reset, por lo que una vez atravesado este estado,
+siempre debería permanecer bajo.
+
+Las instrucciones cumplen las siguientes funciones:
+
+\begin{itemize}
+\item \textbf{Cargar kernel:} Se utiliza para cargar los coeficientes del
+  kernel, cada coeficiente es de 8 bits, junto con la instrucción se deben
+  añadir los 3 coeficientes que forman una columna del kernel.\footnote{Para un
+    diseño que utiliza kernels de $3\times3$, en caso de ser de dimensiones
+    superiores, nuevas instrucciones deben ser añadidas.}
+\item \textbf{Cargar tamaño imagen:} A esta instrucción debe acompañar el tamaño
+  del alto en pixels de la imagen, se utilizan 10 bits para ello por lo que el
+  tamaño máximo es de 1024px.
+\item \textbf{Cargar lote:} Instrucción que indica que los datos corresponden a
+  un pixel del lote.
+\item \textbf{Finalización de lote:} Indica que el pixel que se esta cargando es
+  el último pixel del lote, una vez recibida esta instrucción el módulo pasa al
+  estado de run donde realiza el procesamiento.
+\item \textbf{Recuperar dato:} Con esta instrucción se pide al módulo que
+  entregue el pixel procesado siguiente.
+\end{itemize}
+
+Como se nombró anteriormente, una instrucción no será considerada hasta que no
+haya un flanco ascendente en el bit 28.
+
+\subsection{Address Generator Unit (AGU)}
+
+El bloque AGU es el encargado de generar las direcciones de memoria que son
+consumidas por el MMU.
+\subsection{Multiplier Acumulator Unit (MAC)}
+
+\subsection{Memory Management Unit (MMU)}
+
+\subsection{Storage}
+\subsection{Almacenamiento}\label{storage_subsecc}
+Los coeficientes del kernel se almacenan en registros dentro de cada MAC Unit.
+Para almacenar un lote, el enfoque que se opto fue organizar la BRAM en
+columnas. Cada columna entonces, corresponde a una columna del lote.
+
+El tamaño del lote está dado por la altura de la imagen y por el número de
+columnas de memoria instanciadas.  La máxima altura en pixels de la imagen,
+entonces, debe ser menor o igual al número de direcciones de una columna de
+memoria instanciada.
+
 Durante el procesamiento del lote, cada pixel se lee únicamente una vez, lo que permite un uso mas eficiente de la memoria. Los pixeles que ya se utilizaron, se sobrescriben con los pixeles procesados. 
 Esto permite reducir la cantidad de memoria necesaria, ya que reúsa la misma memoria para almacenar el lote de entrada, y el lote procesado.
 

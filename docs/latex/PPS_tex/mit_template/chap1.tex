@@ -14,6 +14,37 @@ Donde $I(x,y)$ es una imagen de $(m \times n)$ pixels, $K(i,j)$ un conjunto de
 coeficientes denominado kernel, de tamaño $(k \times k)$ and $G(x,y)$ es la
 convolucion resultante de tamaño  $(m-2 \times n-2)$.
 
+\section{Expansión dinámica de rango y Maximum Norm}\label{dynamicrange}
+
+Los pixeles de la imagen en escala de grises $I(x,y)$ tienen un rango dinámico de valores que se hallan entre $[0,255]$,
+y los valores que toma el kernel $K(x,y)$ pueden ser positivos o negativos.
+
+Dado que el sistema desarrollado forma parte de un proyecto de Deep Learning,
+donde es usual operar en un rango dinámico centrado en cero, se aplicó una
+transformación denominada  expansión dinámica de rango ($\mathcal{D}([.])$),
+junto con Maximum Norm ($(\mathcal{M}[.])$) para reacomodar los diferentes 
+rangos de valores. 
+
+Para el caso de la imagen, se tiene $\mathcal{D}[I(x,y)]=I^\prime(x,y)$ y un rango resultante de $[0,1]$.
+Para el caso del kernel, $\mathcal{M}[K(x,y)]=K^\prime(x,y)$ con un rango $[-1,1]$, respectivamente.
+Así, reemplazando en la ecuación~\ref{conv-org}, se tiene 
+\begin{equation}\label{conv-org1}
+  G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],
+\end{equation}
+siendo $\mathcal{D}^{-1}[.]$ el cambio de rango dinamico entre $[0,255]$.
+
+La figura~\ref{transformation} muestra el proceso completo de mapeo de datos, se
+aplica la transformación a la imagen de entrada, luego se convoluciona con el
+kernel y se hace la transformación inversa a ese resultado para volverlo a
+mapear al conjunto de valores iniciales.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.47]{wflow3}
+\caption{Transformaciones del rango dinámico durante el procesamiento de la imagen.}
+\label{transformation}
+\end{figure}
+
 \section{Representación en punto fijo}\label{fixedpoint}
 
 La representación en punto flotante, almacena los números en términos de la mantisa y del exponente. El hardware que soporta el formato punto flotante, luego de ejecutar cada computo, 
@@ -28,46 +59,15 @@ la representación adecuada según el sistema que pretende llevar a cabo.
 
 FALTA: QUE REPRESENTACION USAMOS Y  PORQUE (GRAFICOS). NO LO PUSE PORQUE NO SE CON CUAL NOS QUEDAMOS AL FINAL
 
-\section{Expansión dinámica de rango y Maximum Norm}\label{dynamicrange}
-Los pixeles de la imagen en escala de grises $I(x,y)$ tienen un rango dinámico de valores que se hallan entre $[0,255]$,
-y los valores que toma el kernel $K(x,y)$ pueden ser positivos o negativos.
-
-Dado que el sistema desarrollado forma parte de un proyecto de Deep Learning,
-donde es usual operar en un rango dinámico centrado en cero, se aplicó una
-transformación denominada  expansión dinámica de rango ($\mathcal{D}([.])$),
-junto con Maximum Norm ($(\mathcal{M}[.])$) para reacomodar los diferentes 
-rangos de valores. 
-
-Para el caso de la imagen, se tiene $\mathcal{D}[I(x,y)]=I^\prime(x,y)$ y un rango resultante de $[0,1]$.
-Para el caso del kernel, $\mathcal{M}[K(x,y)]=K^\prime(x,y)$ con un rango $[-1,1]$, respectivamente.
-Así, reemplazando en~\ref{conv-org}, se tiene 
-
-\begin{equation}\label{conv-org1}
-  G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],
-\end{equation}
-
-siendo $\mathcal{D}^{-1}[.]$ el cambio de rango dinamico entre $[0,255]$ en la FPGA.
-
-El proceso completo puede observarse en la Fig.~\ref{transformation}.
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.47]{wflow3}
-\caption{Transformaciones del rango dinámico durante el procesamiento de la imagen.}
-\label{transformation}
-\end{figure}
-
 \section{Flujo de diseño} \label{flujo_subsecc}
 
 Se estructuró el proyecto y se siguió el flujo o estructura de la
 Fig.~\ref{design_flow} para llevar el proyecto a cabo en el tiempo disponible.
 
 En primera instancia se partió de las especificaciones, simulando el comportamiento en punto flotante mediante el lenguaje de alto nivel Python. Luego, se analizaron los resultados obtenidos tras implementar el sistema en punto fijo, a nivel software. 
-Fijados los requerimientos se comenzó con la programación del hardware,
+Fijados los requerimientos se comenzó con el diseño del hardware,
 previamente habiendo estudiado y modelado la arquitectura del sistema, la cual
 se detalla en la seccion \ref{arquitectura_sec}.
-
-Como instancias intermedias se realizaron diferentes tipos de testing: test unitarios de cada módulo (test bench del módulo), test de integración (varios módulos y su interacción) y finalmente test de sistema, donde se probó el funcionamiento del sistema completo dada cierta imagen de entrada.
 
 \begin{figure}
 \centering
@@ -75,6 +75,18 @@ Como instancias intermedias se realizaron diferentes tipos de testing: test unit
 \caption{Esquemático del flujo de diseño seguido.}
 \label{design_flow}
 \end{figure}
+
+\subsection{Testing}
+
+Se realizaron diferentes tipos de testing: test
+unitarios de cada módulo (test bench del módulo), test de integración (varios
+módulos y su interacción) y finalmente test de sistema, donde se probó el
+funcionamiento del sistema completo dada cierta imagen de entrada. Para realizar
+el proceso de testeo, en primera instancia se corrobora que los bits producidos
+por el simulador del hardware descripto coincidieran con los bits del simulador
+del sistema en Python, una vez pasada esta etapa con éxito, se implementa el
+hardware en una FPGA y se comprueba nuevamente que los resultados obtenidos no
+difieran con los simulados.
 
 % \begin{figure}
 % \centering
