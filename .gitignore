@@ -67,3 +67,6 @@ auto
 *shell*
 *.bk
 *.synctex.gz
+
+# pdf 
+./docs/latex/PPS_tex/main.pdf
