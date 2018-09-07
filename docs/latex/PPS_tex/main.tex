@@ -1,7 +1,6 @@
 \documentclass[a4paper]{article}
 
 
-
 %% Language and font encodings
 \usepackage[english,spanish]{babel}
 \usepackage[utf8x]{inputenc}
@@ -12,7 +11,10 @@
 \usepackage{subcaption}
 \usepackage{booktabs}
 
+\usepackage{amsfonts}
+\usepackage{graphicx}
 
+\graphicspath{{figures/}{../../schematics/svg/}{../../schematics/imagenes/}} % Directory in which figures are stored
 
 %% Sets page size and margins
 \usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
@@ -75,19 +77,97 @@ $(k \times k)$ and $G(x,y)$ es la convolucion resultante de tamaño  $(m-2 \time
 
 \underline{\textbf{Representación en punto fijo:}}
 
-La representación en punto flotante, almacena los números en términos de la mantisa y del exponente. El hardware que soporta el formato punto flotante, luego de ejecutar cada computo, 
-automáticamente escala la mantisa y actualiza el exponente para que el resultado se corresponda con el número de bits de forma definida. Todas estas operaciones hacen que el hardware que soporte punto flotante,
-sea más costoso en términos de área y potencia. Emerge una alternativa: la representación en punto fijo.
-Este formato se emplea para almacenar y manipular datos, con cierto número de bits fijos. Esto implica que luego del cómputo, no se sigue la posición del punto decimal, y
-se le delega esta responsabilidad al diseñador del hardware. El punto decimal, valga la redundancia, es fijo para cada variable, y es predefinido.
-Fijando el punto, una variable se limita a tomar un rango fijo de valores.
-Pese a que este límite nos brinda ventajas en lo que refiere a utilización de recursos, si el resultado del cómputo cae fuera del rango, se produce un overflow. Existen varias
-formas de manipular los overflows que emergen como resultado de un cómputo en punto fijo (redondeo, saturación, truncamiento) y sigue siendo responsabilidad del diseñador optar por
-la representación adecuada según el sistema que pretende llevar a cabo.
+La representaci\'on en punto flotante, almacena los n\'umeros en t\'erminos de la mantisa y
+del exponente. El hardware que soporta el formato punto flotante, luego de ejecutar cada
+computo, automáticamente escala la mantisa y actualiza el exponente para que el resultado
+se corresponda con el n\'umero de bits de forma definida. Todas estas operaciones hacen que
+el hardware que soporte punto flotante, sea m\'as costoso en t\'erminos de \'area y potencia.
+
+Emerge una alternativa:la representación en punto fijo. Este formato se emplea para almacenar
+y manipular datos, con cierto n\'umero de bits fijos. Esto implica que luego del c\'omputo,
+no se sigue la posici\'on del punto decimal, y se le delega esta responsabilidad al diseñador
+del hardware. El punto decimal, valga la redundancia, es fijo para cada variable, y es predefinido.
+Fijando el punto, una variable se limita a tomar un rango fijo de valores. Pese a que este
+límite nos brinda ventajas en lo que refiere a utilización de recursos, si el resultado del
+c\'omputo cae fuera del rango, se produce un overflow. Existen varias formas de manipular los
+overflows que emergen como resultado de un c\'omputo en punto fijo (redondeo, saturaci\'on,
+truncamiento) y sigue siendo responsabilidad del diseñador optar por la representación
+adecuada según el sistema que pretende llevar a cabo.
 
 FALTA:    QUE REPRESENTACION USAMOS Y  PORQUE (GRAFICOS). NO LO PUSE PORQUE NO SE CON CUAL NOS QUEDAMOS AL FINAL
 
-\subsection{Expansión dinámica de rango y Maximun Norm}\label{dynamicrange}
+\subsection{NoExpansión dinámica de rango y Maximun Norm}\label{dynamicrange}
+
+% Texto extraido del paper. primero comits en español
+Como la finalidad del trabajo desarrollado es ser aplicado en Deep Learning es habitual 
+modificar rango dinamico a uno que se encuentra distubidos de sobre cero con valores
+positivos y negativos. Para ello se aplican metodos para modifcar el rango a uno apto
+parael trabajo. .
+
+Este an\'alisis tiene por objeto el trabajar con una m\'inima representaci\'on
+finita para los p\'ixeles de la imagen y los valores del kernel.
+Para ello se necesita efectuar un estudio acerca de la cantidad de bits de
+resoluci\'on m\'inimos  con una p\'erdida de informaci\'on aceptable.
+
+Los valores de los p\'ixeles \(I_{ij}\) se encuentran en el rango 0 a 255.
+Con la normalizacion dynamic range expansion\cite{dinamic_rango} se lo lleva al rango 0 a 1.
+Los valores del kernel \(K_{ij}\) pueden ser tanto positivos como negativos.
+Utilizando Maximum norm\cite{max_norm} se obtiene el m\'aximo valor absoluto y se
+divide los \(K_{ij}\) por este valor para llevar al kernel al rango -1 a 1
+manteniendo su efecto. 
+
+Para poder operar los rangos anteriores en una representaci\'on de 8 bits se
+utiliza representac\'ion Signed Fixed Point\cite{fix_p} \(S(8,7)\). 
+
+La convoluci\'on de una imagen con un $\mathbb{K}^{3{\times}3}$ resulta en una 
+salida de 20 bits, en \(S(16,14)\) por cada producto sumado la adici\'on de los nueve
+elemento tiene una representaci\'on total de \(S(20,14)\).Entonces se realiza un
+post procesamiento donde se lleva el resultado a un rango positivo y truncamiento.
+Se establece una comparaci\'on a fines de decidir la cantidad de bits de salida del
+procesamiento.
+
+Para relaizar una comparaci\'on se utiliza la relaci\'on SNR de la operaci\'on a m\'axima
+resoluci\'on \(S(20,14)\) y el error pruducido al reducir la cantidad de bits
+\(e_r=f(x)_{20b}-f(x)_{pos}\)\cite{srntesis}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.47]{posprocesamiento2}
+\caption{Transformaciones del rango dinámico durante el procesamiento de la imagen.}
+\label{prepro2}
+\end{figure}
+
+Al la convolucionar con un filtro unitario y realizar una reducci\'on de los bits de
+la parte fraccionaria, partiendo de 8 bits en totales, mejora la representaci\'on de la
+imagen , y que a partir de 13 bits totales 1 bit de signo, 5 bits parte entera y
+7 en parte fraccionaria, con una representacion \(S(13,8)\) tiene una SNR
+aprimada de \(30 [dB]\) que permite observar el efecto de la convolucion con una
+m\'inima perdida de informaci\'on recordando que nuestro objetivo no es no es
+representar una imagen en su totalidad.
+
+\begin{figure}[H]
+  \centering
+   \begin{subfigure}{0.5\textwidth}
+   %\centering
+    %\label{f:ps1}
+     \includegraphics[width=0.47\linewidth]{posprocesanto1}
+   \end{subfigure}%
+   \begin{subfigure}{0.5\textwidth}
+   \centering
+     \includegraphics[width=0.47\linewidth]{posprocesanto2}
+   \end{subfigure}%
+  \caption{Transformaciones del rango dinámico durante el procesamiento de la imagen.}
+  \label{prepro2}
+\end{figure}
+
+Se puede llevar el rango final a 8 bits si se utiliza dynamic range expansion
+\cite{dinamic_rango}. Pero se requiere conocer el m\'aximo y el m\'inimo valor de p\'ixel
+de la imagen luego de filtrar, lo que implica que toda la imagen se encuentre
+en memoria.
+
+
+Original...
+
 Los pixeles de la imagen en escala de grises $I(x,y)$ tienen un rango dinámico de valores que se hallan entre $[0,255]$,
 y los valores que toma el kernel $K(x,y)$ pueden ser positivos o negativos.\\
 Dado que el sistema desarrollado forma parte de un proyecto de Deep Learning, donde es usual operar en un rango dinámico centrado en cero, se aplicó una transformación denominada  expansión dinámica de rango ( $\mathcal{D}[.])$ ),
@@ -96,6 +176,8 @@ junto con Maximun Norm ($(\mathcal{M}[.])$) para reacomodar los diferentes rango
 Para el caso de la imagen, se tiene $\mathcal{D}[I(x,y)]=I^\prime(x,y)$ y un rango resultante de $[0,1]$.
 Para el caso del kernel, $\mathcal{M}[K(x,y)]=K^\prime(x,y)$ con un rango $[-1,1]$, respectivamente.
 Asi, reemplazando en ~\eqref{conv-org}, se tiene 
+
+
 
 \begin{equation}\label{conv-org1}
   G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],
@@ -127,7 +209,7 @@ Como instancias intermedias se realizaron diferentes tipos de testing: test unit
 
 \begin{figure}[H]
 \centering
-\includegraphics{general_sch.png}
+\includegraphics{general_sch}
 \caption{Diagrama general del sistema: comunicación y lenguajes empleados.}
 \label{design_flow}
 \end{figure}
@@ -180,7 +262,7 @@ Cuando se finaliza el procesamiento de un lote, se emite una notificación hacia
 
 \begin{figure}[H]
 \centering
-\includegraphics{states_2.png}
+\includegraphics{states_2}
 \caption{Diferentes estados y las etapas involucradas }
 \label{statesfig2}
 \end{figure}
@@ -235,7 +317,7 @@ Este procedimiento es equivalente a desplazar verticalmente el kernel sobre la i
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{conv1_despl.png}
+\includegraphics[scale=0.7]{conv1_despl}
 \caption{Desplazamiento vertical del kernel sobre la imagen }
 \label{verticaldesp}
 \end{figure}
@@ -357,7 +439,7 @@ donde se distinguen con colores las columnas involucradas y las etapas respectiv
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.75]{conv2_despl.png}
+\includegraphics[scale=0.75]{conv2_despl}
 \caption{Desplazamiento del kernel paraa N=2, k=3 }
 \label{writingprocess2}
 \end{figure}
