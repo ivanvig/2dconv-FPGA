@@ -140,7 +140,7 @@ Las instrucciones cumplen las siguientes funciones:
 \begin{itemize}
 \item \textbf{Cargar kernel:} Se utiliza para cargar los coeficientes del
   kernel, cada coeficiente es de 8 bits, junto con la instrucción se deben
-  añadir los 3 coeficientes que forman una columna del kernel.\footnote{Para un
+  añadir los 3 coeficientes que forman una fila del kernel.\footnote{Para un
     diseño que utiliza kernels de $3\times3$, en caso de ser de dimensiones
     superiores, nuevas instrucciones deben ser añadidas.}
 \item \textbf{Cargar tamaño imagen:} A esta instrucción debe acompañar el tamaño
@@ -185,10 +185,102 @@ lectura de los datos procesados, al igual que en el estado de ImageLoad, se
 incrementa con cada flanco de subida del bit 28 y tiene en cuenta el alto de la
 imagen para hacer el cambio de columna de datos.
 
-% \subsection{Multiplier Acumulator Unit (MAC)}
+\subsection{Multiplier Acumulator Unit (MAC)}
 
-% \subsection{Memory Management Unit (MMU)}
+Las MACs son unidades que se instancian en paralelo, son las encargadas de
+hacer el calculo necesario para realizar la convolución. Poseen 9 registros
+donde se almacenan los coeficientes del kernel y 9 registros donde se almacenan
+los pixels de la porción del lote que se esta procesando en ese instante.
 
+Las MAC poseen un único puerto de entrada de datos, donde se ingresan 3
+coeficientes (correspondientes a una fila) del kernel o de una sección de lote
+según le sea indicado por una señal proveniente del Control Unit. Además se
+tiene otra señal de control donde se indica si los registros deben ser
+modificados o permanecer congelados.
+
+Luego de realizar la suma de los productos, el rango de los datos aumenta, por
+lo que antes de ponerlos a la salida, las MAC realizan un truncado sobre los resultados.
+
+La figura~\ref{conv_struct} muestra la estructura para realizar la operación,
+como el hardware combinacional de los productos en cascada con la suma tiene un
+tiempo de establecimiento de la salida mayor al período de reloj, se
+introdujeron registros entre el hardware de los productos y la suma. Si bien
+esto impacta en la latencia del bloque, la frecuencia de procesamiento se
+mantiene en un pixel procesado por ciclo de reloj. 
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.7]{conv_struct}
+\caption{Estructura donde se realiza el calculo dentro de una unidad MAC.}
+\label{conv_struct}
+\end{figure}
+
+\subsection{Memory Management Unit (MMU)}
+
+Este bloque, en cada iteración, mantiene un seguimiento de las posiciones de
+memoria donde el lote entrante debe ser almacenado, la información que debe
+alimentar a cada unidad MAC, la posición de memoria donde la información
+procesada debe ser almacenada y del orden en el cual la información procesada
+debe ser devuelta.
+
+Para cumplir con estas funciones, se basa en una máquina de estados finitos interna al módulo, donde cada estado corresponde a un conjunto de las posiciones citadas anteriormente.
+El número de estados está dado por el número de iteración de la ecuación:
+
+\begin{equation}\label{niter}
+  \frac{It}{m} = \frac{N}{k-1} + 1
+\end{equation}
+\bigskip
+
+Este bloque consta de un conjunto de multiplexores cuyas líneas o entradas de selección son manejadas por la máquina de estados mencionada, para así hacer el routing de la información entrante y saliente, como se ve en la figura resaltado en color azul:
+\begin{figure}
+\centering
+\includegraphics[scale=0.8]{arq_blue.png}
+\caption{Bloque MMU}
+\label{mmu_location}
+\end{figure}
+
+\bigskip
+Analizando la arquitectura interna de los bloques que conforman este módulo, el bloque data multiplexer está conformado por un conjunto de bloques más pequeños clasificados en dos clases acorde a la función que cumplen:
+\begin{frame}{}
+\begin{itemize}
+
+ \item \textbf{$MMB$(Memory Multiplexer Blocks)}
+  \item \textbf{$PMB$(Processing Multiplexer Blocks)}
+
+\end{itemize}
+\end{frame}
+
+
+Los $MMB$ hacen el routing de la información sin procesar (raw data) y la información desde las unidades $MAC$ hacia las memorias.
+Los $PMB$ hacen el routing de la información desde las memorias hacia las unidades $MAC$.\\
+\bigskip
+
+Este flujo se puede ver en la siguiente figura:
+\begin{figure}
+\centering
+\includegraphics[scale=0.9]{muxes}
+\caption{ Enrutamiento de información}
+\label{mmu_routing}
+\end{figure}
+Tanto los bloques $MMB$ como los $PMB$ tienen un numero de entradas proporcional al numero de estados de la $FSM$ interna del bloque $MMU$. 
+Las entradas a sus multiplexores se definen respectivamente:
+\begin{equation}%\label{niter}
+  O_j^i = O_{[(k-1)i+j]\%N}
+\end{equation}
+\begin{equation}%\label{niter}
+  M_j^i = M_{(iN+j)\%(N+k-1)}
+\end{equation}
+\\
+donde el símbolo $ \% $ representa la operación módulo, e $i$ toma valores desde $0$ a $It-1$.
+
+\bigskip
+\bigskip
+\begin{figure}
+\centering
+\includegraphics{muxes_cont}
+\caption{ Estructura de los bloques MMB y PMB}
+\label{mmu_structure}
+\end{figure}
 % \subsection{Storage}
 \subsection{Almacenamiento}\label{storage_subsecc}
 Los coeficientes del kernel se almacenan en registros dentro de cada MAC Unit.
@@ -207,7 +299,7 @@ Esto permite reducir la cantidad de memoria necesaria, ya que reúsa la misma me
 Para un kernel de  $(k \times k)$, cada MAC Unit toma $k$ columnas de memoria
 adyacentes como entrada.
 
-El bloque $MAC$  $Unit$ necesita primero que se carguen k pixeles de cada
+El bloque $MAC$ $Unit$ necesita primero que se carguen k pixeles de cada
 columna para asi tener $(k \times k)$ pixeles cargados dentro de ella para así
 producir el primer pixel procesado.
 
@@ -217,9 +309,9 @@ Finalmente se trunca el resultado, y se almacena el mismo en la primera posició
 
 Una vez que se procesa un pixel, se almacena en la memoria mientras bloque $MAC$  $Unit$ efectua un desplazamiento (shift) de sus registros en donde se almacenan pixeles de la imagen, para asi descartar los k pixeles mas antiguos,
  y se cargan los $k$ nuevos pixeles, es decir, uno de cada columna de entrada, lo que es equivalente a una estructura FIFO (First Input – First Output).
-Se sincroniza lo mencionado anteriormente de forma tal de obtener un pixel por cada ciclo de clock.
-
-Este procedimiento es equivalente a desplazar verticalmente el kernel sobre la imagen:
+Se sincroniza lo mencionado anteriormente de forma tal de obtener un pixel por
+cada ciclo de reloj. Este procedimiento es equivalente a desplazar verticalmente
+el kernel sobre la imagen como muestra la figura~\ref{verticaldesp}.
 
 \begin{figure}
 \centering
@@ -227,7 +319,6 @@ Este procedimiento es equivalente a desplazar verticalmente el kernel sobre la i
 \caption{Desplazamiento vertical del kernel sobre la imagen }
 \label{verticaldesp}
 \end{figure}
-
 
 El módulo $AGU$ maneja las direcciones de memoria, tanto lectura como de escritura, teniendo en cuenta la latencia desde que un pixel se carga en bloque $MAC$ $Unit$ hasta que el pixel procesado correspondiente sea almacenado.
 Todo lo mencionado anteriormente fue de manera genérica sobre una sola MAC Unit, pero ahora se explicara como poder trabajar en el sistema con mas de uno de estos modulos instanciados en paralelo:
@@ -355,65 +446,3 @@ manteniéndolos independientes al grado de paralelismo del sistema y al número 
 \bigskip
 
 \section {MMU (Memory Managment Unit) }  \label{mmu_subsecc}
-Este bloque, en cada iteración, mantiene un seguimiento de las posiciones de memoria donde el lote entrante debe ser almacenado,
-la información que debe alimentar a cada unidad $MAC$, lLa posición de memoria donde la información procesada debe ser almacenada
-y del orden en el cual la información procesada debe ser devuelta.
-
-Para cumplir con estas funciones, se basa en una máquina de estados finitos interna al módulo, donde cada estado corresponde a un conjunto de las posiciones citadas anteriormente.
-El número de estados está dado por el número de iteración de la ecuación:
-
-\begin{equation}\label{niter}
-  \frac{It}{m} = \frac{N}{k-1} + 1
-\end{equation}
-\bigskip
-
-Este bloque consta de un conjunto de multiplexores cuyas líneas o entradas de selección son manejadas por la máquina de estados mencionada, para así hacer el routing de la información entrante y saliente, como se ve en la figura resaltado en color azul:
-\begin{figure}
-\centering
-\includegraphics[scale=0.8]{arq_blue.png}
-\caption{Bloque MMU}
-\label{mmu_location}
-\end{figure}
-
-\bigskip
-Analizando la arquitectura interna de los bloques que conforman este módulo, el bloque data multiplexer está conformado por un conjunto de bloques más pequeños clasificados en dos clases acorde a la función que cumplen:
-\begin{frame}{}
-\begin{itemize}
-
- \item \textbf{$MMB$(Memory Multiplexer Blocks)}
-  \item \textbf{$PMB$(Processing Multiplexer Blocks)}
-
-\end{itemize}
-\end{frame}
-
-
-Los $MMB$ hacen el routing de la información sin procesar (raw data) y la información desde las unidades $MAC$ hacia las memorias.
-Los $PMB$ hacen el routing de la información desde las memorias hacia las unidades $MAC$.\\
-\bigskip
-
-Este flujo se puede ver en la siguiente figura:
-\begin{figure}
-\centering
-\includegraphics[scale=0.9]{muxes}
-\caption{ Enrutamiento de información}
-\label{mmu_routing}
-\end{figure}
-Tanto los bloques $MMB$ como los $PMB$ tienen un numero de entradas proporcional al numero de estados de la $FSM$ interna del bloque $MMU$. 
-Las entradas a sus multiplexores se definen respectivamente:
-\begin{equation}%\label{niter}
-  O_j^i = O_{[(k-1)i+j]\%N}
-\end{equation}
-\begin{equation}%\label{niter}
-  M_j^i = M_{(iN+j)\%(N+k-1)}
-\end{equation}
-\\
-donde el símbolo $ \% $ representa la operación módulo, e $i$ toma valores desde $0$ a $It-1$.
-
-\bigskip
-\bigskip
-\begin{figure}
-\centering
-\includegraphics{muxes_cont}
-\caption{ Estructura de los bloques MMB y PMB}
-\label{mmu_structure}
-\end{figure}
