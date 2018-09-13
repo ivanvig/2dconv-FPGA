@@ -1,22 +1,27 @@
+\chapter{Apéndice}
 \section{Proceso de escritura en memoria}  \label{writing_subsecc}
-\smallskip
-Se analiza el caso de tener instanciadas $N=4$, $MACs$ y un kernel con $k=3$ para clarificar la operación del algoritmo descrito.
-El proceso de escritura en memoria, utilizando el desplazamiento circular de columnas mencionado.\\
+
+Se analiza el caso de tener instanciadas $N=4$, $MACs$ y un kernel con $k=3$
+para clarificar la operación del algoritmo descrito. El proceso de escritura en
+memoria, utilizando el desplazamiento circular de columnas mencionado.
 
 Como consideramos un kernel con $k=3$ y $N=4$, $MACs$:
-\begin{frame}{}
 	    
-      \begin{itemize}
-        \item Se necesitan o requieren N+k-1=4+3-1=6 columnas de memoria
-	\item En la primera iteración, se cargan las memorias 1 a 6 con el nuevo lote (donde cada memoria instanciada alberga una columna del lote) y el resultado se almacena en las memorias 1 a 4, marcadas con otro color y en la etapa run  out.
-	\item En la segunda iteración, los datos del nuevo lote se cargan sin sobrescribir las memorias 5 y 6 . Luego del procesamiento, se almacenan los datos comenzando en la memoria  5 hasta la última, para luego sobrescribir los datos del lote previo desde el principio.
-
-\bigskip
-\bigskip
-Lo anterior se puede apreciar en la siguiente figura, donde se incluye una línea punteada que separa la etapa de carga y la de procesamiento y salida de dato:
-
+\begin{itemize}
+\item Se necesitan o requieren N+k-1=4+3-1=6 columnas de memoria
+\item En la primera iteración, se cargan las memorias 1 a 6 con el nuevo lote
+  (donde cada memoria instanciada alberga una columna del lote) y el resultado
+  se almacena en las memorias 1 a 4, marcadas con otro color y en la etapa run
+  out.
+\item En la segunda iteración, los datos del nuevo lote se cargan sin
+  sobrescribir las memorias 5 y 6 . Luego del procesamiento, se almacenan los
+  datos comenzando en la memoria  5 hasta la última, para luego sobrescribir los
+  datos del lote previo desde el principio.
 \end{itemize}
-\end{frame}
+
+Lo anterior se puede apreciar en la figura~\ref{writingprocess1}, donde se
+incluye una línea punteada que separa la etapa de carga y la de procesamiento y
+salida de dato
 
 \begin{figure}
 \centering
@@ -25,8 +30,10 @@ Lo anterior se puede apreciar en la siguiente figura, donde se incluye una líne
 \label{writingprocess1}
 \end{figure}
 
-Considerando ahora un kernel con $k=3$ y  $N=2$, $MACs$, se anexan graficos para ilustrar lo mencionado de forma mas clara, 
-donde se distinguen con colores las columnas involucradas y las etapas respectivas:
+Considerando ahora un kernel con $k=3$ y  $N=2$, $MACs$, las
+figuras~\ref{writingprocess2} y~\ref{writ_proc} intentan ilustrar lo mencionado
+de forma mas clara, donde se distinguen con colores las columnas involucradas y
+las etapas respectivas.
 
 \begin{figure}
 \centering
@@ -35,28 +42,28 @@ donde se distinguen con colores las columnas involucradas y las etapas respectiv
 \label{writingprocess2}
 \end{figure}
 
-\begin{figure}
+% \begin{figure}
+% \centering
+% \includegraphics[scale=0.5]{example_1}
+% \caption{Primera iteración con N=2, k=3 }
+% \label{writingprocess3}
+% \end{figure}
+
+
+% \begin{figure}
+% \centering
+% \includegraphics[scale=0.5]{example_2}
+% \caption{Siguiente iteración con N=2, k=3}
+% \label{writingprocess4}
+% \end{figure}
+
+\begin{figure}[!t]
 \centering
-\includegraphics[scale=0.7]{example_1}
-\caption{Primera iteración con N=2, k=3 }
-\label{writingprocess3}
+\subfloat[][Primera iteración]{\includegraphics[scale=0.5]{example_1}}
+\hfil
+\subfloat[][Iteración siguiente]{\includegraphics[scale=0.5]{example_2}}
+\caption{Escritura y lectura de memorias para $N=2$, $k=3$.}
+\label{writ_proc}
 \end{figure}
-
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.7]{example_2}
-\caption{Siguiente iteración con N=2, k=3}
-\label{writingprocess4}
-\end{figure}
-
-
-
-
-La lógica del sistema se implementa en el bloque $MMU$ ($Memory$ $Managment$ $Unit$), que sirve como interfaz entre las memorias y el resto de los componentes, 
-manteniéndolos independientes al grado de paralelismo del sistema y al número de iteración.
-
-\bigskip
-
-\clearpage
-\newpage
+% \clearpage
+% \newpage
