@@ -1,80 +1,56 @@
 \chapter{Implementación y resultados}  \label{implementations_sec}
- diseño e implementación
-El diseño fue implementado en una FPGA Xilinx Artix-35T (xc7a35ticsg324-1L) utilizando las herramientas del software
-Xilinx Vivado Design Suite 2017.4. Se trabajó con un clock de referencia de $100$ MHz, y el script para el pre-procesamiento 
-y el post-procesamiento fueron escritos en Python 2.7.
 
-Tanto los coeficientes del kernel como el correspondiente lote de imagen, se cargan a la placa a través
-del puerto UART. Si bien esta vía es lenta con respecto al tiempo de procesamiento, se optó por utilizarla
-debido a su simplicidad y al bajo consumo de recursos comparado a otros medios de transmisión.
+\section{Especificaciones}
 
-En lo que refiere a representación de datos, se trabajó con aritmética en punto fijo, con una
-resolución de $U(8,0)$ para la imagen de entrada y salida (imagen procesada), y $S(8,7)$ para el kernel.
+El diseño fue implementado en una FPGA Xilinx Artix-35T (xc7a35ticsg324-1L)
+utilizando las herramientas del software Xilinx Vivado Design Suite 2017.4. Se
+trabajó con un clock de referencia de $100$ MHz, y el script para el
+pre-procesamiento y el post-procesamiento fueron escritos en Python 2.7. 
 
+Tanto los coeficientes del kernel como el correspondiente lote de imagen, se
+cargan a la placa a través del puerto UART. Si bien esta vía es lenta con
+respecto al tiempo de procesamiento, se optó por utilizarla debido a su
+simplicidad y al bajo consumo de recursos comparado a otros medios de
+transmisión.
+
+En lo que refiere a representación de datos, como se explica en la
+sección~\ref{fixedpoint}, se trabajó con aritmética en punto fijo, con una
+resolución de $U(8,0)$ para la imagen de entrada y salida (imagen procesada), y
+$S(8,7)$ para el kernel.
+
+\section{Verificación}
 
 Para verificar el comportamiento del sistema. se armaron diferentes kernels
 en Python, y se aplicaron los mismos a una imagen de prueba. Luego, 
 se filtró a la imagen con los mismos kernels  pero utilizando la FPGA
-
 Los kernels que se utilizaron fueron: identidad $[0, 0, 0; 0, 1, 0; 0, 0,
 0]$ sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ y embossing $[-2, -1, 0; -1,
-0, 1; 0, 1, 2]$.\\
+0, 1; 0, 1, 2]$. La figura~\ref{images_py_po} los resultados obtenidos.
 
-
-A la izquierda, se ve la imagen procesada con una $CPU$ utilizando Python, y a la derecha
-la misma imagen filtrada en la placa:
-
-
-\begin{figure}
+\begin{figure}[!t]
 \centering
-\includegraphics[scale=0.9]{identity_c}
-\caption{Kernel Identidad}
-\label{identity}
-\end{figure}
-\begin{figure}
-\centering
-\includegraphics[scale=0.9]{shaped_c}
-\caption{Sharpening Kernel}
-\label{sharp}
+\subfloat[][Identidad]{\includegraphics[scale=1.1]{identity_c}
+  \label{fig:identity}}
+\hfil
+\subfloat[][Sharpening]{\includegraphics[scale=1.1]{shaped_c}
+  \label{fig:share}}
+\hfil
+\subfloat[][Embossing]{\includegraphics[scale=1.1]{emboss_c2}
+\label{fig:embossing}}
+\caption{Comparación de resultados: A la izquierda, la imagen procesada en una CPU usando python y, a la
+  izquierda, la misma imagen procesada con el módulo en la FPGA.}
+\label{images_py_po}
 \end{figure}
 
-FALTA UNA QUE DICE TOO WIDE NOSE QUE MIERDA, Y NO LA SE PONER. TAMPOCO CON SUBFIG O SUBFLOAT, MUERTE A LATEX
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
-\bigskip
+\section{Utilización de recursos}
 
-%\begin{figure}
-%\centering
-%\includegraphics[]{emboss2_c}
-%\caption{Embossing Kernel}
-%\label{emboss}
-%\end{figure}
-
-
-
-
-La arquitectura se sintetizó para diferentes grados de paralelismo.
-La tabla Tabla~\ref{res_table} muestra la complejidad del modulo y el microprocesador en la FPGA
-con y sin el uso de DSP respectivamente, medida por la utilización de recursos.
-Se ve un incremento lineal acorde al grado de paralelismo en el sistema. Debido a las limitaciones de la FPGA utilizada,
-se llegó a instanciar $8$ $MAC$ $units$ para que operen en pparalelo con DSP, y $24$ sin el uso de DSP pero con
-una utilizacióon de $LUTs$ mas intensiva.
+La arquitectura se sintetizó para diferentes grados de paralelismo. La tabla
+Tabla~\ref{res_table} muestra la complejidad del módulo y el microprocesador en
+la FPGA con y sin el uso de DSP respectivamente, medida por la utilización de
+recursos. Se ve un incremento lineal acorde al grado de paralelismo en el
+sistema. Debido a las limitaciones de la FPGA utilizada, se llegó a instanciar
+$8$ $MAC$ $units$ para que operen en pparalelo con DSP, y $24$ sin el uso de DSP
+pero con una utilización de $LUTs$ más intensiva.
 
 \begin{table}
 % increase table row spacing, adjust to taste
@@ -100,32 +76,30 @@ una utilizacióon de $LUTs$ mas intensiva.
 \end{tabular}           
 \end{table}
 
+También se realizó una comparación, mostrada en la figura~\ref{bram_n}, entre la
+utilización de BRAM estimada, y los resultados obtenidos de la síntesis. Se
+efectuó una normalización con respecto al porcentaje de utilización de BRAM
+dividiendo el máximo valor de porcentaje de utilización, y considerando que la
+instancia del microblaze ya ocupa $18\%$ de los recursos BRAM.
+Puede observarse que el comportamiento lineal anticipado por los
+cálculos teóricos, es consistente con los resultados de la síntesis.
 
-
-También se realizó una comparación entre la utilización de BRAM estmidada, y los resultados
-obtenidos de la síntesis.\\
-
-Se efectuó una normalización con respecto al porcentaje de utilización de BRAM dividiendo el máximo
-valor de porcentaje de utilización, y considerando que la instancia del microblaze ya ocupa $18\%$
-de los recursos BRAM. 
 \begin{figure}
 \centering
 \includegraphics[scale=0.3]{BRAM_c2}
-\caption{Normalized curve for BRAM resources utilization.}
+\caption{Curva normalizada para la utilización de los recursos de BRAM.}
 \label{bram_n}
 \end{figure}
 
-Puede observarse que el comportamiento lineal anticipado por los
-cálculos teóricos, es consistente con los resultados de la síntesis.\\
+\section{Throughput}
 
+Considerando únicamente la operación de convolución, es decir, no teniendo en
+cuenta el tiempo necesario para cargar la imagen en memoria, se obtiene un pixel
+por ciclo de clock ($100$ Mhz) por cada $MAC$ $Unit$ instanciada. 
 
-Considerando únicamente la operación de convolución, es decir, no teniendo en cuenta el tiempo
-necesario para cargar la imagen en memoria, se obtiene un pixel por ciclo de clock ($100$ Mhz) por
-cada $MAC$ $Unit$ instanciada.
-\bigskip
-
-El throughput incrementa linealmente con el grado de paralelismo. La tabla \ref{conv_tp} muestra el throughput
-obtenido para los diferentes grados de paralelismo.
+El throughput incrementa linealmente con el grado de paralelismo. La tabla
+\ref{conv_tp} muestra el throughput obtenido para los diferentes grados de
+paralelismo.
 
 \begin{table}
 % increase table row spacing, adjust to taste
