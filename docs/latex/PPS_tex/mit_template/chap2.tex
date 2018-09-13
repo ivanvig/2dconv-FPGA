@@ -5,7 +5,11 @@ Describiremos el diseño confeccionado en detalle. Se tienen tres etapas fundame
 
 \begin{itemize}
 \item \textbf{Pre-procesamiento:} consiste en capturar la imagen aplicando las
-  transformaciones mencionadas en la sección \ref{dynamicrange} y \ref{fixedpoint}, empleando un script hecho en Python. Este script divide la imagen en lotes o batches y los envía a la FPGA, a través del puerto UART. Un batch o lote, consiste en columnas contiguas de pixeles cuya dimensión se explica en la sección x.
+  transformaciones mencionadas en la sección \ref{dynamicrange} y
+  \ref{fixedpoint}, empleando un script hecho en Python. Este script divide la
+  imagen en lotes o batches y los envía a la FPGA, a través del puerto UART. Un
+  batch o lote, consiste en columnas contiguas de pixeles cuya dimensión se
+  explica en la sección x. %TODO: agregar seccion
     %% Poner seccion aca
 \item \textbf{Procesamiento:}	: el batch es convolucionado con el kernel dentro del módulo. Dicho kernel es configurable, y el usuario puede cargar los coeficientes del mismo mediante el GPIO. 
   Cuando la operación de la convolucion finaliza, una notificación es enviada a
@@ -316,7 +320,7 @@ cero a medida que $N$ incrementa. El abordaje de las entradas compartidas con
 desplazamiento circular es el caso óptimo donde no hay información redundante
 transferida.
 
-\begin{figure}[!t]
+\begin{figure}%[!t]
 \centering
 \subfloat[][Cantidad de memoria requerida.]{\includegraphics[scale=0.3]{mem_space2}%
 \label{mem}}
