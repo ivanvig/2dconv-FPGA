@@ -21,3 +21,4 @@ The hardware design implemented here was published in Argentina's [CASE 2018](ht
 - [Ivan Vignolles](https://github.com/martincasabella)
 - [Martin Casabella](https://github.com/martincasabella)
 - [Sergio Sulca](https://github.com/ser0090)
+- [Ariel Pola](https://github.com/apola83)
