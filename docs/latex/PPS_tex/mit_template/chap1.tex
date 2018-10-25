@@ -6,6 +6,17 @@
 %% prompt when you run the file main.tex through LaTeX.
 \chapter{Introducción}\label{intro_secc}
 
+El filtrado y procesamiento de imágenes es utilizado en múltiples campos, como
+la medicina, ingeniería, navegación, aeronáutica, entre otros. En el campo de la
+inteligencia artificial, área emergente que es de mero interés hoy en día, la
+convolución en 2D es la operación principal que se realiza en una CNN (Red
+neuronal Convolucional)~\cite{Lecun-et-al-1998}.
+
+Dada su naturaleza, la operación de convolución en 2-D es la más empleada en los
+algoritmos de procesamiento de imágenes. El paralelismo inherente de algoritmos
+basados en la convolución es explotado logrando alta performance en estos
+sistemas que los utilizan.
+
 La convolucion bidimensional, se define matemáticamente como:
 \begin{equation}\label{conv-org}
   G(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K(i,j)I(x-i,y-j)
@@ -14,6 +25,26 @@ Donde $I(x,y)$ es una imagen de $(m \times n)$ pixels, $K(i,j)$ un conjunto de
 coeficientes denominado kernel, de tamaño $(k \times k)$ and $G(x,y)$ es la
 convolucion resultante de tamaño  $(m-2 \times n-2)$ pues se considera una
 \textit{valid convolution}~\cite{validconv}. 
+
+El uso de Field Programmable Gate Arrays (FPGAs) para implementar este tipo de
+sistemas, se debe a la ventaja que presentan estos dispositivos en lo que
+concierne al paralelismo a nivel bit, pixel, vecindad y a nivel tarea, lo
+incrementa la performance y velocidad de cómputo.~\cite{papercnn}
+
+Existen múltiples ejemplos en la literatura de implementaciones de convolución
+2D. Como se muestra en~\cite{paper3}, la BRAM es uno de los elementos
+mas usados con el consumo de energía mas alto. Las arquitecturas que se
+encuentran se pueden clasificar en dos grupos, aquellas que consideran un
+almacenamiento total de la imagen~\cite{paper1, paper5} y las que consideran un
+almacenamiento parcial donde la imagen se particiona en
+segmentos~\cite{paper2,paper4}. El problema que se encuentra en estos esquema es
+la falta de modularización del procesamiento, lo que dificulta mejorar la frecuencia
+de trabajo incrementado el paralelismo.
+
+En este trabajo presentamos el concepto del reuso dinámico de BRAM en
+convolución 2D y la complejidad de su implementación para arquitecturas con
+paralelismo. Además, proponemos una arquitectura modular que facilita la
+escalabilidad.
 
 \section{Preprocesamiento}\label{dynamicrange}
 
