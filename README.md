@@ -6,6 +6,7 @@ This is the code corresponding to the implementation of the hardware design desc
 
 <p style="text-align: center;">
 <img src=docs/schematics/general-blockdiagram.png width=75%>
+  
 *Simplified block diagram of the system.*
 </p>
 
