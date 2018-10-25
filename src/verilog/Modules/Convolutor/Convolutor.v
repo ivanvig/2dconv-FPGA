@@ -5,7 +5,7 @@
 `define CONV_LPOS   13
 `define M_LEN       3
 
-module Conv #(
+module Convolutor #(
     parameter BIT_LEN       = `BIT_LEN,
     parameter CONV_LEN      = `CONV_LEN,
     parameter CONV_LPOS     = `CONV_LPOS,
@@ -19,7 +19,8 @@ module Conv #(
     input i_selecK_I, //KI=0 modo kernle k=1 modo imagen
     input i_reset,
     input i_valid,
-    input CLK100MHZ
+    input i_CLK
+    
     );
     // registros del kernel
     // [j][i] Primero columnas luego filas
@@ -34,14 +35,14 @@ module Conv #(
 
     wire signed [CONV_LEN-1:0]   resultado;
     
-    wire signed [(2*BIT_LEN)-1:0] array_prod [0:(M_LEN*M_LEN)-1];
+    reg signed [(2*BIT_LEN)-1:0] array_prod [0:(M_LEN*M_LEN)-1];
 
-    integer ptr0 , ptr1;
+    integer ptr0 , ptr1, i;
     integer shift;
 
     //Asigancion de Convolucion a la salida
     assign {o_data[CONV_LPOS-1],o_data[CONV_LPOS-2:0]}= {~conv_reg[CONV_LPOS-1], conv_reg[CONV_LPOS-2:0]};
-    always @( posedge CLK100MHZ) begin
+    always @( posedge i_CLK) begin
         if(i_reset) begin
             //reset valores de imagen y kernel
             for(shift=0; shift < M_LEN; shift = shift +1) begin
@@ -60,7 +61,7 @@ module Conv #(
                     
                     imagen[M_LEN-1]<={i_dato2,i_dato1,i_dato0};
                     //latcheo de la salida 
-                    conv_reg<= resultado[CONV_LEN-1:CONV_LEN-CONV_LPOS];
+                    conv_reg<= resultado[CONV_LEN-2:CONV_LEN-CONV_LPOS-1];
                 end
                 1'b0: begin
                     //kernel
@@ -84,6 +85,7 @@ module Conv #(
         end
     end
     //Arbol de Suma
+    /*
     generate
         genvar i;
         for(i = 0 ; i < (M_LEN*M_LEN) ; i=i+1) 
@@ -91,7 +93,15 @@ module Conv #(
                                     $signed(imagen[i/3][((i%3)+1)*BIT_LEN-1 -: BIT_LEN]);
         
     endgenerate
+     */
 
+    always@(posedge i_CLK)
+        for(i = 0 ; i < (M_LEN*M_LEN) ; i=i+1) begin
+            array_prod[i] =
+                $signed(kernel[i/3][((i%3)+1)*BIT_LEN-1 -: BIT_LEN])*
+                $signed(imagen[i/3][((i%3)+1)*BIT_LEN-1 -: BIT_LEN]);
+        end
+    
     always @(*) begin
         parcial0=0;
         for(ptr0 = 0 ; ptr0 < 4; ptr0 = ptr0 +1)begin

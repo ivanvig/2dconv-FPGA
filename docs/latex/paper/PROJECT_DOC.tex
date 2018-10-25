@@ -1,0 +1,1200 @@
+
+%% bare_conf_compsoc.tex
+%% V1.4b
+%% 2015/08/26
+%% by Michael Shell
+%% See:
+%% http://www.michaelshell.org/
+%% for current contact information.
+%%
+%% This is a skeleton file demonstrating the use of IEEEtran.cls
+%% (requires IEEEtran.cls version 1.8b or later) with an IEEE Computer
+%% Society conference paper.
+%%
+%% Support sites:
+%% http://www.michaelshell.org/tex/ieeetran/
+%% http://www.ctan.org/pkg/ieeetran
+%% and
+%% http://www.ieee.org/
+
+%%*************************************************************************
+%% Legal Notice:
+%% This code is offered as-is without any warranty either expressed or
+%% implied; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE! 
+%% User assumes all risk.
+%% In no event shall the IEEE or any contributor to this code be liable for
+%% any damages or losses, including, but not limited to, incidental,
+%% consequential,https://www.google.com/search?q=attention+convolutional+neural+network&ie=utf-8&oe=utf-8&client=firefox-b-ab o_diagramr any other damages, resulting from the use or misuse
+%% of any information contained here.
+%%
+%% All comments are the opinions http://www.bibtex.org/Using/of their respective authors and are not
+%% necessarily endorsed by the IEEE.
+%%
+%% This work is distributed under the LaTeX Project Public License (LPPL)
+%% ( http://www.latex-project.org/ ) version 1.3, and may be freely used,
+%% distributed and modified. A copy of the LPPL, version 1.3, is included
+%% in the base LaTeX documentation of all distributions of LaTeX released
+
+%% 2003/12/01 or later.
+%% Retain all contribution notices and credits.
+%% ** Modified files should be clearly indicated as such, including  **
+%% ** renaming them and changing author support contact information. **
+%%*************************************************************************
+
+
+% *** Authors should verify (and, if needed, correct) their LaTeX system  ***
+% *** with the testflow diagnostic prior to trusting their LaTeX platform ***
+% *** with production work. The IEEE's font choices and paper sizes can   ***
+% *** trigger bugs that do not appear when using other class files.       ***                          ***
+% The testflow support page is at:
+% http://www.michaelshell.org/tex/testflow/
+
+
+
+\documentclass[conference,compsoc,a4paper]{IEEEtran}
+% Some/most Computer Society conferences require the compsoc mode option,
+% but others may want the standard conference format.
+%
+% If IEEEtran.cls has not been installed into the LaTeX system files,
+% manually specify the path to it like:
+% \documentclass[conference,compsoc]{../sty/IEEEtran}
+
+
+
+
+
+% Some very useful LaTeX packages include:
+% (uncomment the ones you want to load)
+
+
+% *** MISC UTILITY PACKAGES ***
+%
+%\usepackage{ifpdf}
+% Heiko Oberdiek's ifpdf.sty is very useful if you need conditional
+% compilation based on whether the output is pdf or dvi.
+% usage:
+% \ifpdf
+%   % pdf code
+% \else
+%   % dvi code
+% \fi
+% The latest version of ifpdf.sty can be obtained from:
+% http://www.ctan.org/pkg/ifpdf
+% Also, note that IEEEtran.cls V1.7 and later provides a builtin
+% \ifCLASSINFOpdf conditional that works the same way.
+% When switching from latex to pdflatex and vice-versa, the compiler may
+% have to be run twice to clear warning/error messages.
+
+
+
+
+
+
+% *** CITATION PACKAGES ***
+%
+\ifCLASSOPTIONcompsoc
+  % IEEE Computer Society needs nocompress option
+  % requires cite.sty v4.0 or later (November 2003)
+  \usepackage[nocompress]{cite}
+  \usepackage{color}
+
+\else
+  % normal IEEE
+  \usepackage{cite}
+  \usepackage{color}
+  
+\fi
+% cite.sty was written by Donald Arseneau
+% V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
+% \cite{} output to follow that of the IEEE. Loading the cite package will
+% result in citation numbers being automatically sorted and properly
+% "compressed/ranged". e.g., [1], [9], [2], [7], [5], [6] without using
+% cite.sty will become [1], [2], [5]--[7], [9] using cite.sty. cite.sty's
+% \cite will automatically add leading space, if needed. Use cite.sty's
+% noadjust option (cite.sty V3.8 and later) if you want to turn this off
+% such as if a citation ever needs to be enclosed in parenthesis.
+% cite.sty is already installed on most LaTeX systems. Be sure and use
+% version 5.0 (2009-03-20) and later if using hyperref.sty.
+% The latest version can be obtained at:
+% http://www.ctan.org/pkg/cite
+% The documentation is contained in the cite.sty file itself.
+%
+% Note that some packages require special options to format as the Computer
+% Society requires. In particular, Computer Society  papers do not use
+% compressed citation ranges as is done in typical IEEE papers
+% (e.g., [1]-[4]). Instead, they list every citation separately in order
+% (e.g., [1], [2], [3], [4]). To get the latter we need to load the cite
+% package with the nocompress option which is supported by cite.sty v4.0
+% and later.
+
+
+
+
+
+% *** GRAPHICS RELATED PACKAGES ***
+%
+\renewcommand{\figurename}{Fig.}
+\ifCLASSINFOpdf
+  \usepackage[pdftex]{graphicx}
+  % declare the path(s) where your graphic files are
+  \graphicspath{{../../schematics/svg/}{../../schematics/imagenes/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  \DeclareGraphicsExtensions{.pdf,.jpeg,.png,.eps}
+\else
+  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
+  % will default to the driver specified in the system graphics.cfg if no
+  % driver is specified.
+  % \usepackage[dvips]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../eps/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.eps}
+\fi
+% graphicx was written by David Carlisle and Sebastian Rahtz. It is
+% required if you want graphics, photos, etc. graphicx.sty is already
+% installed on most LaTeX systems. The latest version and documentation
+% can be obtained at: 
+% http://www.ctan.org/pkg/graphicx
+% Another good source of documentation is "Using Imported Graphics in
+% LaTeX2e" by Keith Reckdahl which can be found at:
+% http://www.ctan.org/pkg/epslatex
+%
+% latex, and pdflatex in dvi mode, support graphics in encapsulated
+% postscript (.eps) format. pdflatex in pdf mode supports graphics
+% in .pdf, .jpeg, .png and .mps (metapost) formats. Users should ensure
+% that all non-photo figures use a vector format (.eps, .pdf, .mps) and
+% not a bitmapped formats (.jpeg, .png). The IEEE frowns on bitmapped formats
+% which can result in "jaggedy"/blurry rendering of lines and letters as
+% well as large increases in file sizes.
+%
+% You can find documentation about the pdfTeX application at:
+% http://www.tug.org/applications/pdftex
+
+
+
+
+
+% *** MATH PACKAGES ***
+%
+\usepackage{amsmath}
+% A popular package from the American Mathematical Society that provides
+% many useful and powerful commands for dealing with mathematics.
+%
+% Note that the amsmath package sets \interdisplaylinepenalty to 10000
+% thus preventing page breaks from occurring within multiline equations. Use:
+\interdisplaylinepenalty=2500
+% after loading amsmath to restore such page breaks as IEEEtran.cls normally
+% does. amsmath.sty is already installed on most LaTeX systems. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/pkg/amsmath
+
+
+
+
+
+% *** SPECIALIZED LIST PACKAGES ***
+%
+\usepackage{algorithmic}
+% algorithmic.sty was written by Peter Williams and Rogerio Brito.
+% This package provides an algorithmic environment fo describing algorithms.
+% You can use the algorithmic environment in-text or within a figure
+% environment to provide for a floating algorithm. Do NOT use the algorithm
+% floating environment provided by algorithm.sty (by the same authors) or
+% algorithm2e.sty (by Christophe Fiorio) as the IEEE does not use dedicated
+% algorithm float types and packages that provide these will not provide
+% correct IEEE style captions. The latest version and documentation of
+% algorithmic.sty can be obtained at:
+% http://www.ctan.org/pkg/algorithms
+% Also of interest may be the (relatively newer and more customizable)
+% algorithmicx.sty package by Szasz Janos:
+% http://www.ctan.org/pkg/algorithmicx
+
+
+
+
+% *** ALIGNMENT PACKAGES ***
+%
+\usepackage{array}
+% Frank Mittelbach's and David Carlisle's array.sty patches and improves
+% the standard LaTeX2e array and tabular environments to provide better
+% appearance and additional user controls. As the default LaTeX2e table
+% generation code is lacking to the point of almost being broken with
+% respect to the quality of the end results, all users are strongly
+% advised to use an enhanced (at the very least that provided by array.sty)
+% set of table tools. array.sty is already installed on most systems. The
+% latest version and documentation can be obtained at:
+% http://www.ctan.org/pkg/array
+
+
+% IEEEtran contains the IEEEeqnarray family of commands that can be used to
+% generate multiline equations as well as matrices, tables, etc., of high
+% quality.
+
+
+
+
+% *** SUBFIGURE PACKAGES ***
+\ifCLASSOPTIONcompsoc
+  \usepackage[caption=false,font=footnotesize,labelfont=sf,textfont=sf]{subfig}
+\else
+  \usepackage[caption=false,font=footnotesize]{subfig}
+\fi
+% subfig.sty, written by Steven Douglas Cochran, is the modern replacement
+% for subfigure.sty, the latter of which is no longer maintained and is
+% incompatible with some LaTeX packages including fixltx2e. However,
+% subfig.sty requires and automatically loads Axel Sommerfeldt's caption.sty
+% which will override IEEEtran.cls' handling of captions and this will result
+% in non-IEEE style figure/table captions. To prevent this problem, be sure
+% and invoke subfig.sty's "caption=false" package option (available since
+% subfig.sty version 1.3, 2005/06/28) as this is will preserve IEEEtran.cls
+% handling of captions.
+% Note that the Computer Society format requires a sans serif font rather
+% than the serif font used in traditional IEEE formatting and thus the need
+% to invoke different subfig.sty package options depending on whether
+% compsoc mode has been enabled.
+%
+% The latest version and documentation of subfig.sty can be obtained at:
+% http://www.ctan.org/pkg/subfig
+
+
+
+
+% *** FLOAT PACKAGES ***
+%
+%\usepackage{fixltx2e}
+% fixltx2e, the successor to the earlier fix2col.sty, was written by
+% Frank Mittelbach and David Carlisle. This package corrects a few problems
+% in the LaTeX2e kernel, the most notable of which is that in current
+% LaTeX2e releases, the ordering of single and double column floats is not
+% guaranteed to be preserved. Thus, an unpatched LaTeX2e can allow a
+% single column figure to be placed prior to an earlier double column
+% figure.
+% Be aware that LaTeX2e kernels dated 2015 and later have fixltx2e.sty's
+% corrections already built into the system in which case a warning will
+% be issued if an attempt is made to load fixltx2e.sty as it is no longer
+% needed.
+% The latest version and documentation can be found at:
+% http://www.ctan.org/pkg/fixltx2e
+
+
+%\usepackage{stfloats}
+% stfloats.sty was written by Sigitas Tolusis. This package gives LaTeX2e
+% the ability to do double column floats at the bottom of the page as well
+% as the top. (e.g., "\begin{figure*}[!b]" is not normally possible in
+% LaTeX2e). It also provides a command:
+%\fnbelowfloat
+% to enable the placement of footnotes below bottom floats (the standard
+% LaTeX2e kernel puts them above bottom floats). This is an invasive package
+% which rewrites many portions of the LaTeX2e float routines. It may not work
+% with other packages that modify the LaTeX2e float routines. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/pkg/stfloats
+% Do not use the stfloats baselinefloat ability as the IEEE does not allow
+% \baselineskip to stretch. Authors submitting work to the IEEE should note
+% that the IEEE rarely uses double column equations and that authors should try
+% to avoid such use. Do not be tempted to use the cuted.sty or midfloat.sty
+% packages (also by Sigitas Tolusis) as the IEEE does not format its papers in
+% such ways.
+% Do not attempt to use stfloats with fixltx2e as they are incompatible.
+% Instead, use Morten Hogholm'a dblfloatfix which combines the features
+% of both fixltx2e and stfloats:
+%
+% \usepackage{dblfloatfix}
+% The latest version can be found at:
+% http://www.ctan.org/pkg/dblfloatfix
+
+
+
+
+% *** PDF, URL AND HYPERLINK PACKAGES ***
+%
+%\usepackage{url}
+% url.sty was written by Donald Arseneau. It provides better support for
+% handling and breaking URLs. url.sty is already installed on most LaTeX
+% systems. The latest version and documentation can be obtained at:
+% http://www.ctan.org/pkg/url
+% Basically, \url{my_url_here}.
+
+
+
+
+% *** Do not adjust lengths that control margins, column widths, etc. ***
+% *** Do not use packages that alter fonts (such as pslatex).         ***
+% There should be no need to do such things with IEEEtran.cls V1.6 and later.
+% (Unless specifically asked to do so by the journal or conference you plan
+% to submit to, of course. )
+
+% correct bad hyphenation here
+\usepackage{amssymb}
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+
+\begin{document}
+%
+% paper title
+% Titles are generally capitalized except for words such as a, an, and, as,
+% at, but, by, for, in, nor, of, on, or, the, to and up, which are usually
+% not capitalized unless they are the first or last word of the title.
+% Linebreaks \\ can be used within to get better formatting as desired.
+% Do not put math or special symbols in the title.
+%\title{Bare Demo of IEEEtran.cls for\\ IEEE Computer Society Conferences}
+\title{Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing}
+
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+% \author{\IEEEauthorblockN{
+%     xxxxxx xxxxxxxxx,
+%     xxxxxx xxxxx,
+%     xxxx xxxxxxxxx,
+%     xxxxx xx xxxx
+%   }
+%   \IEEEauthorblockA{
+%     xxxxxxxxxx xx xxxxxxxx xxx xxxxxxxxxxx\\
+%     xxxxxxxxx xxxxxx \\
+%     xxxxxxx xxxxxxxx xxx, xxxxxxx xxxxxxxx, xxxxxxxxx\\
+%     xxxxx: xxxxxx.xxxxxxxxx@xxxxx.xxx, xxx.xxxx@xxxxx.xxx,
+%     xxxxxxxx@xxxxx.xxx, xxxxxxxxx@xxxxx.xxx}
+% }
+\author{\IEEEauthorblockN{
+    Martin Casabella,
+    Sergio Sulca,
+    Ivan Vignolles,
+    Ariel L. Pola
+  }
+  \IEEEauthorblockA{Department of Research and Development\\
+    Fundacion Fulgor \\
+    Ernesto Romagosa 518, C\'ordoba X5016GQN, Argentina\\
+    Email: martin.casabella@gmail.com, ser.0090@gmail.com,
+    ivanmvig@gmail.com, arielpola@gmail.com}
+}
+% conference papers do not typically use \thanks and this command
+% is locked out in conference mode. If really needed, such as for
+% the acknowledgment of grants, issue a \IEEEoverridecommandlockouts
+% after \documentclass
+
+% for over three affiliations, or if they all won't fit within the width
+% of the page (and note that there is less available width in this regard for
+% compsoc conferences compared to traditional conferences), use this
+% alternative format:
+% 
+%\author{\IEEEauthorblockN{Michael Shell\IEEEauthorrefmark{1},
+%Homer Simpson\IEEEauthorrefmark{2},
+%James Kirk\IEEEauthorrefmark{3}, 
+%Montgomery Scott\IEEEauthorrefmark{3} and
+%Eldon Tyrell\IEEEauthorrefmark{4}}
+%\IEEEauthorblockA{\IEEEauthorrefmark{1}School of Electrical and Computer Engineering\\
+%Georgia Institute of Technology,
+%Atlanta, Georgia 30332--0250\\ Email: see http://www.michaelshell.org/contact.html}
+%\IEEEauthorblockA{\IEEEauthorrefmark{2}Twentieth Century Fox, Springfield, USA\\
+%Email: homer@thesimpsons.com}
+%\IEEEauthorblockA{\IEEEauthorrefmark{3}Starfleet Academy, San Francisco, California 96678-2391\\
+%Telephone: (800) 555--1212, Fax: (888) 555--1212}
+%\IEEEauthorblockA{\IEEEauthorrefmark{4}Tyrell Inc., 123 Replicant Street, Los Angeles, California 90210--4321}}
+
+
+
+
+% use for special paper notices
+%\IEEEspecialpapernotice{(Invited Paper)}
+
+
+
+
+% make the title area
+\maketitle
+
+% As a general rule, do not put math, special symbols or citations
+% in the abstract
+
+%abstract spanish
+%\begin{abstract}
+ %En este art\'iculo se presenta una arquitectura de hardware para realizar una
+ %convoluci\'on 2D en una FPGA cuando no se puede instanciar suficiente memoria
+ %RAM para poder alojar la imagen completa. Se prioriz\'o la velocidad de
+ %procesamiento, el uso eficiente de los recursos y un dise\~no escalable donde
+ %se pudieran agregar tantas operaciones de convoluci\'on en paralelo como se
+ %desee sin deber hacer grandes modificaciones en el dise\~no.
+%\end{abstract}
+
+
+\begin{abstract}
+  This paper presents a hardware architecture for two-dimensional (2D)
+  convolution implementation on a Xilinx Artix 7 FPGA platform when there is not
+  enough RAM memory to instantiate and store a complete image. Not only
+  processing speed is prioritized, but also efficient resource utilization and
+  scalability in design, so as to add as many convolution operations in parallel
+  as needed without requiring any major changes. In the proposed structure,
+ dynamic memory reuse is accomplished, with a linear increase in memory utilization
+ with respect to parallelism level.
+
+  % In this article, a hardware architecture for 2D convolution implementation on FPGA when
+  % there is not enough RAM memory for instantiate and store a complete image, is presented.
+  % Not only processing speed is prioritized, but also efficient resource utilization and scalability in design, 
+  % so as to add as many convolution operations in parallel as needed without requiring any major changes.
+\end{abstract}
+ 
+\noindent
+Keywords: FPGA, hardware architecture, convolution, kernel filter, multiplier-accumulator unit, image filtering
+
+
+
+
+% For peer review papers, you can put extra information on the cover
+% page as needed:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+%
+% For peerreview papers, this IEEEtran command inserts a page break and
+% creates the second title. It will be ignored for other modes.
+\IEEEpeerreviewmaketitle
+
+
+
+\section{Introduction}
+
+% The 2D discrete convolution is an operation widely used in multiple engineering
+% fields, in particular, it is one of the main operation in computer vision and
+% image processing. Recently the convolutional neural networks
+% (CNN)\cite{Lecun-et-al-1998} have dominated the field, hence a fast and
+% efficient convolution implementation is important.
+
+% There are different architectures to do a convolution in a FPGA, but most of them
+% ignore the FPGA's memory limitation, the ones who take it into account like
+% \cite{paper3} waste lots of resources to store the entire image. Another
+% approach is to work with batches like \cite{paper2} and \cite{paper4} which is the
+% approach we adopt.
+
+% Other important aspect is the pixel processing rate, the architectures in \cite{paper2} and
+% \cite{paper5} take 9 clock cycles to produce a processed pixel, \cite{paper1}
+% achieves a speed up to 221MP/sec but has a fixed kernel and does not take into
+% account the memory limitations.
+
+% In this paper, we propose a high throughput, parallelizable, memory efficient
+% hardware architecture with customizable kernel that can achieve up to 2.4GP/sec in pixel processing rate
+% and 135MP/sec if the load and output stage are taken into account.
+
+The origin of digital image processing is directly related to the development and evolution of computers. Most
+image filters that focus, blur, enhance edges and detect edges, among
+others, use convolution as a mathematical operation. Image processing is a very
+extensive research area with a large number of applications in multiple fields
+such as medicine, engineering, navigation, aeronautics, among others.
+Convolutional neural networks (CNN)~\cite{Lecun-et-al-1998} have received
+increasing attention in recent years. This technique uses a fast and efficient
+convolution implementation.
+
+The implementation of high-speed image processing systems in field programmable
+gate array (FPGA) has been a very active field. This is mainly due to the
+ability to take advantage of bit level parallelism, pixel level, neighborhood
+level and task level to increase computing performance and speed. In addition, FPGAs are
+reconfigurable, allowing the flexibility that is often desired in neural
+networks. This combination of parallel processing and flexibility at very high
+speed, is what makes FPGAs a platform of choice for the development of these
+areas~\cite{papercnn}.
+
+There are many examples in the literature of two-dimensional (2D) convolution
+implementations, where most of the work focuses on high performance, resource
+reduction and FPGA area efficiency. As shown in~\cite{paper3}, block random access
+memory (BRAM) is one of the most used elements with the highest energy
+consumption. Therefore, the architectures seek to reduce the use of BRAMs by
+dividing them into two groups that consider either total storage or partial storage of the
+image. The first of them increases processing by applying parallelization as
+well as reusing resources to reduce complexity~\cite{paper1,paper5}. On the
+other hand, architectures with partial storage partition the image into as many
+parts as convolders are used~\cite{paper2,paper4}. The drawback presented by
+these schemes is the non-modularization of processing, making it difficult to
+improve the work rate by increasing parallelism.
+
+In this work, we explain the concept of dynamic reuse of BRAM in 2D convolution
+and its complexity concerning implementation for parallel architectures. Moreover, we
+propose a modular architecture, where it is easy to appreciate that when the
+parallelism level increases, the complexity of BRAM increases linearly.
+
+This paper is organized as follows. Section~\ref{sec:preproc} introduces the
+image processing algorithm. The archicterure design is
+presented in section~\ref{sec:architecture}. In
+section~\ref{sec:implementation}, hardware implementation and experimental
+results are shown. Finally, conclusions are drawn in
+section~\ref{sec:conclusion}.
+
+%Existen diferentes tipos de arquitecturas para realizar la convolucion 2D en una FPGA, pero 
+%muchas de ellas referencia no se no tiene en cuenta el uso de la memoria. 
+%
+%En \cite{paper1} platea una arqutecura paralelizable, posee una tasa de 221 MP/s pero no tiene en cuenta las limitaciones de memoria. El kenel no es configurable.
+%
+%En \cite{paper2} realiza un preprocemiento, posprocesamiento y una carga de la imagen por lotes desde
+%una PC. Sin embargo se obtiene un restultado cada 9 ciclos de reloj.
+%
+%En \cite{paper3} se enfoca en el uso eficiente de la energia. Anque esta limitado a una imagen NxN y almacenada en memoria de la placa, esto utiliza el 90\% de los recursos.
+%
+%En \cite{paper4} al igual que \cite{paper2} se procesa y se carga la imagen por lotes. Pero la
+%cantidad de pixeles procesados por segundo es relativamente baja con respecto a \cite{paper2}.
+%
+%En \cite{paper5} similar a \cite{paper4}, con resutlados cada 9 ciclos de reloj y no se tiene en cuenta el uso de memoria.
+% 
+%Nosotros proponemos una arquitectura que permita la configuracion del kernel, 
+%haga un uso eficiente de memoria, tenga un high throughput , sea paralelizable y escalable.
+
+\section{Image Processing Algorithms}\label{sec:preproc}
+Given its local and two dimensional nature, 2-D Convolution is one of the most used image processing algorithms. 
+Inherent parallelism of the image convolution algorithm can be exploited to increase the performance.
+We focus our study on a more efficient design of 2D convolution technique
+to reduce the usage of  FPGA resources. 
+
+\subsection{Convolution Operation}
+
+Bidimensional convolution is mathematically defined as
+
+\begin{equation}\label{conv-org}
+  G(x,y) = \sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K(i,j)I(x-i,y-j)
+\end{equation}
+where $I(x,y)$ is an image of size $(m \times n)$ pixels, $K(i,j)$ is a set of
+coefficients called Kernel of size $(k \times k)$ and $G(x,y)$ is convolution
+result of size $(m-2 \times n-2)$ pixels because we are considered valid
+convolution~\cite{validconv}. 
+
+\subsection{Change of Dynamic Range}
+
+The images used for processing are grayscale because of its implementation simplicity, but the design can be extrapolated
+to multiple channel images by considering each channel as an independent grayscale image.
+ 
+
+The pixels of the grayscale images $I(x,y)$ have a dynamic range between
+$[0,255]$ and Kernel values $K(x,y)$ can be negative or positive. This work is
+part of a Deep Learning project where it is usual to operate with a dynamic
+range centered on zero. Therefore, we apply dynamic range expansion
+$(\mathcal{D}[.])$~\cite{dinamic_rango} and maximum norm
+$(\mathcal{M}[.])$~\cite{max_norm} to rearrange
+$\mathcal{D}[I(x,y)]=I^\prime(x,y)$ between $[0,1]$ and
+$\mathcal{M}[K(x,y)]=K^\prime(x,y)$ between $[-1,1]$, respectively. Therefore,
+replacing in~\eqref{conv-org}
+
+\begin{equation}\label{conv-org1}
+  G(x,y) = \mathcal{D}^{-1}\left[\sum_{i=0}^{m-1} \sum_{j=0}^{n-1}K^\prime(i,j)I^\prime(x-i,y-j)\right],
+\end{equation}
+where $\mathcal{D}^{-1}[.]$ is the dynamic range change between $[0,255]$ in the
+FPGA. Finally, all the processed blocks are reordered by software.
+The complete processing is described in Fig.~\ref{transformation}.
+
+
+\begin{figure}[!t]
+\centering
+\includegraphics[scale=0.47]{wflow3}
+\caption{Transformations of the dynamic range during the processing of the image.}
+\label{transformation}
+\end{figure}
+
+% Due to the data and convolution operation nature, a parallel approach it is much
+% more efficient than a sequential one in terms of speed. FPGAs were used for
+% system implementation, owing to the fact that these devices not only solve
+% parallelism requirement but also allow different hardware prototypes testing.
+
+% 2D discrete convolution is defined by the following equation:
+
+% \begin{equation}\label{conv-org}
+% S(x,y) = \sum_{i} \sum_{j}I(x-i,y-j)K(i, j)
+% \end{equation}
+% Following nowadays deep learning community tendency of no filter flipping, since
+% filter must be learnt anyway \cite{Goodfellow-et-al-2016}, cross correlation function is obtained:
+
+% \begin{equation}\label{conv}
+% S(x,y) = \sum_{i} \sum_{j}I(x+i,y+j)K(i, j)
+% \end{equation}
+% which will be implemented, so in the following sections every time convolution
+% operation is mentioned indicates a reference to eq. \ref{conv}
+
+% For simplicity, grey scale images were used, since only one channel is needed.
+
+% \section{Previous Analysis}\label{preproc}
+% The anlysis puropose is to work with a finite minimum representation for image
+% pixels and kernel values. 
+% To do this, a study about number of bits used effects in image representation was made. 
+
+% Pixels values \(I_{ij}\) range is [0, 255]. Dynamic range expansion
+% \cite{dinamic_rango} was used in order to rearrange values to [0, 1]. Kernel
+% values \(K_{ij}\) can be negative or positive. Thus maximum norm \cite{max_norm}
+% was also used to displace this range to [-1, 1], so that kernel effects are
+% maintained.
+
+%%% 
+% Signed fixed point representation\cite{fix_p} \textit{S(8,7)} for previous range
+% mentioned above. 
+
+% Convolution between image and a $3\times3$ kernel results in \textit{S(20,14)}. 
+% Hence, post processing is made and the outcoming result value
+% is shifted to positive range and truncated. Then, doing post-processing. 
+
+% Signal to Noise Ratio (SNR) measure between \textit{S(20,14)} output and error
+% produced by reducing bits number \(e_r=f(x)_{20b}-f(x)_{pos}\)\cite{srntesis} is
+% analyzed. \textit{S(13,8)} representation leads to \textit{30 [dB]} SNR that
+% shows filter effects with minimum data loss. This SNR value is acceptable
+% because the objective is achieved despite not getting a perfect image.
+
+%8 bits representation for image values is also achieved by using dynamic range
+%expansion, but maximun and minimun pixel value is needed after convolution. This
+%implies that full image stored is needed. 
+
+\section{Architecture Design}\label{sec:architecture}
+
+\subsection{Workflow}
+In this section, the design of the architecture is described in detail. The
+entire process is divided into three stages, pre-processing, processing and
+post-processing. The pre-processing consists of capturing the image and applying
+the described transformation in Section~\ref{sec:preproc} using a Python script.
+In addition, the script divides the image into batches and sends them through
+the UART port to the FPGA. A batch consists of contiguous pixel columns whose dimension is described in Section ~\ref{infstorage}. In the FPGA a microprocessor receives the information
+and transfers it to the convolution module using a 32 bits general purpose
+input-output (GPIO) port. This port writes the BRAMs that store filtered data.
+Due to FPGA size limitations, no other
+interface was used, such as Ethernet or direct memory access, to read the
+image directly from a storage device. However, the proposed architecture is
+indifferent to these methods. The second stage is the processing. The batch is
+convolved with the kernel inside the module, which is established by the user through
+the GPIO. When the operation ends, a notification is sent to the microprocessor,
+which gives the order to recover the processed batch from the module and sends it
+to the central processing unit (CPU). Finally, the post-processing stage combines
+the batches on the CPU using a Python script.
+
+% As shown in Fig. \ref{general}, the workflow consists of three
+% %The workflow consists of three
+% instances: first, in the PC a python script does the preprocessing described in
+% section \ref{preproc}, separates the image in batches and then sends the
+% kernel's coefficients and the first batch through an UART connection to the
+% FPGA. In the FPGA a microprocessor receives the information and communicates it
+% to the convolution module using a 32 bits GPIO port. The batch is then convolved
+% with the kernel inside the module. When the operation is finished a notification
+% is sent to the microprocessor, which gives the order to retrieve the processed
+% batch from the module and sends it to the PC and then waits for the next batch
+% to arrive.
+
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=3in]{workflow}
+%\caption{System's workflow and languages used in every instance}
+%\label{fig_workflow}
+%\end{figure}
+
+\subsection{Convolution Module}
+A simplified architecture of the module is shown in Fig. \ref{general}. The
+\textbf{control unit} is the one in charge of handling the communication with
+the processor and the \textbf{multiplier-accumulator (MAC) unit} executes the sum
+of the products of the kernel's coefficients with the pixels. The
+\textbf{address generation unit (AGU)} manages the memory addresses along with
+the \textbf{memory management unit (MMU)}, that decides how the values in memory
+are read and written. The last module is the \textbf{storage} one, which is
+implemented with a set of columns of the FPGA's block RAM. 
+
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3in]{general.pdf}
+\caption{Simplified block diagram of the convolution module implemented in FPGA.}
+\label{general}
+\end{figure}
+
+\subsubsection{States}
+The convolution module goes through several states during the work cycle, as
+shown in Fig.~\ref{state}. states transitions are controlled by coded
+instructions embedded in the 32-bits input frame, and the module remain in
+its current state until it receives a valid instruction.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[scale=0.55]{states.pdf}
+  \caption{State diagram that describes the transitions of events for the
+    processing of the image.}
+  \label{state}
+\end{figure}
+
+At the beginning the module must be in a \textbf{reset} state, waiting to be
+configured, so it must receive a reset signal. After receiving coded
+instruction, its is switched to the \textbf{KernelLoad} state, in which the
+kernel coefficients are loaded to the module. The next state is
+\textbf{SizeLoad} state where the image's height, i.e.  number of rows of BRAM, is
+loaded. The convolution method is explained in the section~\ref{infstorage}. The
+three previous states are executed once throughout the work cycle. The process
+is repeated for each new image.
+
+The following states define the processing cycle. First, the module goes to the
+\textbf{ImageLoad} state and stores the batch in FPGA's block RAM. Next state
+is the \textbf{Run} state where the processing occurs, and while processing is
+being made the module can not be interrupted. As a consequence, all instructions
+are ignored until the batch is completely processed. As soon as processing step
+ends, a notification is emitted through Control Unit's \textit{EoP} pin and
+the module waits for \textbf{Out} state switch instruction. After this transition, processed batch is sent back to the microprocessor.
+
+\subsubsection{Data storage}\label{infstorage}
+The kernel coefficients are stored in registers within each MAC unit. To store a
+batch, the proposed approach is to organize the block RAM in columns. Each block RAM column corresponds to one batch
+ column.
+Therefore, the batch size is given
+by the height of the image and the number of memory columns. In addition, the maximum
+height of the image must be less than or equal to memory column height.
+
+During batch processing, every pixel is read only once, so in order to do a
+more efficient use of the memory, the pixels that were already used are
+overwritten with processed pixels. This approach drastically reduces the amount
+of required memory because it reuses the same memory to store the input batch and the
+processed batch. In section~\ref{dataproc} additional aspects of the design
+that reduces even more the memory use are explained.
+
+\subsubsection{Data processing}\label{dataproc}
+For a $k\times k$ kernel, each MAC unit takes $k$ adjacent memory columns as
+input. The MAC unit first needs to load $k$ pixels from each columns so as to
+have $k\times k$ pixels loaded into it to produce the first processed
+pixel. Then it proceeds to multiply the pixels with the kernel's coefficients and
+sum every term. Finally, it truncates the result and stores it into memory first position.
+
+Once a pixel is processed, it is stored in the memory while the MAC unit shifts
+its image register, discarding the oldest $k$ pixels and loading new $k$ pixels,
+i.e. one from each input column identical to a first input first output (FIFO) structure.
+This procedure is equivalent to shifting the kernel vertically on the image. All
+these steps are synchronized in such a way that one processed pixel is generated
+in every clock cycle.
+
+The AGU manages read and write memory addresses taking into account the latency from the time
+a pixel is loaded into a MAC unit until the corresponding processed pixel is stored.
+
+Up to this point the analysis was over a single MAC unit, now the
+approach to work with multiple MAC units in parallel is
+described.
+
+As mentioned above, $k$ columns are needed as input to produce one processed
+column in a MAC unit, thus $2 \times k$ columns are needed for two MAC units.
+However, given the nature of convolution operation, to obtain a contiguous
+column it is necessary to shift the input columns by one. Hence, there is an
+overlap between two MAC units inputs which produce adjacent columns, so information can
+be shared.
+Consequently, despite $k$ input columns are still needed per MAC unit, only $k+1$
+different input columns are needed for given two units. 
+. 
+Therefore, for $N$ MAC units, the number of required memory columns is reduced from $N \times k$ to $N+k-1$, concluding
+that adding a new MAC unit only adds one new memory column.
+
+As a consequence of explained overlap, there is repeated data
+between one batch and the next one. In order to reduce data transmission, repeated
+information is kept in memory and only the missing part of 
+the incoming batch is transmitted. Given $N$ MAC units and a $k\times k$ kernel, a $N+k-1$
+batch width is necessary, but the processed batch has a width of $N$ columns, i.e.
+one for each MAC unit. So, the last $k-1$ memory columns are not overwritten and
+maintain the input data. This $k-1$ columns are reused as the first columns
+of the next batch, thus the transmitted batch width is reduced to $N$, with the exception of
+the first batch that maintains a width of $N+k-1$.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[scale=0.55]{algorithm}
+\caption{Memory writing process using circular shift for $N = 4$ MAC units and
+  Kernel $k = 3$.}
+\label{algorithm}
+\end{figure}
+
+Reusing memory columns written by the previous batch results in
+ a circular shift by $N$ places, shifting memory columns possition associated with each
+MAC unit, in each iteration.
+From the above it
+follows that a periodicity in the relation
+between the memory columns and the
+MAC unit's inputs must exist, where the period $It$ is the number of
+iterations necessary to get to the original memory columns - MAC units
+inputs relation, i.e. when $It(k-1)$ is a multiple of $N+k-1$. That is, there
+must be an integer $m$ such that 
+
+\begin{equation}\label{niter}
+  \frac{It}{m} = \frac{N}{k-1} + 1
+\end{equation}
+
+System logic is implemented in the MMU
+, which serves as an interface between the
+memories and the rest of the components, keeping them independent from the
+parallelism degree and the iteration number. An example of data-flow in memories is shown in Fig.~\ref{algorithm}.
+We consider a kernel $k=3$ and $N=4$ MAC units, thus 6 memory columns are needed. In the first iteration, memories 1 to 6 
+are loaded with the new batch, and the result is stored in memories 1 to 4. In the next iteration, data from a new batch 
+is loaded without overwriting memories 5 and 6. After processing step, the data is stored, starting from memory 5 up to the last
+one and then overwriting previous batch data from the beginning.
+
+The MMU keeps track of the memory positions where the input batch must be stored,
+the information that must be fed to every MAC unit, the memory position where
+the processed data must be stored and the order in which the processed data must
+be returned, for each iteration. To do so, it has a finite state machine where
+each state corresponds to a set of the aforementioned positions. The number of states
+is given by the iteratiotn number in eq.~\eqref{niter}.
+
+\begin{figure}[!t]
+\centering
+\subfloat[]{\includegraphics[scale=0.8]{muxes}%
+\label{dflow}}
+\hfil
+\centering
+\subfloat[]{\includegraphics[scale=0.6]{muxes_cont}%
+\label{int_struct}}
+\caption{\protect\subref{dflow} The data flow between the MACs and the
+  storage. \protect\subref{int_struct} The internal structure of MMB and PMB.}
+\label{muxes}
+\end{figure}
+
+The MMU has a set of multiplexers whose select lines are managed by the finite
+state machine (Fig.~\ref{general}) to route the incoming and outgoing data. The
+data multiplexer is conformed by a set of smaller blocks which are classified
+into two classes according to their function: memory multiplexer blocks (MMB)
+and processing multiplexer blocks (PMB). The MMB routes the raw data and the
+data from the MACs to a memory, whereas the PMB routes the data from the memories
+to a MAC. The information flow between
+memories$\rightarrow$MMU$\rightarrow$MACs$\rightarrow$MMU$\rightarrow$memories
+is shown in Fig.~\ref{muxes}. Both the MMBs and PMBs have a number of inputs
+proportional to the number of states from the MMU FSM and their multiplexers
+inputs are defined respectively as
+
+\begin{figure}[!t]
+\centering
+\subfloat[]{\includegraphics[scale=0.3]{mem_space2}%
+\label{mem}}
+\hfil %\vspace{0.1cm}
+\centering
+\subfloat[]{\includegraphics[scale=0.3]{data_sent}%
+\label{transmitted}}
+\caption{Comparison between different approaches. \protect\subref{mem} Amount of
+  memory required. \protect\subref{transmitted} Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.}
+\label{comp}
+\end{figure}
+
+
+\begin{equation}%\label{niter}
+  O_j^i = O_{[(k-1)i+j]\%N}
+\end{equation}
+\begin{equation}%\label{niter}
+  M_j^i = M_{(iN+j)\%(N+k-1)}
+\end{equation}
+where the symbol $\%$ represents the module operation and $i$ goes from $0$ to $It-1$.
+
+A comparison between the naive (which assigns $k$ independent
+memory columns to each MAC unit), the shared inputs and the
+shared inputs with circular shift approaches is shown in Fig.~\ref{comp}.
+Figure~\ref{mem} shows the amount of memory required as a function of the
+parallelism degree whereas Fig.~\ref{transmitted} shows the amount of transferred
+bytes (considering that every transmitted byte is stored in only one memory
+register) for processing a $1600\times1024$ image and a $3\times3$ kernel.
+
+As shown in Fig.~\ref{transmitted}, with the naive approach the transferred data is
+almost $3$ times the image size (because a $3\times3$ kernel) and it does not
+get affected by the parallelism degree. The shared inputs approach tends to
+diminish the redundant data transferred as $N$ increases, that is because the
+redundant data in a $N+k-1$ batch is $k-1$ and $\frac{k-1}{N+k-1}$ tends to zero
+as N increases. The shared inputs with circular shift approach is the best case
+scenario where no redundant data is transferred at all.
+
+
+% \begin{figure}[!t]
+% \centering
+% \subfloat[]{\includegraphics[scale=0.3]{mem_space2}%
+% \label{mem}}
+% \hfil \vspace{0.1cm}
+% \centering
+% \subfloat[]{\includegraphics[scale=0.3]{data_sent}%
+% \label{transmitted}}
+% \caption{Comparison between different approaches. \protect\subref{mem} Amount of
+%   memory required. \protect\subref{transmitted} Amount of data transmitted for an image of $1600\times1024$px and a $3\times3$ kernel.}
+% \label{comp}
+% \end{figure}
+
+\section{Implementation and Results}\label{sec:implementation}
+The design was implemented in a Xilinx Artix-35T FPGA (xc7a35ticsg324-1L) using
+Xilinx Vivado Design Suite 2017.4 tools. A $100$ MHz reference clock
+was synthesized. The script for pre-processing and post-processing was written in Python
+2.7.
+
+In the first instance the desired kernel coefficients are loaded followed by
+the corresponding image batch via UART\@. Although UART is slow with respect to
+the processing time, it is used because of its simplicity and low resource
+consumption compared with other transmission media.
+As far as data representation is concerned, fixed point arithmetic was used with
+a resolution of $U(8,0)$ for input and output image and $S(8,7)$ for kernel.
+
+To ensure the proper behavior of the architecture, multiple kernels were
+coded in python and applied to an image, and then the same kernels were applied
+using the FPGA module. The kernels used were identity $[0, 0, 0; 0, 1, 0; 0, 0,
+0]$ sharpening $[0, -1, 0; -1, 5, -1; 0, -1, 0]$ and embossing $[-2, -1, 0; -1,
+0, 1; 0, 1, 2]$. The results are shown in Fig.~\ref{images_py_po}. 
+
+
+\begin{figure}[!t]
+\centering
+\subfloat[]{\includegraphics[scale=1.1]{identity_c}
+  \label{fig:identity}}
+\hfil
+\subfloat[]{\includegraphics[scale=1.1]{shaped_c}
+  \label{fig:share}}
+\hfil
+\subfloat[]{\includegraphics[scale=1.1]{emboss_c2}
+\label{fig:embossing}}
+\caption{On the left, an image processed in a CPU using python and on the right the
+  same image processed with the FPGA module. The filters used are \protect\subref{fig:identity}
+  Identity Kernel, \protect\subref{fig:share} Sharpening Kernel and \protect\subref{fig:embossing} Embossing Kernel.}
+\label{images_py_po}
+\end{figure}
+
+The architecture was synthesized for different degrees of parallelism.
+Table~\ref{res_table} shows module and microprocessor complexity
+on the FPGA with and without DSP respectively, meassured by resource utilization. As a result, a linear increase is
+shown according to parallelism. Due to implemented FPGA limitations a
+parallelism up to 8 was achieved using DSP and up to 24 without DSP but with a
+more intensive LUT usage.
+
+\begin{table}[!t]
+% increase table row spacing, adjust to taste
+\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+\caption{Resource utilization table with and without DSP.}
+\label{res_table}
+\centering
+% some packages, such as mdw tools, offer better commands for making tables
+% than the plain latex2e tabular which is used here.
+\begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  & \multicolumn{3}{c|}{\textbf{With DSP [N](\%)}} & \multicolumn{3}{c|}{\textbf{Without DSP [N](\%)}} \\ \hline
+  \textbf{P}  & \textbf{DSP}            & \textbf{LUT}        & \textbf{BRAM}       & \textbf{DSP}         & \textbf{LUT}           & \textbf{BRAM}         \\ \hline
+  2  & 20(22)         & 1845(9)    & 10(20)     & ---         & 3168(15)      & 10(20)         \\ \hline
+  4  & 40(44)         & 2022(10)   & 11(22)     & ---         & 4627(22)      & 11(22)         \\ \hline
+  6  & 60(67)         & 2175(10)   & 12(24)     & ---         & 6063(29)      & 12(24)         \\ \hline
+  8  & 80(89)         & 2448(12)   & 13(26)     & ---         & 7756(37)      & 13(26)         \\ \hline
+  10 & ---            & ---        & ---        & ---         & 9328(45)      & 14(28)         \\ \hline
+  12 & ---            & ---        & ---        & ---         & 10917(52)     & 15(30)         \\ \hline
+  24 & ---            & ---        & ---        & ---         & 20209(97)     & 21(42)         \\ \hline
+\end{tabular}           
+\end{table}
+
+A comparison between the estimated BRAM utilization and the results obtained
+from synthesis is shown in Fig.~\ref{bram_n}. Normalization was made with
+respect to BRAM utilization percentage dividing by the maximun utilization
+percentage value, and considering that microblaze instance already occupies $18\%$
+of BRAM resources. It can be appreciated that the linear
+  behaviour anticipated by theoretical calculations is consistent with the
+  synthesis results.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[scale=0.3]{BRAM_c2}
+\caption{Normalized curve for BRAM resources utilization.}
+\label{bram_n}
+\end{figure}
+
+
+Considering only convolution operation processing, i.e. not taking into account
+the time needed to load the image into memory, one pixel per clock cycle ($100$ Mhz) is
+obtained per instantiated MAC unit. Thus, throughput increases linearly with
+parallelism degree. Table \ref{conv_tp} shows throughput obtained for
+different parallelism degrees.
+
+
+
+\begin{table}[!t]
+% increase table row spacing, adjust to taste
+\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+\caption{Throughput achieved in convolution processing.}
+\label{conv_tp}
+\centering
+% some packages, such as mdw tools, offer better commands for making tables
+% than the plain latex2e tabular which is used here.
+\begin{tabular}{|c|c|c|}
+ \hline
+  \textbf{Parallelism}  &    \textbf{Processing Speed [Mp/s]}  \\ \hline
+          2             &                     200              \\ \hline
+          4             &                     400              \\ \hline
+          8             &                     800              \\ \hline
+\end{tabular}           
+\end{table}
+% An example of a floating figure using the graphicx package.
+% Note that \label must occur AFTER (or within) \caption.
+% For figures, \caption should occur after the \includegraphics.
+% Note that IEEEtran v1.7 and later has special internal code that
+% is designed to preserve the operation of \label within \caption
+% even when the captionsoff option is in effect. However, because
+% of issues like this, it may be the safest practice to put all your
+% \label just after \caption rather than within \caption{}.
+%
+% Reminder: the "draftcls" or "draftclsnofoot", not "draft", class
+% option should be used if it is desired that the figures are to be
+% displayed while in draft mode.
+%
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=2.5in]{myfigure}
+% where an .eps filename suffix will be assumed under latex, 
+% and a .pdf suffix will be assumed for pdflatex; or what has been declared
+% via \DeclareGraphicsExtensions.
+%\caption{Simulation results for the network.}
+%\label{fig_sim}
+%\end{figure}
+
+% Note that the IEEE typically puts floats only at the top, even when this
+% results in a large percentage of a column being occupied by floats.
+
+
+% An example of a double column floating figure using two subfigures.
+% (The subfig.sty package must be loaded for this to work.)
+% The subfigure \label commands are set within each subfloat command,
+% and the \label for the overall figure must come after \caption.
+% \hfil is used as a separator to get equal spacing.
+% Watch out that the combined width of all the subfigures on a 
+% line do not exceed the text width or a line break will occur.
+%
+%\begin{figure*}[!t]
+%\centering
+%\subfloat[Case I]{\includegraphics[width=2.5in]{box}%
+%\label{fig_first_case}}
+%\hfil
+%\subfloat[Case II]{\includegraphics[width=2.5in]{box}%
+%\label{fig_second_case}}
+%\caption{Simulation results for the network.}
+%\label{fig_sim}
+%\end{figure*}
+%
+% Note that often IEEE papers with subfigures do not employ subfigure
+% captions (using the optional argument to \subfloat[]), but instead will
+% reference/describe all of them (a), (b), etc., within the main caption.
+% Be aware that for subfig.sty to generate the (a), (b), etc., subfigure
+% labels, the optional argument to \subfloat must be present. If a
+% subcaption is not desired, just leave its contents blank,
+% e.g., \subfloat[].
+
+
+% An example of a floating table. Note that, for IEEE style tables, the
+% \caption command should come BEFORE the table and, given that table
+% captions serve much like titles, are usually capitalized except for words
+% such as a, an, and, as, at, but, by, for, in, nor, of, on, or, the, to
+% and up, which are usually not capitalized unless they are the first or
+% last word of the caption. Table text will default to \footnotesize as
+% the IEEE normally uses this smaller font for tables.
+% The \label must come after \caption as always.
+%
+%\begin{table}[!t]
+%% increase table row spacing, adjust to taste
+%\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+%\caption{An Example of a Table}
+%\label{table_example}
+%\centering
+%% Some packages, such as MDW tools, offer better commands for making tables
+%% than the plain LaTeX2e tabular which is used here.
+%\begin{tabular}{|c||c|}
+%\hline
+%One & Two\\
+%\hline
+%Three & Four\\
+%\hline
+%\end{tabular}
+%\end{table}
+
+
+% Note that the IEEE does not put floats in the very first column
+% - or typically anywhere on the first page for that matter. Also,
+% in-text middle ("here") positioning is typically not used, but it
+% is allowed and encouraged for Computer Society conferences (but
+% not Computer Society journals). Most IEEE journals/conferences use
+% top floats exclusively. 
+% Note that, LaTeX2e, unlike IEEE journals/conferences, places
+% footnotes above bottom floats. This can be corrected via the
+% \fnbelowfloat command of the stfloats package.
+
+
+
+
+\section{Conclusion}\label{sec:conclusion}
+Using FPGA we are able to process the filtering at the same time as reading the
+current image batch. In this paper, we have presented the implementation of
+two-dimensional convolution on a Xilinx Artix 7 FPGA platform based on resource
+efficiency and system parallelism. We implemented a whole image processing
+system taking into account load stage, processing stage, and output stage.
+Moreover, a relation between instantiated BRAM blocks and MAC units was
+found in the presented architecture, which allows our system to work with different
+parallelism degrees.
+
+In addition, we optimized the use of memory resources implementing an algorithm
+for memory operations and module synchronization. Performances and results show that resources utilization
+concerning BRAM resources increase linearly, as desired.
+
+High throughput was achieved in what processing is concerned. On the other hand,
+the limiting factor that impacted the implemented system the most was UART speed
+transmission. Another limiting factor was the DSP48A1 slices. Both factors
+are easily solved by using an FPGA with more slices and
+resources.
+
+% conference papers do not normally have an appendix
+
+
+
+% use section* for acknowledgment
+\ifCLASSOPTIONcompsoc
+  % The Computer Society usually uses the plural form
+  \section*{Acknowledgments}
+%xxx xxxxxxx xxxxx xxxx xx xxxxx xxxx xxxxx xx xxxxx xxx xxxx xxxxxx xxxxxx xxx
+%xxxxxxxxxx xxxxxxxxxxxx xxxxxxx xxxxxx xxxxxxxxx xxxxxxxx xxxxxxxxx.
+The authors would like to thank PhD. Mario R. Hueda and PhD. Damian Morero for supporting their
+design through Fulgor fundation research program.
+
+
+
+
+\else
+  % regular IEEE prefers the singular form
+  \section*{Acknowledgment}
+\fi
+
+
+%%%% Para cuando vaya a incluirse: esto es acknowledgment
+%%
+%%The authors would like to thank PhD. Mario R. Hueda and PhD. Damian Morero for supporting their
+%%design through Fulgor fundation research program.
+
+
+
+
+% trigger a \newpage just before the given reference
+% number - used to balance the columns on the last page
+% adjust value as needed - may need to be readjusted if
+% the document is modified later
+%\IEEEtriggeratref{8}
+% The "triggered" command can be changed if desired:
+%\IEEEtriggercmd{\enlargethispage{-5in}}
+
+% references section
+
+% can use a bibliography generated by BibTeX as a .bbl file
+% BibTeX documentation can be easily obtained at:
+% http://mirror.ctan.org/biblio/bibtex/contrib/doc/
+% The IEEEtran BibTeX style support page is at:
+% http://www.michaelshell.org/tex/ieeetran/bibtex/
+%\bibliographystyle{IEEEtran}
+% argument is your BibTeX string definitions and bibliography database(s)
+%\bibliography{IEEEabrv,../bib/paper}
+%
+% <OR> manually copy in the resultant .bbl file
+% set second argument of \begin to the number of references
+% (used to reserve space for the reference number labels box)
+\enlargethispage{-5.7in}
+\bibliographystyle{IEEEtran}
+\bibliography{PROJECT_DOC}
+%\begin{thebibliography}{1}
+%
+%\bibitem{IEEEhowto:kopka}
+%H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
+  %0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+%
+%\end{thebibliography}
+
+
+
+
+% that's all folks
+\end{document}
+
+

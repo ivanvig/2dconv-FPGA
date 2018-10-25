@@ -1,6 +1,6 @@
 module MCU_CTRL
     #(
-      parameter N = 2,
+      parameter N = 16,
       parameter STATES = 3,
       localparam LOAD = 2'b00,
       localparam PROC = 2'b01,

@@ -50,7 +50,7 @@ module tb_FSM();
 	Fsmv#(  
 		.NB_ADDRESS(NB_ADDRESS),
 		.NB_IMAGE (NB_IMAGE),
-		.N_CONV (2))
+		.N_CONV (4))
 		u_Fsmv(
 			.o_readAdd(readAddress),
 			.o_writeAdd(writeAddress),
