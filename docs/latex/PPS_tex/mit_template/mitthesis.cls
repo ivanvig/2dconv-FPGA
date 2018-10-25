@@ -468,7 +468,10 @@ reserved.\par\permission}}
 \signature{Alumnos}{Casabella, Martin\\ Sulca, Sergio \\Vignolles, Ivan}
 \par
 \vfill
-\signature{Tutor}{Dr. Ing. Ariel Luis Pola}
+\signature{Tutor}{Dr. Ing. Mario Rafael Hueda}
+\par
+\vfill
+\signature{Supervisor}{Dr. Ing. Ariel Luis Pola}
 \par
 \vfill
 \signature{Institución}{Fundación Fulgor}
