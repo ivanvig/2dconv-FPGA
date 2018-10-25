@@ -4,7 +4,7 @@
 
 This is the code corresponding to the implementation of the hardware design described in [this paper](docs/PROJECT_DOC.pdf). It takes into account the reduced amount of memory available in the FPGA and makes an efficient use of those resources. It also achieves high throughout due to the pixel parallel processing.
 
-<p align="center">
+<p style="text-align: center;">
 <img src=docs/schematics/general-blockdiagram.png width=75%>
 *Simplified block diagram of the system.*
 </p>
