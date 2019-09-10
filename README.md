@@ -27,6 +27,7 @@ pages   = {145-150},
 isbn    = {978-987-46297-5-3},
 month   = {8},
 note    = {\url{https://drive.google.com/file/d/1yCnoOdT11zj-F6tbj7h3EdRZK2gGX1SY/view?usp=sharing}}
+}
 ```
 
 ## Authors
