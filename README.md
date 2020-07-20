@@ -17,7 +17,10 @@ For a more detailed design description see [this](docs/pps.pdf) (in Spanish)
 The hardware design implemented here was published in Argentina's [CASE 2018](http://www.sase.com.ar/case18/ ) as a technical forum. The paper in this repository can also be found in [CASE 2018 Collection of articles](https://drive.google.com/file/d/1yCnoOdT11zj-F6tbj7h3EdRZK2gGX1SY/view)
 
 ### Cite
-```
+If you use Containernet for your research and/or other publications,
+please cite the following paper to reference our work:
+
+```bibtex
 @article{2dconv-FPGA,
 author  = {Martin Casabella and Sergio Sulca and Ivan Vignolles and Ariel Pola},
 title   = {Dynamic Reuse of Memory in 2D Convolution Applied to Image Processing},
