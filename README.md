@@ -37,5 +37,5 @@ note    = {\url{https://drive.google.com/file/d/1yCnoOdT11zj-F6tbj7h3EdRZK2gGX1S
 
 - [Ivan Vignolles](https://github.com/martincasabella)
 - [Martin Casabella](https://github.com/martincasabella)
-- [Sergio Sulca](https://github.com/ser0090)
+- [Sergio Sulca](https://github.com/ssulca)
 - [Ariel Pola](https://github.com/apola83)
